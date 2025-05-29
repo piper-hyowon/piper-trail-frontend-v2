@@ -163,6 +163,7 @@ export interface TwoFactorRequest {
 }
 
 export interface AuthResponse {
+    requiresTwoFactor: boolean;
     accessToken: string; // 2단계 인증 완료시 포함
     refreshToken: string; // 2단계 인증 완료시 포함
     qrCodeDataUrl: string; // TOTP 설정 필요시(최초1 회)
