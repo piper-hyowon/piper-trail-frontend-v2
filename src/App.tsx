@@ -15,8 +15,9 @@ import {BLOG_CATEGORIES} from "./config/navigation.config.ts";
 import ProjectsPage from "./pages/ProjectsPage.tsx";
 import AboutPage from "./pages/AboutPage.tsx";
 import PostcardsPage from "./pages/PostcardsPage.tsx";
+import DolphinPage from "./pages/DolphinPage.tsx";
 
-const VALID_CATEGORIES = BLOG_CATEGORIES.map(e => e.name); // ['tech', 'food', 'books']
+const VALID_CATEGORIES = BLOG_CATEGORIES.map(e => e.name);
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -48,6 +49,8 @@ const App: React.FC = () => {
 
                                     {/*Interactive*/}
                                     <Route path="/postcards" element={<PostcardsPage/>}/>
+                                    <Route path="/dolphin" element={<DolphinPage/>}/>
+
 
 
                                     {/*Blog Category*/}
