@@ -5,6 +5,7 @@ import {theme, ThemeMode} from '../styles/theme';
 type ThemeContextType = {
     themeMode: ThemeMode;
     toggleTheme: () => void;
+    isDay: boolean;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
@@ -40,7 +41,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({children}) => 
 
     // TODO: error
     return (
-        <ThemeContext.Provider value={{themeMode, toggleTheme}}>
+        <ThemeContext.Provider value={{themeMode, toggleTheme, isDay: themeMode === 'light'}}>
             <StyledThemeProvider theme={currentTheme}>
                 {children}
             </StyledThemeProvider>
