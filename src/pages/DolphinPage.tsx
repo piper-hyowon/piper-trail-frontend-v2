@@ -1,6 +1,8 @@
-import React, {useState} from 'react';
-import styled, {keyframes, css} from 'styled-components';
+import React, {useState, useEffect} from 'react';
+import styled, {keyframes, css, createGlobalStyle} from 'styled-components';
 import {useLanguage} from "../context/LanguageContext.tsx";
+import {useNavigate} from "react-router-dom";
+import {useEasterEgg} from "../context/EasterEggDolphinContext.tsx";
 
 const fadeInBounce = keyframes`
   0% {
@@ -52,8 +54,18 @@ const bubbleFloat = keyframes`
   }
 `;
 
+const DolphinPageFont = createGlobalStyle`
+  @font-face {
+    font-family: 'DXcutecute';
+    src: url('/fonts/The Jamsil 3 Regular.ttf') format('truetype'); // TODO: 저작권 검색해보기
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+`;
+
 const DolphinContainer = styled.div`
-  min-height: 100vh;
+  min-height: 50vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -66,6 +78,9 @@ const DolphinContainer = styled.div`
   width: 100vw;
   margin: calc(-${({theme}) => theme.spacing.lg}) 0 calc(-${({theme}) => theme.spacing.lg}) 50%;
   transform: translateX(-50%);
+
+  /* DXcutecute 폰트 적용 */
+  font-family: 'DXcutecute', 'Comic Sans MS', cursive;
 `;
 
 const Title = styled.h1`
@@ -75,6 +90,8 @@ const Title = styled.h1`
   font-size: 2.5rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   animation: ${float} 3s ease-in-out infinite;
+  font-family: 'DXcutecute', 'Comic Sans MS', cursive;
+  font-weight: normal;
 
   @media (max-width: 768px) {
     font-size: 2rem;
@@ -118,7 +135,7 @@ const SpeechBubble = styled.div<{ $show: boolean }>`
   position: absolute;
   top: -20px;
   right: -50px;
-  background: white;
+  background: ${({theme}) => theme.colors.background};
   padding: ${({theme}) => theme.spacing.md};
   border-radius: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -140,7 +157,7 @@ const SpeechBubble = styled.div<{ $show: boolean }>`
     height: 0;
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
-    border-top: 15px solid white;
+    border-top: 15px solid ${({theme}) => theme.colors.background};;
     filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.1));
   }
 
@@ -169,11 +186,12 @@ const SpeechBubble = styled.div<{ $show: boolean }>`
 
 const SpeechText = styled.p`
   margin: 0;
-  color: ${({theme}) => theme.colors.text};
+  color: ${({theme}) => theme.colors.accent};
   font-size: 1rem;
   line-height: 1.4;
   text-align: center;
-  font-weight: 500;
+  font-weight: normal;
+  font-family: 'DXcutecute', 'Noto Sans KR', sans-serif;
 `;
 
 const ClickHint = styled.div<{ $show: boolean }>`
@@ -188,6 +206,7 @@ const ClickHint = styled.div<{ $show: boolean }>`
   transition: opacity 0.3s ease-in-out;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
   animation: ${float} 2s ease-in-out infinite;
+  font-family: 'DXcutecute', 'Comic Sans MS', cursive;
 
   @media (max-width: 768px) {
     bottom: 80px;
@@ -271,69 +290,106 @@ const dolphinTranslations = {
 };
 
 const DolphinPage: React.FC = () => {
-    const [showBubble, setShowBubble] = useState(false);
-    const [currentMessage, setCurrentMessage] = useState('');
-    const [clickCount, setClickCount] = useState(0);
-    const [isClicked, setIsClicked] = useState(false);
+        const navigate = useNavigate()
+        const [showBubble, setShowBubble] = useState(false);
+        const [currentMessage, setCurrentMessage] = useState('');
+        const [clickCount, setClickCount] = useState(0);
+        const [isClicked, setIsClicked] = useState(false);
+        const [isMounted, setIsMounted] = useState(false); // 마운트 상태 추가
+        const {setEasterEggUnlocked} = useEasterEgg();
+        const {language} = useLanguage();
+        const t = dolphinTranslations[language];
 
-    const {language} = useLanguage();
-    const t = dolphinTranslations[language];
+        useEffect(() => {
+            setIsMounted(true);
 
-    const handleDolphinClick = () => {
-        setIsClicked(true);
-        setClickCount(prev => prev + 1);
+            return () => {
+                setIsMounted(false);
+            };
+        }, []);
 
-        const randomMessage = t.messages[Math.floor(Math.random() * t.messages.length)];
-        setCurrentMessage(randomMessage);
-        setShowBubble(true);
+        useEffect(() => {
+            if (!isMounted) return;
 
-        setTimeout(() => {
-            setIsClicked(false);
-        }, 500);
-    };
+            const hasAccess = localStorage.getItem('dolphinAccess') === 'true';
 
-    const bubbles = Array.from({length: 8}, (_, i) => ({
-        delay: i * 0.5,
-        left: 10 + (i * 12)
-    }));
+            if (!hasAccess) {
+                navigate('/404');
+                return;
+            }
 
-    return (
-        <DolphinContainer>
-            {/* 배경 물방울들 */}
-            {bubbles.map((bubble, index) => (
-                <WaterBubble
-                    key={index}
-                    $delay={bubble.delay}
-                    $left={bubble.left}
-                />
-            ))}
+            setEasterEggUnlocked(true);
 
-            <Title>{t.title}</Title>
+        }, [isMounted, navigate, setEasterEggUnlocked]);
 
-            <DolphinImageContainer>
-                <DolphinImage
-                    src="/images/dolphin.png"
-                    alt={language === 'ko' ? '돌고래' : 'Dolphin'}
-                    onClick={handleDolphinClick}
-                    $clicked={isClicked}
-                />
+        useEffect(() => {
+            return () => {
+                if (isMounted) {
+                    localStorage.removeItem('dolphinAccess');
+                    setEasterEggUnlocked(false);
+                }
+            };
+        }, [isMounted, setEasterEggUnlocked]);
 
-                <SpeechBubble $show={showBubble}>
-                    <SpeechText>{currentMessage}</SpeechText>
-                </SpeechBubble>
-            </DolphinImageContainer>
+        const handleDolphinClick = () => {
+            setIsClicked(true);
+            setClickCount(prev => prev + 1);
 
-            <ClickHint $show={!showBubble}>
-                {t.clickHint}
-            </ClickHint>
+            const randomMessage = t.messages[Math.floor(Math.random() * t.messages.length)];
+            setCurrentMessage(randomMessage);
+            setShowBubble(true);
 
-            {clickCount > 5 && (
-                <ClickHint $show={true} style={{bottom: '60px', fontSize: '0.9rem'}}>
-                    {t.clickCount(clickCount)}
-                </ClickHint>
-            )}
-        </DolphinContainer>
-    );
-};
+            setTimeout(() => {
+                setIsClicked(false);
+            }, 500);
+        };
+
+        const bubbles = Array.from({length: 8}, (_, i) => ({
+            delay: i * 0.5,
+            left: 10 + (i * 12)
+        }));
+
+        return (
+            <>
+                <DolphinPageFont/>
+                <DolphinContainer>
+                    {/* 배경 물방울들 */}
+                    {bubbles.map((bubble, index) => (
+                        <WaterBubble
+                            key={index}
+                            $delay={bubble.delay}
+                            $left={bubble.left}
+                        />
+                    ))}
+
+                    <Title>{t.title}</Title>
+
+                    <DolphinImageContainer>
+                        <DolphinImage
+                            src="/images/dolphin.png"
+                            alt={language === 'ko' ? '돌고래' : 'Dolphin'}
+                            onClick={handleDolphinClick}
+                            $clicked={isClicked}
+                        />
+
+                        <SpeechBubble $show={showBubble}>
+                            <SpeechText>{currentMessage}</SpeechText>
+                        </SpeechBubble>
+                    </DolphinImageContainer>
+
+                    <ClickHint $show={!showBubble}>
+                        {t.clickHint}
+                    </ClickHint>
+
+                    {clickCount > 5 && (
+                        <ClickHint $show={true} style={{bottom: '130px', fontSize: '0.9rem'}}>
+                            {t.clickCount(clickCount)}
+                        </ClickHint>
+                    )}
+                </DolphinContainer>
+            </>
+        );
+    }
+;
 
 export default DolphinPage;
