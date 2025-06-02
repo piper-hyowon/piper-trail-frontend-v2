@@ -1,6 +1,6 @@
 import React, {useRef, useEffect, Suspense, useMemo, useState, useCallback} from 'react';
 import {Canvas, useFrame} from '@react-three/fiber';
-import {useGLTF, Environment, PerspectiveCamera, OrbitControls, Text} from '@react-three/drei';
+import {useGLTF, PerspectiveCamera, OrbitControls, Text} from '@react-three/drei';
 import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry.js';
 import {FontLoader} from 'three/examples/jsm/loaders/FontLoader.js';
 import {Font} from 'three/examples/jsm/loaders/FontLoader.js';
@@ -15,58 +15,86 @@ interface Mailbox3DProps {
     entries?: any[];
 }
 
+const STAMP_COLORS: Record<string, string> = {
+    'awesome': '#87CEEB',
+    'interesting': '#DDA0DD',
+    'helpful': '#90EE90',
+    'inspiring': '#FFE4B5',
+    'thank_you': '#FFDAB9',
+    'love_it': '#FFB6C1'
+};
+
+const STAMP_NAMES: Record<string, string> = {
+    'awesome': '멋져요',
+    'interesting': '흥미로워요',
+    'helpful': '도움돼요',
+    'inspiring': '영감받았어요',
+    'thank_you': '고마워요',
+    'love_it': '사랑해요'
+};
+
 const getStampColor = (stampId: string): string => {
-    const colors: Record<string, string> = {
-        'awesome': '#87CEEB',
-        'interesting': '#DDA0DD',
-        'helpful': '#90EE90',
-        'inspiring': '#FFE4B5',
-        'thank_you': '#FFDAB9',
-        'love_it': '#FFB6C1'
-    };
-    return colors[stampId] || '#cccccc';
+    return STAMP_COLORS[stampId] || '#cccccc';
 };
 
 const getStampName = (stampId: string): string => {
-    const names: Record<string, string> = {
-        'awesome': '멋져요',
-        'interesting': '흥미로워요',
-        'helpful': '도움돼요',
-        'inspiring': '영감받았어요',
-        'thank_you': '고마워요',
-        'love_it': '사랑해요'
-    };
-    return names[stampId] || '도장';
+    return STAMP_NAMES[stampId] || '도장';
 };
 
-function SafeText({text, position, size = 0.05, color = "#2c2c2c"}: any) {
-    const [font, setFont] = useState<Font | null>(null);
-    const [fontError, setFontError] = useState(false);
+let fontCache: Font | null = null;
+let fontLoadPromise: Promise<Font> | null = null;
 
-    useEffect(() => {
+const loadFont = (): Promise<Font> => {
+    if (fontCache) return Promise.resolve(fontCache);
+    if (fontLoadPromise) return fontLoadPromise;
+
+    fontLoadPromise = new Promise((resolve, reject) => {
         const loader = new FontLoader();
         const fontPaths = [
-            '/fonts/DXcutecute_Regular.json',
+            '/fonts/Ownglyph PDH Regular_Regular.json',
             'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json'
         ];
 
         const tryLoadFont = async (paths: string[]): Promise<void> => {
             for (const path of paths) {
                 try {
-                    const loadedFont = await new Promise<Font>((resolve, reject) => {
-                        loader.load(path, resolve, undefined, reject);
+                    const loadedFont = await new Promise<Font>((res, rej) => {
+                        loader.load(path, res, undefined, rej);
                     });
-                    setFont(loadedFont);
-                    setFontError(false);
+                    fontCache = loadedFont;
+                    resolve(loadedFont);
                     return;
                 } catch (error) {
                     console.warn(`Font loading failed for ${path}:`, error);
                 }
             }
-            setFontError(true);
+            reject(new Error('All font loading attempts failed'));
         };
 
         tryLoadFont(fontPaths);
+    });
+
+    return fontLoadPromise;
+};
+
+const OptimizedText = React.memo(function OptimizedText({
+                                                            text,
+                                                            position,
+                                                            size,
+                                                            color,
+                                                        }: any) {
+    const [font, setFont] = useState<Font | null>(fontCache);
+    const [fontError, setFontError] = useState(false);
+
+    useEffect(() => {
+        if (fontCache) {
+            setFont(fontCache);
+            return;
+        }
+
+        loadFont()
+            .then(setFont)
+            .catch(() => setFontError(true));
     }, []);
 
     const textGeometry = useMemo(() => {
@@ -77,7 +105,7 @@ function SafeText({text, position, size = 0.05, color = "#2c2c2c"}: any) {
                 font: font,
                 size: size,
                 height: size * 0.02,
-                curveSegments: 12,
+                curveSegments: 9,
                 bevelEnabled: false
             });
         } catch (error) {
@@ -106,32 +134,158 @@ function SafeText({text, position, size = 0.05, color = "#2c2c2c"}: any) {
             <meshStandardMaterial color={color}/>
         </mesh>
     );
-}
+});
+
+const PostcardItem = React.memo(function PostcardItem({
+                                                          entry,
+                                                          index,
+                                                          totalEntries
+                                                      }: {
+    entry: any;
+    index: number;
+    totalEntries: number;
+}) {
+    const groupRef = useRef<THREE.Group | null>(null);
+
+    const position = useMemo(() => {
+        const layer = Math.floor(index / 6);
+        const posInLayer = index % 6;
+        const radius = 2.5 + layer * 0.4;
+        const height = 0.5 + layer * 0.6;
+        const hourAngle = (posInLayer * 2) * (Math.PI / 6);
+
+        return {
+            x: Math.sin(hourAngle) * radius,
+            y: height,
+            z: Math.cos(hourAngle) * radius,
+            rotation: hourAngle
+        };
+    }, [index]);
+
+    const stampColor = useMemo(() => getStampColor(entry.stampId), [entry.stampId]);
+    const stampName = useMemo(() => getStampName(entry.stampId), [entry.stampId]);
+
+    const displayMessage = useMemo(() => {
+        if (!entry.message) return null;
+        return entry.message.length > 15
+            ? entry.message.substring(0, 15) + '...'
+            : entry.message;
+    }, [entry.message]);
+
+    useFrame(({clock}) => {
+        if (groupRef.current) {
+            const time = clock.getElapsedTime();
+            const wingSpeed = 2 + index * 0.3;
+
+            // 30fps
+            if (Math.floor(time * 30) % 2 === 0) {
+                const wingAngle = Math.sin(time * wingSpeed) * 0.2;
+                groupRef.current!.rotation.z = wingAngle;
+                groupRef.current!.position.y = position.y + Math.sin(time * wingSpeed + index) * 0.1;
+            }
+        }
+    });
+
+    return (
+        <group
+            ref={groupRef}
+            position={[position.x, position.y, position.z]}
+            rotation={[0, position.rotation, 0]}
+        >
+            {/* 엽서 몸통 */}
+            <mesh position={[0, 0, 0]}>
+                <planeGeometry args={[0.8, 0.6]}/>
+                <meshStandardMaterial
+                    color="#faf8f5"
+                    side={2}
+                    roughness={0.3}
+                    metalness={0.1}
+                />
+            </mesh>
+
+            {/* 도장 */}
+            <mesh position={[0.15, 0.15, 0.001]}>
+                <circleGeometry args={[0.08]}/>
+                <meshStandardMaterial
+                    color={stampColor}
+                    roughness={0.2}
+                />
+            </mesh>
+
+            {/* 닉네임 텍스트 */}
+            <OptimizedText
+                text={entry.nickname}
+                position={[-0.2, 0.1, 0.002]}
+                size={0.09}
+                color="#2c2c2c"
+            />
+
+            {/* 메시지 텍스트 */}
+            {displayMessage && (
+                <OptimizedText
+                    text={displayMessage}
+                    position={[-0.3, -0.05, 0.002]}
+                    size={0.1}
+                    color="#4a4a4a"
+                />
+            )}
+
+            {/* 도장 이름 */}
+            <OptimizedText
+                text={stampName}
+                position={[0.1, -0.05, 0.002]}
+                size={0.05}
+                color={stampColor}
+            />
+
+            {/* 날개들 */}
+            <mesh position={[-0.5, 0.1, 0]} rotation={[0, 0, 0.5]}>
+                <boxGeometry args={[0.3, 0.2, 0.01]}/>
+                <meshStandardMaterial
+                    color="white"
+                    transparent
+                    opacity={0.9}
+                    roughness={0.1}
+                />
+            </mesh>
+            <mesh position={[0.5, 0.1, 0]} rotation={[0, 0, -0.5]}>
+                <boxGeometry args={[0.3, 0.2, 0.01]}/>
+                <meshStandardMaterial
+                    color="white"
+                    transparent
+                    opacity={0.9}
+                    roughness={0.1}
+                />
+            </mesh>
+        </group>
+    );
+});
 
 const MailboxModel = React.memo(function MailboxModel({hasEntries, entries = []}: any) {
     const groupRef = useRef<THREE.Group | null>(null);
-
     const gltf = useGLTF('/models/draco/mailbox.glb');
 
     useFrame(({clock}) => {
         if (groupRef.current) {
-            groupRef.current!.position.y = Math.sin(clock.getElapsedTime() * 0.5) * 0.1;
-            groupRef.current!.rotation.y = clock.getElapsedTime() * 0.1;
+            const time = clock.getElapsedTime();
+            // 15fps
+            if (Math.floor(time * 15) % 2 === 0) {
+                groupRef.current!.position.y = Math.sin(time * 0.5) * 0.1;
+                groupRef.current!.rotation.y = time * 0.1;
+            }
         }
     });
 
-    const postcardRefs = useRef<(THREE.Group | null)[]>([]);
-    useFrame(({clock}) => {
-        postcardRefs.current.forEach((ref, index) => {
-            if (ref) {
-                const time = clock.getElapsedTime();
-                const wingSpeed = 2 + index * 0.3;
-                const wingAngle = Math.sin(time * wingSpeed) * 0.2;
-                ref.rotation.z = wingAngle;
-                ref.position.y = Math.sin(time * wingSpeed + index) * 0.1;
-            }
-        });
-    });
+    const renderedPostcards = useMemo(() => {
+        return entries.map((entry: any, index: number) => (
+            <PostcardItem
+                key={entry.id}
+                entry={entry}
+                index={index}
+                totalEntries={entries.length}
+            />
+        ));
+    }, [entries]);
 
     return (
         <group ref={groupRef} scale={hasEntries ? 1.1 : 1.0}>
@@ -142,104 +296,8 @@ const MailboxModel = React.memo(function MailboxModel({hasEntries, entries = []}
                 rotation={[Math.PI / 30, -Math.PI / 3, 0]}
             />
 
-            {/* 날아다니는 엽서들 - 시계방향 배치 */}
-            {entries.map((entry: any, index: number) => {
-                // 층별 설정 (6개씩 3층)
-                const layer = Math.floor(index / 6);
-                const posInLayer = index % 6;
+            {renderedPostcards}
 
-                // 각 층의 반지름과 높이
-                const radius = 2.5 + layer * 0.4;
-                const height = 0.5 + layer * 0.6;
-
-                // 시계방향 배치 (12시부터 시작해서 2시간씩)
-                const hourAngle = (posInLayer * 2) * (Math.PI / 6);
-
-                // 원형 좌표 계산
-                const x = Math.sin(hourAngle) * radius;
-                const z = Math.cos(hourAngle) * radius;
-
-                return (
-                    <group
-                        key={entry.id}
-                        ref={(el) => {
-                            postcardRefs.current[index] = el;
-                        }}
-                        position={[x, height, z]}
-                        rotation={[0, hourAngle, 0]}
-                    >
-                        {/* 엽서 몸통 */}
-                        <mesh position={[0, 0, 0]}>
-                            <planeGeometry args={[0.8, 0.6]}/>
-                            <meshStandardMaterial
-                                color="#faf8f5"
-                                side={2}
-                                roughness={0.3}
-                                metalness={0.1}
-                            />
-                        </mesh>
-
-                        {/* 도장 */}
-                        <mesh position={[0.15, 0.15, 0.001]}>
-                            <circleGeometry args={[0.08]}/>
-                            <meshStandardMaterial
-                                color={getStampColor(entry.stampId)}
-                                roughness={0.2}
-                            />
-                        </mesh>
-
-                        {/* 닉네임 텍스트 */}
-                        <SafeText
-                            text={entry.nickname}
-                            position={[-0.2, 0.1, 0.002]}
-                            size={0.09}
-                            color="#2c2c2c"
-                        />
-
-                        {/* 메시지 텍스트 */}
-                        {entry.message && (
-                            <SafeText
-                                text={entry.message.length > 15
-                                    ? entry.message.substring(0, 15) + '...'
-                                    : entry.message}
-                                position={[-0.3, -0.05, 0.002]}
-                                size={0.06}
-                                color="#4a4a4a"
-                            />
-                        )}
-
-                        {/* 도장 이름 */}
-                        <SafeText
-                            text={getStampName(entry.stampId)}
-                            position={[0.1, -0.05, 0.002]}
-                            size={0.05}
-                            color={getStampColor(entry.stampId)}
-                        />
-
-                        {/* 얇은 큐브 날개들 */}
-                        <mesh position={[-0.5, 0.1, 0]} rotation={[0, 0, 0.5]}>
-                            <boxGeometry args={[0.3, 0.2, 0.01]}/>
-                            <meshStandardMaterial
-                                color="white"
-                                transparent
-                                opacity={0.9}
-                                roughness={0.1}
-                            />
-                        </mesh>
-                        <mesh position={[0.5, 0.1, 0]} rotation={[0, 0, -0.5]}>
-                            <boxGeometry args={[0.3, 0.2, 0.01]}/>
-                            <meshStandardMaterial
-                                color="white"
-                                transparent
-                                opacity={0.9}
-                                roughness={0.1}
-                            />
-                        </mesh>
-                    </group>
-                );
-            })}
-
-            {/* 따뜻한 조명 */}
             {hasEntries && (
                 <pointLight
                     position={[0, 1, 2]}
@@ -252,18 +310,10 @@ const MailboxModel = React.memo(function MailboxModel({hasEntries, entries = []}
     );
 });
 
-// 로딩 컴포넌트
-function LoadingFallback() {
-    return (
-        <CanvasLoadingScreen/>
-        // <mesh>
-        //     <boxGeometry args={[1, 1, 1]}/>
-        //     <meshBasicMaterial color="#7eb3d9"/>
-        // </mesh>
-    );
-}
+const LoadingFallback = React.memo(function LoadingFallback() {
+    return <CanvasLoadingScreen/>;
+});
 
-// 씬 설정
 const MailboxScene = React.memo(function MailboxScene({hasEntries, entries}: any) {
     return (
         <>
@@ -278,23 +328,43 @@ const MailboxScene = React.memo(function MailboxScene({hasEntries, entries}: any
                 enableDamping={true}
                 dampingFactor={0.1}
                 enableZoom={true}
-                enablePan={false}
+                // enablePan={false}
                 maxPolarAngle={Math.PI / 2}
                 minDistance={2}
-                maxDistance={8}
+                maxDistance={10}
             />
 
-            <Environment
-                preset="warehouse"
-                background={false}
-                resolution={64}
+            {/* 메인 조명  */}
+            <directionalLight
+                position={[5, 8, 5]}
+                intensity={3.5}
+                color="#ffcccc"
+                castShadow
+                shadow-mapSize-width={512}
+                shadow-mapSize-height={512}
+            />
+
+            {/* 보조 조명들 - 빨간색 계열로 */}
+            <directionalLight
+                position={[-5, 3, 3]}
+                intensity={1.5}
+                color="#ff9999"
             />
 
             <directionalLight
-                position={[10, 10, 5]}
-                intensity={-4}
-                color="#ffffff"
+                position={[0, 3, -5]}
+                intensity={1}
+                color="#ffaaaa"
             />
+
+            <directionalLight
+                position={[0, -2, 5]}
+                intensity={0.8}
+                color="#ffdddd"
+            />
+
+            {/* 환경광 - 기본 밝기 */}
+            <ambientLight intensity={0.8} color="#fff5f5"/>
 
             <MailboxModel hasEntries={hasEntries} entries={entries}/>
         </>
@@ -327,11 +397,15 @@ function Mailbox3D({
         >
             <Canvas
                 shadows
-                dpr={[1, 1.5]}
+                dpr={[1, 1.2]}
                 gl={{
                     powerPreference: 'high-performance',
-                    antialias: true,
+                    antialias: false,
                     alpha: true,
+                    stencil: false,
+                    depth: true,
+                    logarithmicDepthBuffer: false,
+                    outputColorSpace: 'srgb',
                 }}
                 style={{
                     background: 'transparent',
@@ -347,4 +421,4 @@ function Mailbox3D({
     );
 }
 
-export default Mailbox3D;
+export default React.memo(Mailbox3D);

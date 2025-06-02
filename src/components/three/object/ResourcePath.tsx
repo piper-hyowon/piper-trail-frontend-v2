@@ -16,7 +16,7 @@ const ResourcePath: React.FC<ResourcePathProps> = ({
     const {themeMode} = useTheme();
 
     return (
-        <Html position={[0, 10, 0]} center>
+        <Html position={[0, 40, 0]} center>
             <div style={{
                 color: theme[themeMode].colors.text,
                 fontSize: '16px',

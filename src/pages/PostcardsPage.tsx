@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import styled, {keyframes} from 'styled-components';
+import React, {useEffect, useState, useMemo, useCallback} from 'react';
+import styled from 'styled-components';
 import Mailbox3D from '../components/ui/stamps/Mailbox3D';
 import StampCard from '../components/ui/stamps/StampCard';
 import PostcardCard from '../components/ui/stamps/PostcardCard';
@@ -340,6 +340,10 @@ const ClickHint = styled.div<{ $visible: boolean }>`
   }
 `;
 
+const MemoizedMailbox3D = React.memo(Mailbox3D);
+const MemoizedPostcardCard = React.memo(PostcardCard);
+const MemoizedStampCard = React.memo(StampCard);
+
 const PostcardsPage: React.FC = () => {
     const [showPostcards, setShowPostcards] = useState(false);
     const [showModal, setShowModal] = useState(false);
@@ -370,7 +374,7 @@ const PostcardsPage: React.FC = () => {
         };
     }, []);
 
-    const availableStamps: Stamp[] = [
+    const availableStamps: Stamp[] = useMemo(() => [
         {
             id: 'awesome',
             name: '멋져요',
@@ -407,43 +411,20 @@ const PostcardsPage: React.FC = () => {
             color: '#FFB6C1',
             description: '정말 사랑하는 콘텐츠!'
         }
-    ];
+    ], []);
 
-    const stampEntries = React.useMemo(() =>
+    const stampEntries = useMemo(() =>
             postcardsResponse?.content
                 ? postcardsResponse.content.map(convertPostcardResponse)
                 : [],
         [postcardsResponse?.content]
     );
 
-    React.useEffect(() => {
-        let interval: number;
-        if (rateLimitCountdown > 0) {
-            interval = window.setInterval(() => {
-                setRateLimitCountdown(prev => {
-                    if (prev <= 1) {
-                        setIsRateLimited(false);
-                        setRateLimitMessage('');
-                        return 0;
-                    }
-                    return prev - 1;
-                });
-            }, 1000);
-        }
-        return () => window.clearInterval(interval);
-    }, [rateLimitCountdown]);
+    const getStampInfo = useCallback((stampId: string) => {
+        return availableStamps.find(stamp => stamp.id === stampId);
+    }, [availableStamps]);
 
-    React.useEffect(() => {
-        let hintTimer: number;
-        if (showClickHint) {
-            hintTimer = window.setTimeout(() => {
-                setShowClickHint(false);
-            }, 3000); // 3초 후 힌트 사라짐
-        }
-        return () => window.clearTimeout(hintTimer);
-    }, [showClickHint]);
-
-    const handleMailboxClick = React.useCallback(() => {
+    const handleMailboxClick = useCallback(() => {
         if (stampEntries.length === 0) return;
 
         if (mailboxClickCount === 0) {
@@ -460,13 +441,52 @@ const PostcardsPage: React.FC = () => {
         }
     }, [stampEntries.length, mailboxClickCount, showPostcards]);
 
+    const handleStampSelect = useCallback((stampId: string) => {
+        setSelectedStampId(stampId);
+    }, []);
+
+    const handleModalClose = useCallback(() => {
+        setShowModal(false);
+    }, []);
+
+    const handlePostcardsClose = useCallback(() => {
+        setShowPostcards(false);
+    }, []);
+
+    useEffect(() => {
+        if (rateLimitCountdown <= 0) return;
+
+        const interval = setInterval(() => {
+            setRateLimitCountdown(prev => {
+                if (prev <= 1) {
+                    setIsRateLimited(false);
+                    setRateLimitMessage('');
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [rateLimitCountdown]);
+
+    useEffect(() => {
+        if (!showClickHint) return;
+
+        const hintTimer = setTimeout(() => {
+            setShowClickHint(false);
+        }, 3000);
+
+        return () => clearTimeout(hintTimer);
+    }, [showClickHint]);
+
     const handleStampSubmit = async () => {
         if (!selectedStampId) {
             alert('도장을 선택해주세요!');
             return;
         }
 
-        const finalNickname = nickname.trim() || undefined; // 빈 문자열이면 undefined로
+        const finalNickname = nickname.trim() || undefined;
         const finalMessage = message.trim() || undefined;
 
         try {
@@ -494,7 +514,7 @@ const PostcardsPage: React.FC = () => {
                 error.message?.includes('잦은 스탬프')) {
 
                 setIsRateLimited(true);
-                setRateLimitCountdown(60); // 60초 대기
+                setRateLimitCountdown(60);
                 setRateLimitMessage('너무 빨라요');
                 setShowModal(false);
             } else {
@@ -502,9 +522,31 @@ const PostcardsPage: React.FC = () => {
             }
         }
     };
-    const getStampInfo = (stampId: string) => {
-        return availableStamps.find(stamp => stamp.id === stampId);
-    };
+
+    const renderedPostcardCards = useMemo(() => {
+        return stampEntries.map((entry, index) => {
+            const stampInfo = getStampInfo(entry.stampId);
+            return (
+                <MemoizedPostcardCard
+                    key={entry.id}
+                    entry={entry}
+                    stampInfo={stampInfo}
+                    index={index}
+                />
+            );
+        });
+    }, [stampEntries, getStampInfo]);
+
+    const renderedStampCards = useMemo(() => {
+        return availableStamps.map(stamp => (
+            <MemoizedStampCard
+                key={stamp.id}
+                stamp={stamp}
+                selected={selectedStampId === stamp.id}
+                onClick={() => handleStampSelect(stamp.id)}
+            />
+        ));
+    }, [availableStamps, selectedStampId, handleStampSelect]);
 
     if (isLoading) {
         return (
@@ -546,7 +588,7 @@ const PostcardsPage: React.FC = () => {
 
             <MailboxSection>
                 <div style={{position: 'relative'}}>
-                    <Mailbox3D
+                    <MemoizedMailbox3D
                         hasEntries={stampEntries.length > 0}
                         onClick={handleMailboxClick}
                         entries={stampEntries}
@@ -584,23 +626,13 @@ const PostcardsPage: React.FC = () => {
                     <PostcardListTitle>
                         📮 도착한 엽서들 ({stampEntries.length}개)
                     </PostcardListTitle>
-                    <ClosePostcardsButton onClick={() => setShowPostcards(false)}>
+                    <ClosePostcardsButton onClick={handlePostcardsClose}>
                         ✕ 우체통 닫기
                     </ClosePostcardsButton>
                 </PostcardListHeader>
 
                 <PostcardGrid>
-                    {stampEntries.map((entry, index) => {
-                        const stampInfo = getStampInfo(entry.stampId);
-                        return (
-                            <PostcardCard
-                                key={entry.id}
-                                entry={entry}
-                                stampInfo={stampInfo}
-                                index={index}
-                            />
-                        );
-                    })}
+                    {renderedPostcardCards}
                 </PostcardGrid>
             </PostcardOverlay>
 
@@ -609,20 +641,13 @@ const PostcardsPage: React.FC = () => {
                 <ModalContent>
                     <ModalHeader>
                         <ModalTitle>✍️ 엽서 작성하기</ModalTitle>
-                        <CloseButton onClick={() => setShowModal(false)}>×</CloseButton>
+                        <CloseButton onClick={handleModalClose}>×</CloseButton>
                     </ModalHeader>
 
                     <FormGroup>
                         <FormLabel $required>어떤 도장을 찍어주실건가요?</FormLabel>
                         <StampGrid>
-                            {availableStamps.map(stamp => (
-                                <StampCard
-                                    key={stamp.id}
-                                    stamp={stamp}
-                                    selected={selectedStampId === stamp.id}
-                                    onClick={() => setSelectedStampId(stamp.id)}
-                                />
-                            ))}
+                            {renderedStampCards}
                         </StampGrid>
                     </FormGroup>
 

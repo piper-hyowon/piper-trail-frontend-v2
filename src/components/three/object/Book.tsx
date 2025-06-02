@@ -41,7 +41,8 @@ const Book: React.FC<BookProps> = ({position, scale, isDay}) => {
         );
     }
 
-    return <primitive object={gltf.scene.clone()} position={position} scale={[scale, scale, scale]}/>;
+    return <primitive object={gltf.scene.clone()} position={position} scale={[scale, scale, scale]}
+                      rotation={[0, Math.PI/6, 0]}/>;
 };
 
 export default Book;
