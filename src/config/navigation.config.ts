@@ -4,6 +4,7 @@ export const BLOG_CATEGORIES = [
 ];
 
 export const STATIC_PAGES = [
+    {path: '/', name: 'home', icon: '🏠', description: 'Home'},
     {path: '/about', name: 'about', icon: '👤', description: 'About me'},
     {path: '/projects', name: 'projects', icon: '🚀', description: 'My projects'},
 ];
