@@ -62,7 +62,7 @@ const Donut: React.FC<{ position: [number, number, number], scale: number, isDay
     })
 
     return (
-        <group ref={donutRef} position={position} scale={scale}>
+        <group ref={donutRef} position={position} scale={scale} rotation={[0, Math.PI / 3, 0]}>
             <group rotation={[Math.PI / 2, 0, 0]}>
                 <group rotation={[-Math.PI / 2, 0, 0]}>
                     {/* 도넛 베이스  */}

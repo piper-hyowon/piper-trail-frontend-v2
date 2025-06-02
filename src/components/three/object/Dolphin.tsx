@@ -19,7 +19,7 @@ const Dolphin: React.FC<DolphinProps> = ({
                                              isDay,
                                              onClick,
                                              maxDistance = 50,
-                                             clickableMinY = 3,
+                                             clickableMinY = 5,
                                          }) => {
     const gltf = useGLTF('/models/dolphin.gltf');
     const groupRef = useRef<THREE.Group | null>(null);

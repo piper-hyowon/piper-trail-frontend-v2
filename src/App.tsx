@@ -17,6 +17,7 @@ import AboutPage from "./pages/AboutPage.tsx";
 import PostcardsPage from "./pages/PostcardsPage.tsx";
 import DolphinPage from "./pages/DolphinPage.tsx";
 import {EasterEggProvider} from "./context/EasterEggDolphinContext.tsx";
+import EasterEggPage from "./pages/EasterEggPage.tsx";
 
 const VALID_CATEGORIES = BLOG_CATEGORIES.map(e => e.name);
 
@@ -47,6 +48,12 @@ const App: React.FC = () => {
                                         {/*Static*/}
                                         <Route path="/about" element={<AboutPage/>}/>
                                         <Route path="/projects" element={<ProjectsPage/>}/>
+
+                                        <Route path="/iloveyou" element={<EasterEggPage/>}/>
+                                        <Route path="/hello" element={<EasterEggPage/>}/>
+                                        <Route path="/coffee" element={<EasterEggPage/>}/>
+                                        <Route path="/cats" element={<EasterEggPage/>}/>
+                                        <Route path="/secret" element={<EasterEggPage/>}/>
 
 
                                         {/*Interactive*/}
