@@ -23,7 +23,7 @@ interface ApiContextType {
     method: HttpMethod;
     apiUrl: string;
     apiData: any | null;
-    statusCode: number;
+    statusCode: number | null;
     acceptHeader: AcceptHeader;
     apiStatus: ApiStatus;
     apiError: string | null;
@@ -35,6 +35,8 @@ interface ApiContextType {
     navigateTo: (url: string, method?: HttpMethod) => void;
     setApiData: (data: any) => void;
     clearApiError: () => void;
+    clearApiState: () => void;
+    clearApiStatus: () => void;
     isAuthenticated: boolean;
     login: (credentials: LoginCredentials) => Promise<boolean>;
     logout: () => void;
@@ -57,8 +59,8 @@ export const ApiProvider: React.FC<{ children: ReactNode }> = ({
     const [acceptHeader, setAcceptHeader] =
         useState<AcceptHeader>("application/json");
     const [apiData, setApiData] = useState<any | null>(null);
-    const [statusCode, setStatusCode] = useState<number>(200);
-    const [apiStatus, setApiStatus] = useState<ApiStatus>("idle");
+    const [statusCode, setStatusCode] = useState<number | null>(200);
+    const [apiStatus, setApiStatus] = useState<ApiStatus>("success");
     const [apiError, setApiError] = useState<string | null>(null);
 
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
@@ -69,6 +71,20 @@ export const ApiProvider: React.FC<{ children: ReactNode }> = ({
     const clearApiError = useCallback(() => {
         setApiError(null);
         setApiStatus("idle");
+    }, []);
+
+    const clearApiStatus = useCallback(() => {
+        setStatusCode(null);
+        setApiError(null);
+        setApiStatus("idle");
+    }, []);
+
+    const clearApiState = useCallback(() => {
+        setStatusCode(null);
+        setApiUrl('');
+        setApiError(null);
+        setApiStatus("idle");
+        setApiData(null);
     }, []);
 
     const fetchApiData = useCallback(
@@ -83,7 +99,7 @@ export const ApiProvider: React.FC<{ children: ReactNode }> = ({
             setApiError(null);
 
             try {
-                let statusCode = 200;
+                let statusCode: number;
 
                 switch (methodToUse) {
                     case 'GET':
@@ -97,11 +113,19 @@ export const ApiProvider: React.FC<{ children: ReactNode }> = ({
                         break;
 
                     case 'PUT':
-                    case 'PATCH':
+                        // PUT 성공 (NavigationBar에서 이미 폼 처리함)
+                        statusCode = 200;
+                        break;
+
                     case 'DELETE':
-                        // TODO: 나중에 구현
+                        // DELETE 성공 (NavigationBar에서 이미 확인 처리함)
+                        statusCode = 200;
+                        break;
+
+                    case 'PATCH':
+                        // PATCH 미지원
                         statusCode = 405;
-                        throw new Error('Method not implemented');
+                        throw new Error('PATCH method not supported');
 
                     default:
                         statusCode = 405;
@@ -132,29 +156,34 @@ export const ApiProvider: React.FC<{ children: ReactNode }> = ({
         [apiUrl, method]
     );
 
-// TODO: PUT/PATCH/DELETE 메서드 구현
-
     const navigateTo = useCallback(
             (url: string, newMethod?: HttpMethod) => {
-                console.log("Navigating to:", url, newMethod ? `with method: ${newMethod}` : "");
+                setStatusCode(200);
+                setApiStatus("success");
+                setApiError(null);
 
                 if (newMethod) {
                     setMethod(newMethod);
+                } else {
+                    setMethod("GET")
                 }
-
                 const correctedUrl = url.startsWith("/") ? url : `/${url}`;
                 setApiUrl(correctedUrl);
                 navigate(correctedUrl);
             },
-            [navigate]
+            [navigate, clearApiStatus]
         )
     ;
 
-    // URL 변경 시 동기화
+    // URL 변경 시 동기화 및 상태 클리어
     useEffect(() => {
         const currentLocationPath = location.pathname + location.search;
         if (currentLocationPath !== apiUrl) {
             setApiUrl(currentLocationPath);
+            // URL이 변경 = 새로운 GET 요청 성공
+            setStatusCode(200);
+            setApiStatus("success");
+            setApiError(null);
         }
     }, [location, apiUrl]);
 
@@ -252,6 +281,8 @@ export const ApiProvider: React.FC<{ children: ReactNode }> = ({
                 fetchApiData,
                 navigateTo,
                 clearApiError,
+                clearApiState,
+                clearApiStatus,
                 isAuthenticated,
                 login,
                 logout,

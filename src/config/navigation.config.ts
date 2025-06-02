@@ -1,6 +1,6 @@
 export const BLOG_CATEGORIES = [
-    {name: 'tech', icon: '💻', description: 'Technology posts'},
-    {name: 'food', icon: '🍔', description: 'Food'},
+    {path: '/tech', name: 'tech', icon: '💻', description: 'Technology posts'},
+    {path: '/food', name: 'food', icon: '🍔', description: 'Food'},
 ];
 
 export const STATIC_PAGES = [
@@ -20,7 +20,6 @@ export const ALL_CATEGORIES = [
 ];
 
 export const ALL_CATEGORY_NAMES = ALL_CATEGORIES.map(cat => cat.name);
-
 
 export const getCategoryName = (category: string): string => {
     switch (category) {
