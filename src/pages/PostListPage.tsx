@@ -8,7 +8,7 @@ import SortSelector from '../components/ui/SortSelector';
 import AuthModal from '../components/ui/AuthModal';
 import PostForm from "../components/ui/PostForm.tsx";
 import {IoAddCircleOutline} from "react-icons/io5";
-import {usePostsByCategory, usePostsByTag, useCreatePost} from '../hooks/useApi';
+import {usePostsByCategory, usePostsByTag, useSearchPosts, useCreatePost} from '../hooks/useApi';
 import {LoginCredentials, useApi} from '../context/ApiContext';
 
 const PAGE_SIZE = 4;
@@ -22,27 +22,54 @@ const SORT_OPTIONS = [
     {value: 'title,desc', label: 'Title Z-A'},
 ];
 
-const PostListControlsContainer = styled.div`
+const PostListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({theme}) => theme.spacing.lg};
+  max-width: 1000px;
+  margin: 0 auto;
+`;
+
+const PostListHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({theme}) => theme.spacing.md};
+`;
+
+const TitleRow = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${({theme}) => theme.spacing.md};
+  align-items: flex-start;
+  gap: ${({theme}) => theme.spacing.md};
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: ${({theme}) => theme.spacing.sm};
+  }
 `;
 
 const PostListTitleSection = styled.div`
   flex: 1;
+  min-width: 0;
 `;
 
-const ActionButtonsContainer = styled.div`
-  display: flex;
-  gap: ${({theme}) => theme.spacing.md};
+const PostListTitle = styled.h1`
+  color: ${({theme}) => theme.colors.primary};
+  margin: 0 0 ${({theme}) => theme.spacing.xs} 0;
+`;
+
+const PostCount = styled.p`
+  margin: 0;
+  color: ${({theme}) => theme.colors.text}80;
+  font-size: ${({theme}) => theme.fontSizes.small};
 `;
 
 const CreatePostButton = styled.button`
   background-color: ${({theme}) => theme.colors.success};
   color: white;
   font-weight: bold;
-  padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.md};
+  padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.lg}`};
   border: none;
   border-radius: ${({theme}) => theme.borderRadius};
   display: flex;
@@ -50,6 +77,8 @@ const CreatePostButton = styled.button`
   gap: ${({theme}) => theme.spacing.xs};
   cursor: pointer;
   transition: ${({theme}) => theme.transitions.default};
+  white-space: nowrap;
+  height: fit-content;
 
   &:hover {
     opacity: 0.9;
@@ -59,30 +88,61 @@ const CreatePostButton = styled.button`
     opacity: 0.6;
     cursor: not-allowed;
   }
-`;
 
-const PostListContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${({theme}) => theme.spacing.lg};
-`;
-
-const PostListTitle = styled.h1`
-  color: ${({theme}) => theme.colors.primary};
-  margin-bottom: ${({theme}) => theme.spacing.md};
+  @media (max-width: 768px) {
+    align-self: flex-start;
+    padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.md}`};
+    font-size: ${({theme}) => theme.fontSizes.small};
+  }
 `;
 
 const FilterContainer = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${({theme}) => theme.spacing.md};
+  flex-direction: column;
+  gap: ${({theme}) => theme.spacing.md};
+  background: ${({theme}) => `${theme.colors.background}F0`};
+  padding: ${({theme}) => theme.spacing.md};
+  border-radius: ${({theme}) => theme.borderRadius};
+  border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+
+  @media (min-width: 769px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+`;
+
+const TagFilterSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({theme}) => theme.spacing.sm};
+  flex: 1;
+  min-width: 0;
+
+  h4 {
+    margin: 0;
+    color: ${({theme}) => theme.colors.primary};
+    font-size: ${({theme}) => theme.fontSizes.small};
+    font-weight: 600;
+  }
+`;
+
+const SortContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({theme}) => theme.spacing.xs};
+  min-width: 200px;
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: ${({theme}) => theme.spacing.md};
+    min-width: auto;
   }
+`;
+
+const SortLabel = styled.label`
+  font-size: ${({theme}) => theme.fontSizes.small};
+  color: ${({theme}) => theme.colors.primary};
+  font-weight: 600;
+  margin: 0;
 `;
 
 const PostDate = styled.span`
@@ -97,6 +157,8 @@ const LoadingContainer = styled.div`
   justify-content: center;
   padding: ${({theme}) => theme.spacing.xl};
   text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
 `;
 
 const ErrorContainer = styled.div`
@@ -105,18 +167,23 @@ const ErrorContainer = styled.div`
   border-radius: ${({theme}) => theme.borderRadius};
   padding: ${({theme}) => theme.spacing.lg};
   margin: ${({theme}) => theme.spacing.lg} 0;
+  max-width: 600px;
+  margin: ${({theme}) => theme.spacing.lg} auto;
 `;
 
-const TagFilterSection = styled.div`
+const PostsGrid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.lg};
+`;
 
-  h4 {
-    margin: 0;
-    color: ${({theme}) => theme.colors.primary};
-    font-size: ${({theme}) => theme.fontSizes.small};
-  }
+const NoPostsMessage = styled.div`
+  text-align: center;
+  padding: ${({theme}) => theme.spacing.xl};
+  color: ${({theme}) => theme.colors.text}80;
+  background: ${({theme}) => `${theme.colors.background}F0`};
+  border-radius: ${({theme}) => theme.borderRadius};
+  border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
 `;
 
 const FormModal = styled.div`
@@ -178,6 +245,7 @@ const PostListPage: React.FC = () => {
     const {isAuthenticated, login} = useApi();
 
     const isTagRoute = location.pathname.startsWith('/tag/');
+    const isSearchRoute = location.pathname.startsWith('/search');
     const pathSegments = location.pathname.split('/').filter(Boolean);
     const currentCategory = isTagRoute
         ? params.tagName
@@ -187,6 +255,10 @@ const PostListPage: React.FC = () => {
     const currentPage = parseInt(searchParams.get('page') || '0');
     const currentSort = searchParams.get('sort') || DEFAULT_SORT;
     const selectedTags = searchParams.get('tags')?.split(',').filter(Boolean) || [];
+
+    // 검색 관련 파라미터
+    const searchQuery = searchParams.get('q') || '';
+    const searchCategory = searchParams.get('category') || '';
 
     // 모달 상태 관리
     const [showPostForm, setShowPostForm] = useState(false);
@@ -198,7 +270,18 @@ const PostListPage: React.FC = () => {
 
     // API 호출
     let postsQuery;
-    if (isTagRoute && params.tagName) {
+    if (isSearchRoute) {
+        const [sortBy, sortDirection] = currentSort.split(',');
+        postsQuery = useSearchPosts({
+            keyword: searchQuery,
+            category: searchCategory || undefined,
+            tags: selectedTags.length > 0 ? selectedTags : undefined,
+            page: currentPage,
+            size: PAGE_SIZE,
+            sortBy: sortBy,
+            sortDirection: (sortDirection as 'asc' | 'desc') || 'desc'
+        });
+    } else if (isTagRoute && params.tagName) {
         postsQuery = usePostsByTag(params.tagName, {
             page: currentPage,
             size: PAGE_SIZE,
@@ -229,15 +312,22 @@ const PostListPage: React.FC = () => {
     }, [postsData]);
 
     const pageTitle = useMemo(() => {
+        if (isSearchRoute) {
+            if (searchQuery) {
+                return `Search: "${searchQuery}"${searchCategory ? ` in ${searchCategory}` : ''}`;
+            }
+            return 'Search Results';
+        }
         if (isTagRoute && params.tagName) return `Tag: #${params.tagName}`;
         if (currentCategory) {
             if (currentCategory === 'null') return 'Uncategorized';
             return currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
         }
         return 'Category Not Found';
-    }, [currentCategory, params.tagName, isTagRoute]);
+    }, [currentCategory, params.tagName, isTagRoute, isSearchRoute, searchQuery, searchCategory]);
 
     const getCategoryName = (category: string): string => {
+        if (isSearchRoute) return 'Search';
         if (isTagRoute) return pageTitle;
         switch (category) {
             case 'tech':
@@ -409,71 +499,124 @@ const PostListPage: React.FC = () => {
 
     return (
         <PostListContainer>
-            <PostListControlsContainer>
-                <PostListTitleSection>
-                    <PostListTitle>{pageTitle}</PostListTitle>
-                    <p>총 {postsData.total || 0}개의 포스트</p>
-                </PostListTitleSection>
+            <PostListHeader>
+                <TitleRow>
+                    <PostListTitleSection>
+                        <PostListTitle>{pageTitle}</PostListTitle>
+                        <PostCount>총 {postsData.total || 0}개의 포스트</PostCount>
+                    </PostListTitleSection>
 
-                <ActionButtonsContainer>
-                    <CreatePostButton
-                        onClick={handleCreatePostClick}
-                        disabled={createPostMutation.isPending}
-                    >
-                        <IoAddCircleOutline size={16}/>
-                        {createPostMutation.isPending ? '작성 중...' : '글 작성하기'}
-                    </CreatePostButton>
-                </ActionButtonsContainer>
-            </PostListControlsContainer>
+                    {/* 검색 라우트가 아닐 때만 글 작성 버튼 표시 */}
+                    {!isSearchRoute && (
+                        <CreatePostButton
+                            onClick={handleCreatePostClick}
+                            disabled={createPostMutation.isPending}
+                        >
+                            <IoAddCircleOutline size={16}/>
+                            {createPostMutation.isPending ? '작성 중...' : '글 작성하기'}
+                        </CreatePostButton>
+                    )}
+                </TitleRow>
 
-            <FilterContainer>
-                {availableTags.length > 0 && (
-                    <TagFilterSection>
-                        <h4>Filter by tags:</h4>
-                        <TagList
-                            tags={availableTags}
-                            selectedTags={selectedTags}
-                            onTagClick={handleTagFilterClick}
-                        />
-                    </TagFilterSection>
-                )}
+                <FilterContainer>
+                    {availableTags.length > 0 && !isSearchRoute && (
+                        <TagFilterSection>
+                            <h4>Filter by tags:</h4>
+                            <TagList
+                                tags={availableTags}
+                                selectedTags={selectedTags}
+                                onTagClick={handleTagFilterClick}
+                            />
+                        </TagFilterSection>
+                    )}
 
-                <SortSelector
-                    options={SORT_OPTIONS}
-                    currentSort={currentSort}
-                    onSortChange={handleSortChange}
-                />
-            </FilterContainer>
-
-            {posts.length > 0 ? (
-                posts.map((post) => (
-                    <Card key={post.id} onClick={() => handleCardClick(post)}>
-                        <CardTitle>{post.title}</CardTitle>
-                        <CardContent>
-                            <p>{post.preview}</p>
-                            {post.tags && post.tags.length > 0 && (
-                                <TagList
-                                    tags={post.tags}
-                                    onTagClick={handlePostTagClick}
-                                />
+                    {isSearchRoute && availableTags.length > 0 && (
+                        <TagFilterSection>
+                            <h4>Search Results for: "{searchQuery}"</h4>
+                            {searchCategory && (
+                                <p style={{margin: '0 0 8px 0', fontSize: '0.9rem', opacity: 0.8}}>
+                                    in category: {searchCategory}
+                                </p>
                             )}
-                        </CardContent>
-                        <CardFooter>
-                            <div>
-                                {post.category && <span>Category: {post.category}</span>}
-                                <span style={{marginLeft: post.category ? '1rem' : '0'}}>
-                                    Views: {post.viewCount || 0}
-                                </span>
+                            <div style={{marginTop: '12px'}}>
+                                <span style={{fontSize: '0.9rem', fontWeight: 600}}>Filter by tags:</span>
+                                <div style={{marginTop: '4px'}}>
+                                    <TagList
+                                        tags={availableTags}
+                                        selectedTags={selectedTags}
+                                        onTagClick={handleTagFilterClick}
+                                    />
+                                </div>
                             </div>
-                            <PostDate>
-                                {new Date(post.createdAt).toLocaleDateString()}
-                            </PostDate>
-                        </CardFooter>
-                    </Card>
-                ))
-            ) : (
-                <p>No posts found{selectedTags.length > 0 ? ' matching your filter criteria' : ''}.</p>
-            )}
+                        </TagFilterSection>
+                    )}
+
+                    {/* 검색 페이지에서 검색어만 있고 태그가 없는 경우 */}
+                    {isSearchRoute && availableTags.length === 0 && searchQuery && (
+                        <TagFilterSection>
+                            <h4>Search Results for: "{searchQuery}"</h4>
+                            {searchCategory && (
+                                <p style={{margin: 0, fontSize: '0.9rem', opacity: 0.8}}>
+                                    in category: {searchCategory}
+                                </p>
+                            )}
+                        </TagFilterSection>
+                    )}
+
+                    <SortContainer>
+                        <SortLabel>Sort by:</SortLabel>
+                        <SortSelector
+                            options={SORT_OPTIONS}
+                            currentSort={currentSort}
+                            onSortChange={handleSortChange}
+                        />
+                    </SortContainer>
+                </FilterContainer>
+            </PostListHeader>
+
+            <PostsGrid>
+                {posts.length > 0 ? (
+                    posts.map((post) => (
+                        <Card key={post.id} onClick={() => handleCardClick(post)}>
+                            <CardTitle>{post.title}</CardTitle>
+                            <CardContent>
+                                <p>{post.preview}</p>
+                                {post.tags && post.tags.length > 0 && (
+                                    <TagList
+                                        tags={post.tags}
+                                        onTagClick={handlePostTagClick}
+                                    />
+                                )}
+                            </CardContent>
+                            <CardFooter>
+                                <div>
+                                    {post.category && <span>Category: {post.category}</span>}
+                                    <span style={{marginLeft: post.category ? '1rem' : '0'}}>
+                                        Views: {post.viewCount || 0}
+                                    </span>
+                                </div>
+                                <PostDate>
+                                    {new Date(post.createdAt).toLocaleDateString()}
+                                </PostDate>
+                            </CardFooter>
+                        </Card>
+                    ))
+                ) : (
+                    <NoPostsMessage>
+                        <p>
+                            {isSearchRoute
+                                ? `No posts found for "${searchQuery}"${searchCategory ? ` in ${searchCategory}` : ''}`
+                                : `No posts found${selectedTags.length > 0 ? ' matching your filter criteria' : ''}`
+                            }.
+                        </p>
+                        {isSearchRoute && (
+                            <p style={{marginTop: '0.5rem', fontSize: '0.9rem', opacity: 0.8}}>
+                                Try different keywords or search in all categories.
+                            </p>
+                        )}
+                    </NoPostsMessage>
+                )}
+            </PostsGrid>
 
             {totalPages > 1 && (
                 <Pagination
@@ -483,8 +626,8 @@ const PostListPage: React.FC = () => {
                 />
             )}
 
-            {/* 포스트 작성 모달 (원래 로직대로) */}
-            {showPostForm && (
+            {/* 포스트 작성 모달 (검색 라우트가 아닐 때만) */}
+            {showPostForm && !isSearchRoute && (
                 <FormModal>
                     <ModalContent>
                         <ModalHeader>

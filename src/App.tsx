@@ -68,6 +68,8 @@ const App: React.FC = () => {
                                                 <Route path={`/${category}/:postSlug`} element={<PostDetailPage/>}/>
                                             </React.Fragment>
                                         ))}
+                                        <Route path="/search" element={<PostListPage/>}/>
+
 
                                         {/* 미분류 포스트 (null, uncategorized) */}
                                         <Route path="/null" element={<PostListPage/>}/>

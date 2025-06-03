@@ -22,6 +22,7 @@ import {
     STATIC_PAGES
 } from "../../config/navigation.config.ts";
 import DeleteConfirmModal from "../ui/DeleteConfirmModal.tsx";
+import SearchBar from "../ui/SearchBar.tsx";
 
 const NavContainer = styled.nav`
   padding: ${props => props.theme?.spacing?.md || '16px'};
@@ -75,6 +76,13 @@ const LogoSmallTitle = styled.span`
 `;
 
 const RightControls = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({theme}) => theme.spacing.sm};
+  align-items: flex-end;
+`;
+
+const TopRightControls = styled.div`
   display: flex;
   gap: ${({theme}) => theme.spacing.md};
   align-items: center;
@@ -249,6 +257,13 @@ const CloseButton = styled.button`
   }
 `;
 
+const SearchContainer = styled.div<{ $visible: boolean }>`
+  opacity: ${({$visible}) => $visible ? 1 : 0};
+  max-height: ${({$visible}) => $visible ? '60px' : '0'};
+  overflow: hidden;
+  transition: all 0.3s ease;
+`;
+
 const NavigationBar: React.FC = () => {
     const location = useLocation();
     const {themeMode, toggleTheme} = useTheme();
@@ -268,6 +283,7 @@ const NavigationBar: React.FC = () => {
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [currentCategory, setCurrentCategory] = useState<string>('');
     const [currentPostData, setCurrentPostData] = useState<any>(null);
+    const [showSearch, setShowSearch] = useState(false);
 
     // 인증 모달 상태
     const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
@@ -313,12 +329,6 @@ const NavigationBar: React.FC = () => {
         const pathOnly = url.split('?')[0];
         const pathParts = pathOnly.split('/').filter(Boolean);
         return pathParts.length === 2; // /{category}/{slug}
-    };
-
-    const extractSlugFromUrl = (url: string): string => {
-        const pathOnly = url.split('?')[0];
-        const pathParts = pathOnly.split('/').filter(Boolean);
-        return pathParts.length === 2 ? pathParts[1] : '';
     };
 
     // 현재 페이지의 포스트 데이터 가져오기
@@ -683,6 +693,18 @@ const NavigationBar: React.FC = () => {
         handleFormSubmit(formData, 'update');
     };
 
+    const isSearchablePage = () => {
+        const pathOnly = location.pathname.split('?')[0];
+        const pathParts = pathOnly.split('/').filter(Boolean);
+        const currentCategory = pathParts.length > 0 ? pathParts[0] : '';
+
+        return BLOG_CATEGORIES.some(cat => cat.name === currentCategory);
+    };
+
+    useEffect(() => {
+        setShowSearch(isSearchablePage());
+    }, [location.pathname]);
+
     return (
         <NavContainer>
             <NavContent>
@@ -691,38 +713,44 @@ const NavigationBar: React.FC = () => {
                         <img width={140} src={LogoChacter} alt="Frog Character"/>
                         <LogoTextContainer>
                             <LogoText>piper-trail.com</LogoText>
-                            <LogoSmallTitle>{t('blogTitle')}</LogoSmallTitle>
+                            <LogoSmallTitle>{t('layout.blogTitle')}</LogoSmallTitle>
                         </LogoTextContainer>
                     </Logo>
 
-                    <RightControls>
-                        <LanguageToggle onClick={toggleLanguage}>
-                            {language === 'en' ? '한국어' : 'English'}
-                        </LanguageToggle>
-                        <ThemeToggleButton onClick={toggleTheme}>
-                            {themeMode === 'light' ? '🌙' : '☀️'}
-                        </ThemeToggleButton>
+                    <RightControls $hasSearch={showSearch}>
+                        <TopRightControls>
+                            <LanguageToggle onClick={toggleLanguage}>
+                                {language === 'en' ? '한국어' : 'English'}
+                            </LanguageToggle>
+                            <ThemeToggleButton onClick={toggleTheme}>
+                                {themeMode === 'light' ? '🌙' : '☀️'}
+                            </ThemeToggleButton>
 
-                        <AuthStatusContainer $authenticated={isAuthenticated}>
-                            {isAuthenticated ? '🔒' : '🔓'}
-                            {isAuthenticated ? 'Authenticated' : 'Not authenticated'}
-                        </AuthStatusContainer>
+                            <AuthStatusContainer $authenticated={isAuthenticated}>
+                                {isAuthenticated ? '🔒' : '🔓'}
+                                {isAuthenticated ? 'Authenticated' : 'Not authenticated'}
+                            </AuthStatusContainer>
 
-                        <AuthButtonGroup>
-                            {!isAuthenticated ? (
-                                <Tooltip content="관리자 로그인">
-                                    <AuthButton onClick={handleAuthButtonClick}>
-                                        <IoPersonOutline size={16}/>
-                                    </AuthButton>
-                                </Tooltip>
-                            ) : (
-                                <Tooltip content="로그아웃">
-                                    <LogoutButton onClick={handleLogout}>
-                                        <IoLogOutOutline size={16}/>
-                                    </LogoutButton>
-                                </Tooltip>
-                            )}
-                        </AuthButtonGroup>
+                            <AuthButtonGroup>
+                                {!isAuthenticated ? (
+                                    <Tooltip content="관리자 로그인">
+                                        <AuthButton onClick={handleAuthButtonClick}>
+                                            <IoPersonOutline size={16}/>
+                                        </AuthButton>
+                                    </Tooltip>
+                                ) : (
+                                    <Tooltip content="로그아웃">
+                                        <LogoutButton onClick={handleLogout}>
+                                            <IoLogOutOutline size={16}/>
+                                        </LogoutButton>
+                                    </Tooltip>
+                                )}
+                            </AuthButtonGroup>
+                        </TopRightControls>
+
+                        <SearchContainer $visible={showSearch}>
+                            <SearchBar/>
+                        </SearchContainer>
                     </RightControls>
                 </NavHeader>
 
