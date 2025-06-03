@@ -199,19 +199,12 @@ export const ApiProvider: React.FC<{ children: ReactNode }> = ({
                             username: credentials.username,
                             password: credentials.password
                         });
+                        console.log(response); // QR Code 받는 용도..
 
                         if (response.requiresTwoFactor) {
                             setApiStatus("idle");
                             return false; // 2FA 단계로 진행
                         }
-
-                        // 바로 로그인 성공 (2FA가 필요없는 경우)
-                        apiClient.setTokens(response.accessToken, response.refreshToken);
-                        setIsAuthenticated(true);
-                        setApiStatus("success");
-                        setStatusCode(200);
-                        return true;
-
                     } catch (error: any) {
                         if (error.message?.includes('2FA') || error.message?.includes('two-factor')) {
                             setApiStatus("idle");

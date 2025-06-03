@@ -6,6 +6,11 @@ export interface Theme {
         transparentToSea: string;
         seaGradient: string;
         contentBackground: string;
+        purpleGradient: string;
+        orangeGradient: string;
+        pinkGradient: string;
+        techGradient: string;
+        socialGradient: string;
     };
     colors: {
         background: string;
@@ -19,6 +24,12 @@ export interface Theme {
         success: string;
         warning: string;
         error: string;
+        purple: string;
+        pink: string;
+        orange: string;
+        indigo: string;
+        emerald: string;
+        rose: string;
         commentText: {
             black: string;
             blue: string;
@@ -57,6 +68,11 @@ export const theme: Record<ThemeMode, Theme> = {
             transparentToSea: 'linear-gradient(to bottom, rgba(126, 206, 213, 0.3), rgba(126, 206, 213, 0.6), #00CED1)',
             seaGradient: 'linear-gradient(to bottom, #7eced5, #40E0D0)',
             contentBackground: 'linear-gradient(to bottom, rgba(187, 222, 251, 0.1), rgba(255, 255, 255, 1), rgba(126, 206, 213, 0.1))',
+            purpleGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            orangeGradient: 'linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%)',
+            pinkGradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+            techGradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+            socialGradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
         },
         colors: {
             background: '#FEFEFE',
@@ -70,6 +86,12 @@ export const theme: Record<ThemeMode, Theme> = {
             success: '#2E8B57',
             warning: '#D2691E',
             error: '#CD5C5C',
+            purple: '#8B5FBF',
+            pink: '#E91E63',
+            orange: '#FF7043',
+            indigo: '#5C6BC0',
+            emerald: '#26A69A',
+            rose: '#EC407A',
             commentText: {
                 black: '#1A1A1A',
                 blue: '#1E6091',
@@ -104,6 +126,11 @@ export const theme: Record<ThemeMode, Theme> = {
             transparentToSea: 'linear-gradient(to bottom, rgba(32, 106, 122, 0.3), rgba(32, 106, 122, 0.6), #206a7a)',
             seaGradient: 'linear-gradient(to bottom, #206a7a, #154459)',
             contentBackground: 'linear-gradient(to bottom, rgba(10, 25, 49, 0.15), rgba(18, 18, 18, 1), rgba(32, 106, 122, 0.15))',
+            purpleGradient: 'linear-gradient(135deg, #6a5acd 0%, #9370db 100%)',
+            orangeGradient: 'linear-gradient(135deg, #ff8a65 0%, #ff7043 100%)',
+            pinkGradient: 'linear-gradient(135deg, #f48fb1 0%, #ec407a 100%)',
+            techGradient: 'linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%)',
+            socialGradient: 'linear-gradient(135deg, #66bb6a 0%, #4caf50 100%)',
         },
         colors: {
             background: '#121212',
@@ -117,6 +144,12 @@ export const theme: Record<ThemeMode, Theme> = {
             success: '#4CAF50',
             warning: '#FF9800',
             error: '#F44336',
+            purple: '#BA68C8',
+            pink: '#F06292',
+            orange: '#FF8A65',
+            indigo: '#7986CB',
+            emerald: '#4DB6AC',
+            rose: '#F48FB1',
             commentText: {
                 black: '#E0E0E0',
                 blue: '#42A5F5',

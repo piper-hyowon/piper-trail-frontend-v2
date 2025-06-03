@@ -19,7 +19,7 @@ const Dolphin: React.FC<DolphinProps> = ({
                                              isDay,
                                              onClick,
                                              maxDistance = 50,
-                                             clickableMinY = 5,
+                                             clickableMinY = 3,
                                          }) => {
     const gltf = useGLTF('/models/dolphin.gltf');
     const groupRef = useRef<THREE.Group | null>(null);
@@ -29,7 +29,6 @@ const Dolphin: React.FC<DolphinProps> = ({
     const [currentPosition, setCurrentPosition] = useState<[number, number, number]>([...position]);
     const [isHovered, setIsHovered] = useState(false);
     const timeRef = useRef(0);
-    const lastClickTime = useRef(0);
     const {setEasterEggUnlocked} = useEasterEgg();
 
     // 클릭 영역 제한용
@@ -42,7 +41,7 @@ const Dolphin: React.FC<DolphinProps> = ({
 
             // 돌고래 중심으로부터의 거리 계산
             const distance = clickPoint.distanceTo(dolphinCenter);
-            const clickableRadius = 12; // 클릭 가능한 반경을 작게 제한
+            const clickableRadius = 20; // 클릭 가능한 반경을 작게 제한
 
             // 클릭 영역 내부이고 Y 좌표 조건도 만족할 때만 실행
             if (distance <= clickableRadius && clickPoint.y >= clickableMinY) {
@@ -104,7 +103,7 @@ const Dolphin: React.FC<DolphinProps> = ({
 
         if (isJumping) {
             setJumpProgress(prev => {
-                const newProgress = prev + delta * 0.9; // 점프 속도 조절 (숫자가 클수록 빠름)
+                const newProgress = prev + delta * 0.8; // 점프 속도 조절 (숫자가 클수록 빠름)
 
                 if (newProgress >= 1) {
                     // 점프 완료 - 방향 결정해서 새로운 위치로 업데이트

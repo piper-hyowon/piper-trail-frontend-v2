@@ -1,5 +1,15 @@
 import React, {useState} from 'react';
-import styled, {keyframes} from 'styled-components';
+import styled, {keyframes, createGlobalStyle} from 'styled-components';
+
+const AboutFontStyle = createGlobalStyle`
+  @font-face {
+    font-family: 'AboutCustomFont';
+    src: url('/fonts/PlaypenSans-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+`;
 
 const fadeInUp = keyframes`
   from {
@@ -40,6 +50,7 @@ const pulse = keyframes`
 `;
 
 const AboutContainer = styled.div`
+  font-family: 'AboutCustomFont', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   max-width: 1200px;
   margin: 0 auto;
   padding: ${({theme}) => theme.spacing.lg};
@@ -55,8 +66,8 @@ const AboutContainer = styled.div`
     right: 0;
     bottom: 0;
     background: radial-gradient(circle at 20% 50%, ${({theme}) => `${theme.colors.primary}20`} 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, ${({theme}) => `${theme.colors.secondary}20`} 0%, transparent 50%),
-    radial-gradient(circle at 40% 80%, ${({theme}) => `${theme.colors.accent}20`} 0%, transparent 50%);
+    radial-gradient(circle at 80% 20%, ${({theme}) => `${theme.colors.purple}20`} 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, ${({theme}) => `${theme.colors.emerald}20`} 0%, transparent 50%);
     pointer-events: none;
   }
 `;
@@ -167,7 +178,7 @@ const PrimaryInterestLabel = styled(InterestLabel)`
 
 const SecondaryInterestLabel = styled(InterestLabel)`
   font-size: 1rem;
-  color: ${({theme}) => `${theme.colors.primary}CC`};
+  color: ${({theme}) => theme.colors.secondary};
   font-weight: 500;
 `;
 
@@ -209,35 +220,69 @@ const SecondaryInterestTag = styled(InterestTag)`
   }
 `;
 
-const Section = styled.section`
+const TechSection = styled.section`
   margin-bottom: ${({theme}) => theme.spacing.xl};
   padding: ${({theme}) => theme.spacing.xl};
   background: ${({theme}) => `${theme.colors.background}E6`};
   backdrop-filter: blur(20px);
   border-radius: 20px;
-  border: 1px solid ${({theme}) => `${theme.colors.primary}30`};
-  box-shadow: 0 8px 32px ${({theme}) => `${theme.colors.primary}15`};
+  border: 1px solid ${({theme}) => `${theme.colors.purple}30`};
+  box-shadow: 0 8px 32px ${({theme}) => `${theme.colors.purple}15`};
   animation: ${fadeInUp} 0.8s ease-out;
   animation-fill-mode: both;
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
+  animation-delay: 0.1s;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 20px 40px ${({theme}) => `${theme.colors.primary}20`};
+    box-shadow: 0 20px 40px ${({theme}) => `${theme.colors.purple}25`};
   }
 
-  &:nth-child(2) {
-    animation-delay: 0.1s;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: ${({theme}) => theme.gradients.purpleGradient};
+    opacity: 0.1;
+    animation: ${shimmer} 4s infinite;
+  }
+`;
+
+const LinksSection = styled.section`
+  margin-bottom: ${({theme}) => theme.spacing.xl};
+  padding: ${({theme}) => theme.spacing.xl};
+  background: ${({theme}) => `${theme.colors.background}E6`};
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid ${({theme}) => `${theme.colors.emerald}30`};
+  box-shadow: 0 8px 32px ${({theme}) => `${theme.colors.emerald}15`};
+  animation: ${fadeInUp} 0.8s ease-out;
+  animation-fill-mode: both;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  animation-delay: 0.2s;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px ${({theme}) => `${theme.colors.emerald}25`};
   }
 
-  &:nth-child(3) {
-    animation-delay: 0.2s;
-  }
-
-  &:nth-child(4) {
-    animation-delay: 0.3s;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: ${({theme}) => theme.gradients.socialGradient};
+    opacity: 0.1;
+    animation: ${shimmer} 5s infinite;
   }
 `;
 
@@ -245,10 +290,10 @@ const SectionTitle = styled.h3`
   color: ${({theme}) => theme.colors.text};
   margin-bottom: ${({theme}) => theme.spacing.lg};
   padding-bottom: ${({theme}) => theme.spacing.sm};
-  border-bottom: 2px solid ${({theme}) => `${theme.colors.primary}30`};
+  border-bottom: 2px solid ${({theme}) => `${theme.colors.purple}30`};
   font-size: 1.5rem;
   font-weight: 600;
-  text-shadow: 0 2px 5px ${({theme}) => `${theme.colors.primary}20`};
+  text-shadow: 0 2px 5px ${({theme}) => `${theme.colors.purple}20`};
   position: relative;
 
   &::after {
@@ -258,7 +303,16 @@ const SectionTitle = styled.h3`
     left: 0;
     width: 50px;
     height: 2px;
-    background: ${({theme}) => theme.colors.primary};
+    background: ${({theme}) => theme.colors.purple};
+  }
+`;
+
+const LinksSectionTitle = styled(SectionTitle)`
+  border-bottom: 2px solid ${({theme}) => `${theme.colors.emerald}30`};
+  text-shadow: 0 2px 5px ${({theme}) => `${theme.colors.emerald}20`};
+
+  &::after {
+    background: ${({theme}) => theme.colors.emerald};
   }
 `;
 
@@ -269,19 +323,19 @@ const SkillGrid = styled.div`
   margin-top: ${({theme}) => theme.spacing.lg};
 `;
 
-const SkillCategory = styled.div`
+const BackendSkillCategory = styled.div`
   padding: ${({theme}) => theme.spacing.lg};
   background: ${({theme}) => `${theme.colors.background}B3`};
   backdrop-filter: blur(10px);
   border-radius: 16px;
-  border: 1px solid ${({theme}) => `${theme.colors.primary}30`};
+  border: 1px solid ${({theme}) => `${theme.colors.indigo}30`};
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 
   &:hover {
     transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 15px 30px ${({theme}) => `${theme.colors.primary}20`};
+    box-shadow: 0 15px 30px ${({theme}) => `${theme.colors.indigo}25`};
     background: ${({theme}) => `${theme.colors.background}CC`};
   }
 
@@ -292,13 +346,49 @@ const SkillCategory = styled.div`
     left: 0;
     right: 0;
     height: 3px;
-    background: ${({theme}) => theme.gradients.seaGradient};
+    background: ${({theme}) => theme.gradients.techGradient};
     opacity: 0;
     transition: opacity 0.3s ease;
   }
 
   &:hover::before {
     opacity: 1;
+  }
+`;
+
+const DatabaseSkillCategory = styled(BackendSkillCategory)`
+  border: 1px solid ${({theme}) => `${theme.colors.orange}30`};
+
+  &:hover {
+    box-shadow: 0 15px 30px ${({theme}) => `${theme.colors.orange}25`};
+  }
+
+  &::before {
+    background: ${({theme}) => theme.gradients.orangeGradient};
+  }
+`;
+
+const DevOpsSkillCategory = styled(BackendSkillCategory)`
+  border: 1px solid ${({theme}) => `${theme.colors.rose}30`};
+
+  &:hover {
+    box-shadow: 0 15px 30px ${({theme}) => `${theme.colors.rose}25`};
+  }
+
+  &::before {
+    background: ${({theme}) => theme.gradients.pinkGradient};
+  }
+`;
+
+const OthersSkillCategory = styled(BackendSkillCategory)`
+  border: 1px solid ${({theme}) => `${theme.colors.emerald}30`};
+
+  &:hover {
+    box-shadow: 0 15px 30px ${({theme}) => `${theme.colors.emerald}25`};
+  }
+
+  &::before {
+    background: ${({theme}) => theme.gradients.socialGradient};
   }
 `;
 
@@ -358,13 +448,13 @@ const ContactItem = styled.div`
   background: ${({theme}) => `${theme.colors.background}B3`};
   backdrop-filter: blur(10px);
   border-radius: 16px;
-  border: 1px solid ${({theme}) => `${theme.colors.primary}30`};
+  border: 1px solid ${({theme}) => `${theme.colors.emerald}30`};
   position: relative;
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-5px);
-    box-shadow: 0 15px 30px ${({theme}) => `${theme.colors.primary}20`};
+    box-shadow: 0 15px 30px ${({theme}) => `${theme.colors.emerald}25`};
     background: ${({theme}) => `${theme.colors.background}CC`};
   }
 `;
@@ -376,9 +466,11 @@ const ContactIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${({theme}) => `${theme.colors.primary}20`};
+  background: ${({theme}) => theme.gradients.socialGradient};
   border-radius: 12px;
   backdrop-filter: blur(10px);
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 `;
 
 const ContactText = styled.div`
@@ -390,7 +482,7 @@ const ContactText = styled.div`
     font-weight: 600;
     display: block;
     margin-bottom: 4px;
-    text-shadow: 0 1px 3px ${({theme}) => `${theme.colors.primary}30`};
+    text-shadow: 0 1px 3px ${({theme}) => `${theme.colors.emerald}30`};
   }
 
   a {
@@ -399,14 +491,14 @@ const ContactText = styled.div`
     transition: all 0.2s ease;
 
     &:hover {
-      color: ${({theme}) => theme.colors.primary};
+      color: ${({theme}) => theme.colors.emerald};
     }
   }
 `;
 
 const CopyButton = styled.button`
-  background: ${({theme}) => theme.gradients.seaGradient};
-  color: ${({theme}) => theme.colors.background};
+  background: ${({theme}) => theme.gradients.socialGradient};
+  color: white;
   border: none;
   border-radius: 10px;
   padding: 10px 16px;
@@ -414,13 +506,13 @@ const CopyButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px ${({theme}) => `${theme.colors.primary}30`};
+  box-shadow: 0 4px 15px ${({theme}) => `${theme.colors.emerald}30`};
   position: relative;
   overflow: hidden;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px ${({theme}) => `${theme.colors.primary}40`};
+    box-shadow: 0 8px 25px ${({theme}) => `${theme.colors.emerald}40`};
     animation: ${pulse} 2s infinite;
   }
 
@@ -437,7 +529,7 @@ const CopyButton = styled.button`
     height: 100%;
     background: linear-gradient(90deg,
     transparent,
-    ${({theme}) => `${theme.colors.background}20`},
+    rgba(255, 255, 255, 0.2),
     transparent);
     transition: left 0.5s;
   }
@@ -493,104 +585,112 @@ const AboutPage: React.FC = () => {
     };
 
     return (
-        <AboutContainer>
-            <ContentWrapper>
-                <AboutHeader>
-                    <ProfileImage>
-                        <img width={180} src={'/images/profile.PNG'} alt="Profile Image"/>
-                    </ProfileImage>
-                    <Name>Backend Developer</Name>
+        <>
+            <AboutFontStyle/>
+            <AboutContainer>
+                <ContentWrapper>
+                    <AboutHeader>
+                        <ProfileImage>
+                            <img width={180} src={'/images/profile.PNG'} alt="Profile Image"/>
+                        </ProfileImage>
+                        <Name>Backend Developer</Name>
 
-                    <InterestsContainer>
-                        <InterestGroup>
-                            <PrimaryInterestLabel>Professional Focus</PrimaryInterestLabel>
-                            <PrimaryInterestTags>
-                                <InterestTag>Backend Architecture</InterestTag>
-                                <InterestTag>XaaS</InterestTag>
-                                <InterestTag>Blockchain</InterestTag>
-                                <InterestTag>Secure Coding</InterestTag>
-                            </PrimaryInterestTags>
-                        </InterestGroup>
+                        <InterestsContainer>
+                            <InterestGroup>
+                                <PrimaryInterestLabel>Professional Focus</PrimaryInterestLabel>
+                                <PrimaryInterestTags>
+                                    <InterestTag>Backend Architecture</InterestTag>
+                                    <InterestTag>XaaS</InterestTag>
+                                    <InterestTag>Blockchain</InterestTag>
+                                    <InterestTag>Secure Coding</InterestTag>
+                                </PrimaryInterestTags>
+                            </InterestGroup>
 
-                        <InterestGroup>
-                            <SecondaryInterestLabel>Personal Interests</SecondaryInterestLabel>
-                            <SecondaryInterestTags>
-                                <SecondaryInterestTag>3D Modeling</SecondaryInterestTag>
-                                <SecondaryInterestTag>Q#</SecondaryInterestTag>
-                                <SecondaryInterestTag>Table tennis 🏓</SecondaryInterestTag>
-                            </SecondaryInterestTags>
-                        </InterestGroup>
-                    </InterestsContainer>
-                </AboutHeader>
+                            <InterestGroup>
+                                <SecondaryInterestLabel>Personal Interests</SecondaryInterestLabel>
+                                <SecondaryInterestTags>
+                                    <SecondaryInterestTag>3D Modeling</SecondaryInterestTag>
+                                    <SecondaryInterestTag>Q#</SecondaryInterestTag>
+                                    <SecondaryInterestTag>Table tennis 🏓</SecondaryInterestTag>
+                                </SecondaryInterestTags>
+                            </InterestGroup>
+                        </InterestsContainer>
+                    </AboutHeader>
 
-                <Section>
-                    <SectionTitle>🚀 Tech Stack</SectionTitle>
-                    <SkillGrid>
-                        <SkillCategory>
-                            <SkillTitle>Backend</SkillTitle>
-                            <SkillList>
-                                <SkillItem>Go</SkillItem>
-                                <SkillItem>TypeScript / Node.js / NestJS</SkillItem>
-                                <SkillItem>Java / Spring Boot</SkillItem>
-                            </SkillList>
-                        </SkillCategory>
-                        <SkillCategory>
-                            <SkillTitle>Database</SkillTitle>
-                            <SkillList>
-                                <SkillItem>PostgreSQL</SkillItem>
-                                <SkillItem>MongoDB</SkillItem>
-                                <SkillItem>Redis</SkillItem>
-                            </SkillList>
-                        </SkillCategory>
-                        <SkillCategory>
-                            <SkillTitle>DevOps</SkillTitle>
-                            <SkillList>
-                                <SkillItem>Kubernetes</SkillItem>
-                                <SkillItem>AWS / DigitalOcean</SkillItem>
-                            </SkillList>
-                        </SkillCategory>
-                        <SkillCategory>
-                            <SkillTitle>Others</SkillTitle>
-                            <SkillList>
-                                <SkillItem>Frontend - TypeScript, React</SkillItem>
-                            </SkillList>
-                        </SkillCategory>
-                    </SkillGrid>
-                </Section>
+                    <TechSection>
+                        <SectionTitle>Tech Stack</SectionTitle>
+                        <SkillGrid>
+                            <BackendSkillCategory>
+                                <SkillTitle>Backend</SkillTitle>
+                                <SkillList>
+                                    <SkillItem>Go</SkillItem>
+                                    <SkillItem>TypeScript / Node.js / NestJS</SkillItem>
+                                    <SkillItem>Java / Spring Boot</SkillItem>
+                                </SkillList>
+                            </BackendSkillCategory>
+                            <DatabaseSkillCategory>
+                                <SkillTitle>Database</SkillTitle>
+                                <SkillList>
+                                    <SkillItem>PostgreSQL</SkillItem>
+                                    <SkillItem>MongoDB</SkillItem>
+                                    <SkillItem>Redis</SkillItem>
+                                </SkillList>
+                            </DatabaseSkillCategory>
+                            <DevOpsSkillCategory>
+                                <SkillTitle>DevOps</SkillTitle>
+                                <SkillList>
+                                    <SkillItem>Kubernetes</SkillItem>
+                                    <SkillItem>AWS / DigitalOcean</SkillItem>
+                                </SkillList>
+                            </DevOpsSkillCategory>
+                            <OthersSkillCategory>
+                                <SkillTitle>Others</SkillTitle>
+                                <SkillList>
+                                    <SkillItem>React</SkillItem>
+                                </SkillList>
+                            </OthersSkillCategory>
+                        </SkillGrid>
+                    </TechSection>
 
-                <Section>
-                    <SectionTitle>🔗 Links</SectionTitle>
-                    <ContactInfo>
-                        <ContactItem>
-                            <CopyFeedback $show={copiedStates['github'] || false}>Copied!</CopyFeedback>
-                            <ContactIcon>🐙</ContactIcon>
-                            <ContactText>
-                                <strong>GitHub</strong>
-                                <a href="https://github.com/piper-hyowon" target="_blank" rel="noopener noreferrer">
-                                    github.com/piper-hyowon
-                                </a>
-                            </ContactText>
-                            <CopyButton onClick={() => handleCopy('https://github.com/piper-hyowon', 'github')}>
-                                Copy
-                            </CopyButton>
-                        </ContactItem>
-                        <ContactItem>
-                            <CopyFeedback $show={copiedStates['blog'] || false}>Copied!</CopyFeedback>
-                            <ContactIcon>📝</ContactIcon>
-                            <ContactText>
-                                <strong>Blog</strong>
-                                <a href="https://piper-trail.com/tech" target="_blank" rel="noopener noreferrer">
-                                    piper-trail.com/tech
-                                </a>
-                            </ContactText>
-                            <CopyButton onClick={() => handleCopy('https://piper-trail.com/tech', 'blog')}>
-                                Copy
-                            </CopyButton>
-                        </ContactItem>
-                    </ContactInfo>
-                </Section>
-            </ContentWrapper>
-        </AboutContainer>
+                    <LinksSection>
+                        <LinksSectionTitle>🔗 Links</LinksSectionTitle>
+                        <ContactInfo>
+                            <ContactItem>
+                                <CopyFeedback $show={copiedStates['github'] || false}>Copied!</CopyFeedback>
+                                <ContactIcon>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                        <path
+                                            d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                                    </svg>
+                                </ContactIcon>
+                                <ContactText>
+                                    <strong>GitHub</strong>
+                                    <a href="https://github.com/piper-hyowon" target="_blank" rel="noopener noreferrer">
+                                        github.com/piper-hyowon
+                                    </a>
+                                </ContactText>
+                                <CopyButton onClick={() => handleCopy('https://github.com/piper-hyowon', 'github')}>
+                                    Copy
+                                </CopyButton>
+                            </ContactItem>
+                            <ContactItem>
+                                <CopyFeedback $show={copiedStates['blog'] || false}>Copied!</CopyFeedback>
+                                <ContactIcon>📝</ContactIcon>
+                                <ContactText>
+                                    <strong>Blog</strong>
+                                    <a href="https://piper-trail.com/tech" target="_blank" rel="noopener noreferrer">
+                                        piper-trail.com/tech
+                                    </a>
+                                </ContactText>
+                                <CopyButton onClick={() => handleCopy('https://piper-trail.com/tech', 'blog')}>
+                                    Copy
+                                </CopyButton>
+                            </ContactItem>
+                        </ContactInfo>
+                    </LinksSection>
+                </ContentWrapper>
+            </AboutContainer>
+        </>
     );
 };
 

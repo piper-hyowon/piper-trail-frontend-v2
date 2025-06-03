@@ -7,6 +7,11 @@ declare module 'styled-components' {
             transparentToSea: string;
             seaGradient: string;
             contentBackground: string;
+            purpleGradient: string;
+            orangeGradient: string;
+            pinkGradient: string;
+            techGradient: string;
+            socialGradient: string;
         };
         colors: {
             background: string;
@@ -20,6 +25,12 @@ declare module 'styled-components' {
             success: string;
             warning: string;
             error: string;
+            purple: string;
+            pink: string;
+            orange: string;
+            indigo: string;
+            emerald: string;
+            rose: string;
             commentText: {
                 black: string;
                 blue: string;

@@ -100,7 +100,7 @@ const HeadersPanel: React.FC<HeadersPanelProps> = ({acceptHeader, onAcceptHeader
 
             <HeaderGroup>
                 <HeaderLabel>Authorization:</HeaderLabel>
-                <AuthStatus authenticated={isAuthenticated}>
+                <AuthStatus $authenticated={isAuthenticated}>
                     {isAuthenticated ? '🔒 Bearer token-***' : '🔓 Not authenticated'}
                 </AuthStatus>
             </HeaderGroup>
