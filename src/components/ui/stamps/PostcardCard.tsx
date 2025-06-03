@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, {keyframes} from 'styled-components';
+import styled, {createGlobalStyle, keyframes} from 'styled-components';
 import StampSVG from './StampSVG';
 
 interface PostcardCardProps {
@@ -88,7 +88,7 @@ const CardContainer = styled.div<{ $stampType: string; $index: number }>`
   animation: ${postcardFall} 0.8s ease-out;
   animation-delay: ${({$index}) => $index * 0.15}s;
   animation-fill-mode: both;
-  will-change: transform; 
+  will-change: transform;
 
   &:hover {
     transform: translate3d(0, -5px, 0); /* GPU 가속 사용 */
@@ -98,7 +98,7 @@ const CardContainer = styled.div<{ $stampType: string; $index: number }>`
 `;
 
 const WrittenText = styled.div`
-  font-family: 'Dancing Script', cursive;
+  font-family: 'PostcardCardCustomFont', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif !important;;
   color: #2c3e50;
   margin-bottom: 20px;
   position: relative;
@@ -129,7 +129,7 @@ const WrittenText = styled.div`
 `;
 
 const FromHeader = styled.div`
-  font-size: 18px;
+  font-size: 23px;
   font-weight: 600;
   margin-bottom: 5px;
   transform: rotate(-0.8deg);
@@ -144,14 +144,14 @@ const FromNickname = styled.span`
 `;
 
 const FromDate = styled.span`
-  font-size: 14px;
+  font-size: 17px;
   color: #7f8c8d;
   font-weight: 400;
   transform: rotate(0.5deg);
 `;
 
 const MessageText = styled.div<{ $hasMessage: boolean }>`
-  font-size: ${({$hasMessage}) => $hasMessage ? '16px' : '15px'};
+  font-size: ${({$hasMessage}) => $hasMessage ? '20px' : '19px'};
   font-weight: 400;
   color: ${({$hasMessage}) => $hasMessage ? '#2c3e50' : '#7f8c8d'};
   transform: rotate(0.3deg);
@@ -159,6 +159,16 @@ const MessageText = styled.div<{ $hasMessage: boolean }>`
   margin-left: 10px;
   line-height: 1.4;
   margin-bottom: 15px;
+`;
+
+const PostcardCardFontStyle = createGlobalStyle`
+  @font-face {
+    font-family: 'PostcardCardCustomFont';
+    src: url('/fonts/cat.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
 `;
 
 const StampContainer = styled.div`
@@ -198,27 +208,30 @@ const PostcardCard: React.FC<PostcardCardProps> = React.memo(({entry, stampInfo,
     );
 
     return (
-        <CardContainer $stampType={entry.stampId} $index={index}>
-            <WrittenText>
-                <FromHeader>
-                    <span>From. <FromNickname>{entry.nickname}</FromNickname></span>
-                    <FromDate>{formattedDate}</FromDate>
-                </FromHeader>
-                <MessageText $hasMessage={hasMessage}>
-                    {displayMessage}
-                </MessageText>
-            </WrittenText>
+        <>
+            <PostcardCardFontStyle/>
+            <CardContainer $stampType={entry.stampId} $index={index}>
+                <WrittenText>
+                    <FromHeader>
+                        <span>From. <FromNickname>{entry.nickname}</FromNickname></span>
+                        <FromDate>{formattedDate}</FromDate>
+                    </FromHeader>
+                    <MessageText $hasMessage={hasMessage}>
+                        {displayMessage}
+                    </MessageText>
+                </WrittenText>
 
-            <StampContainer>
-                <StampSVG
-                    stampType={entry.stampId}
-                    color={stampInfo?.color || '#ccc'}
-                    name={stampInfo?.name || ''}
-                    selected={false}
-                    size={120}
-                />
-            </StampContainer>
-        </CardContainer>
+                <StampContainer>
+                    <StampSVG
+                        stampType={entry.stampId}
+                        color={stampInfo?.color || '#ccc'}
+                        name={stampInfo?.name || ''}
+                        selected={false}
+                        size={120}
+                    />
+                </StampContainer>
+            </CardContainer>
+        </>
     );
 });
 

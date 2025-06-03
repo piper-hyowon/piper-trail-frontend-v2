@@ -25,7 +25,7 @@ export interface LinkInfo {
 
 export interface PostDetail extends PostSummary {
     content: string;
-    links: Map<string, LinkInfo>;
+    _links: Map<string, LinkInfo>;
 }
 
 export interface CreatePostRequest {

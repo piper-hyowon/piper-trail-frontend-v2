@@ -7,6 +7,7 @@ import TagList from "../components/ui/TagList";
 import PostForm from "../components/ui/PostForm";
 import DeleteConfirmModal from "../components/ui/DeleteConfirmModal";
 import AuthModal from "../components/ui/AuthModal";
+import ApiLink from "../components/ui/ApiLink";
 import {CommentSection} from "../components/ui/comments/CommentSection.tsx";
 
 const PostDetailContainer = styled.article`
@@ -60,10 +61,10 @@ const PostHeader = styled.header`
 
 const PostTitle = styled.h1`
   color: ${({theme}) => theme.colors.primary};
-  font-size: clamp(1.8rem, 4vw, 2.5rem); /* 반응형 폰트 크기 */
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
   line-height: 1.2;
   margin-bottom: ${({theme}) => theme.spacing.md};
-  word-break: keep-all; /* 한글 줄바꿈 개선 */
+  word-break: keep-all;
 `;
 
 const PostMeta = styled.div`
@@ -123,12 +124,7 @@ const PostContent = styled.div`
   border-radius: ${({theme}) => theme.borderRadius};
   box-shadow: 0 2px 8px ${({theme}) => `${theme.colors.primary}10`};
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  h1, h2, h3, h4, h5, h6 {
     color: ${({theme}) => theme.colors.primary};
     margin-top: ${({theme}) => theme.spacing.xl};
     margin-bottom: ${({theme}) => theme.spacing.md};
@@ -153,7 +149,6 @@ const PostContent = styled.div`
     text-align: justify;
   }
 
-  // 인라인 코드
   code {
     background-color: ${({theme}) => theme.colors.secondaryBackground};
     color: ${({theme}) => theme.colors.primary};
@@ -165,7 +160,6 @@ const PostContent = styled.div`
     font-weight: 500;
   }
 
-  // 코드 블록
   pre {
     background-color: ${({theme}) => theme.colors.secondaryBackground};
     padding: ${({theme}) => theme.spacing.md};
@@ -174,8 +168,6 @@ const PostContent = styled.div`
     margin: ${({theme}) => theme.spacing.md} 0;
     border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
     box-shadow: inset 0 2px 4px ${({theme}) => `${theme.colors.primary}10`};
-    position: relative;
-
     border-left: 4px solid ${({theme}) => theme.colors.primary};
 
     code {
@@ -197,8 +189,7 @@ const PostContent = styled.div`
     color: ${({theme}) => `${theme.colors.text}90`};
   }
 
-  ul,
-  ol {
+  ul, ol {
     margin-bottom: ${({theme}) => theme.spacing.md};
     padding-left: ${({theme}) => theme.spacing.lg};
   }
@@ -226,8 +217,7 @@ const PostContent = styled.div`
     overflow: hidden;
   }
 
-  th,
-  td {
+  th, td {
     padding: ${({theme}) => theme.spacing.sm};
     text-align: left;
     border-bottom: 1px solid ${({theme}) => `${theme.colors.primary}20`};
@@ -307,6 +297,27 @@ const ActionButton = styled.button<{ $variant?: 'edit' | 'delete' }>`
     opacity: 0.9;
     transform: translateY(-1px);
   }
+`;
+
+const ResourceLinksSection = styled.section`
+  margin-top: ${({theme}) => theme.spacing.xl};
+  padding: ${({theme}) => theme.spacing.lg};
+  background: ${({theme}) => theme.colors.background};
+  border-radius: ${({theme}) => theme.borderRadius};
+  border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+`;
+
+const ResourceLinksTitle = styled.h3`
+  color: ${({theme}) => theme.colors.primary};
+  margin-bottom: ${({theme}) => theme.spacing.md};
+  font-size: 1.2rem;
+  font-weight: 600;
+`;
+
+const ApiNavLinks = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({theme}) => theme.spacing.sm};
 `;
 
 const LoadingContainer = styled.div`
@@ -397,7 +408,7 @@ const PostDetailPage: React.FC = () => {
         postSlug: string;
     }>();
     const navigate = useNavigate();
-    const {isAuthenticated, login} = useApi();
+    const {isAuthenticated, login, fetchApiData} = useApi(); // fetchApiData 추가
 
     if (!postSlug) {
         return (
@@ -423,6 +434,61 @@ const PostDetailPage: React.FC = () => {
 
     const updatePostMutation = useUpdatePost();
     const deletePostMutation = useDeletePost();
+
+    const handleUpdateClick = useCallback(() => {
+        if (!post) return;
+        setShowUpdateForm(true);
+    }, [post]);
+
+    const handleDeleteClick = useCallback(() => {
+        if (!post) return;
+        setShowDeleteModal(true);
+    }, [post]);
+
+    const handleApiLinkClick = useCallback(async (href: string, linkMethod?: string) => {
+        try {
+            console.log(`API 링크 클릭: ${linkMethod} ${href}`);
+
+            switch (linkMethod?.toUpperCase()) {
+                case 'PUT':
+                    if (href.includes('/posts/')) {
+                        handleUpdateClick();
+                    }
+                    break;
+
+                case 'DELETE':
+                    if (href.includes('/posts/')) {
+                        handleDeleteClick();
+                    }
+                    break;
+
+                case 'GET':
+                    if (href.includes('/category/')) {
+                        const categoryMatch = href.match(/\/category\/(.+)$/);
+                        if (categoryMatch) {
+                            const category = categoryMatch[1];
+                            navigate(`/${category === 'null' ? 'uncategorized' : category}`);
+                        }
+                    } else if (href.includes('/posts/')) {
+                        // 현재 포스트 새로고침 (self 링크)
+                        window.location.reload();
+                    } else {
+                        navigate(href);
+                    }
+                    break;
+
+                default:
+                    if (fetchApiData) {
+                        await fetchApiData(href, linkMethod as any);
+                    } else {
+                        navigate(href);
+                    }
+                    break;
+            }
+        } catch (error) {
+            console.error('Failed to handle API link click', error);
+        }
+    }, [fetchApiData, navigate, handleUpdateClick, handleDeleteClick]);
 
     // NavigationBar와의 통신을 위한 이벤트 리스너
     React.useEffect(() => {
@@ -494,20 +560,9 @@ const PostDetailPage: React.FC = () => {
         }
     }, [deletePostMutation, post, navigate]);
 
-    const handleUpdateClick = useCallback(() => {
-        if (!post) return;
-        setShowUpdateForm(true);
-    }, [post]);
-
-    const handleDeleteClick = useCallback(() => {
-        if (!post) return;
-        setShowDeleteModal(true);
-    }, [post]);
-
     const handleUpdateSubmit = useCallback(async (formData: any) => {
         try {
             if (!isAuthenticated) {
-                // 인증되지 않았으면 폼 데이터 저장, 인증 모달 표시
                 setFormData(formData);
                 setPendingAction('update');
                 setShowUpdateForm(false);
@@ -516,7 +571,6 @@ const PostDetailPage: React.FC = () => {
                 return;
             }
 
-            // 인증되어 있으면 바로 포스트 수정
             await updatePost(formData);
         } catch (error) {
             console.error('Form submission failed:', error);
@@ -533,7 +587,6 @@ const PostDetailPage: React.FC = () => {
                 return;
             }
 
-            // 인증되어 있으면 바로 포스트 삭제
             await deletePost();
         } catch (error) {
             console.error('Delete confirmation failed:', error);
@@ -630,7 +683,9 @@ const PostDetailPage: React.FC = () => {
 
     return (
         <PostDetailContainer>
-            <BackButton to={`/${post.category}`}>{post.category} 목록으로</BackButton>
+            <BackButton to={`/${post.category || 'uncategorized'}`}>
+                {post.category || 'uncategorized'} 목록으로
+            </BackButton>
 
             <PostHeader>
                 <PostTitle>{post.title}</PostTitle>
@@ -638,17 +693,17 @@ const PostDetailPage: React.FC = () => {
                 <PostMeta>
                     <PostMetaItem>
                         <MetaIcon>📅</MetaIcon>
-                        {formatDate(post.createdAt)}
+                        {post.createdAt ? formatDate(post.createdAt) : '날짜 없음'}
                     </PostMetaItem>
 
-                    <CategoryLink to={`/${post.category}`}>
+                    <CategoryLink to={`/${post.category || 'uncategorized'}`}>
                         <MetaIcon>📁</MetaIcon>
-                        {post.category}
+                        {post.category || '미분류'}
                     </CategoryLink>
 
                     <PostMetaItem>
                         <MetaIcon>👀</MetaIcon>
-                        {post.viewCount} views
+                        {post.viewCount || 0} views
                     </PostMetaItem>
                 </PostMeta>
 
@@ -665,8 +720,8 @@ const PostDetailPage: React.FC = () => {
 
             <PostFooter>
                 <FooterContent>
-                    <BackButton to={`/${post.category}`}>
-                        {post.category} 목록으로 돌아가기
+                    <BackButton to={`/${post.category || 'uncategorized'}`}>
+                        {post.category || 'uncategorized'} 목록으로 돌아가기
                     </BackButton>
 
                     <ShareSection>
@@ -685,6 +740,23 @@ const PostDetailPage: React.FC = () => {
                 </FooterContent>
             </PostFooter>
 
+            {post._links && Object.keys(post._links).length > 0 && (
+                <ResourceLinksSection>
+                    <ResourceLinksTitle>API Resource Links</ResourceLinksTitle>
+                    <ApiNavLinks>
+                        {Object.entries(post._links).map(([key, link]) => (
+                            <ApiLink
+                                key={key}
+                                method={link.method || 'GET'}
+                                path={link.href}
+                                title={link.title || key}
+                                onClick={() => handleApiLinkClick(link.href, link.method)}
+                            />
+                        ))}
+                    </ApiNavLinks>
+                </ResourceLinksSection>
+            )}
+
             {/* Update Post Modal */}
             {showUpdateForm && (
                 <FormModal>
@@ -694,7 +766,7 @@ const PostDetailPage: React.FC = () => {
                             <CloseButton onClick={handleFormCancel}>×</CloseButton>
                         </ModalHeader>
                         <PostForm
-                            category={post.category}
+                            category={post.category || 'uncategorized'}
                             initialData={{
                                 title: post.title,
                                 content: post.content || post.content,
