@@ -48,7 +48,6 @@ const HomePage: React.FC = () => {
     const is3DView = acceptHeader === 'text/html';
 
     const handleCategoryClick = (category: string) => {
-        console.log('Category clicked:', category);
         navigateTo(`/${category}`);
     };
 

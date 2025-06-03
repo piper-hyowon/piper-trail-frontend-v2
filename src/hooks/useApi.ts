@@ -47,7 +47,6 @@ export const useSearchPosts = (searchRequest: PostSearchRequest) => {
 };
 
 export const usePost = (slug: string) => {
-    console.log(slug)
     return useQuery({
         queryKey: ['post', slug],
         queryFn: () => apiClient.getPost(slug),
@@ -109,7 +108,6 @@ export const useTags = () => {
 };
 
 export const usePostComments = (postId: string, page = 0, size = 20) => {
-    console.log("postId: ", postId)
     return useQuery({
         queryKey: ['comments', 'post', postId, page, size],
         queryFn: () => apiClient.getPostComments(postId, page, size),
