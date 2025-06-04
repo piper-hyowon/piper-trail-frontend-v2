@@ -59,20 +59,20 @@ const HeaderValue = styled.div`
   font-size: ${({theme}) => theme.fontSizes.small};
 `;
 
-const AuthStatus = styled.div<{ authenticated: boolean }>`
+const AuthStatus = styled.div<{ $authenticated: boolean }>`
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
   font-family: 'Roboto Mono', monospace;
   font-size: ${({theme}) => theme.fontSizes.small};
   padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.sm}`};
-  background-color: ${({theme, authenticated}) =>
-          authenticated ? `${theme.colors.success}10` : theme.colors.background};
-  border: 1px solid ${({theme, authenticated}) =>
-          authenticated ? `${theme.colors.success}30` : `${theme.colors.primary}20`};
+  background-color: ${({theme, $authenticated}) =>
+          $authenticated ? `${theme.colors.success}10` : theme.colors.background};
+  border: 1px solid ${({theme, $authenticated}) =>
+          $authenticated ? `${theme.colors.success}30` : `${theme.colors.primary}20`};
   border-radius: ${({theme}) => theme.borderRadius};
-  color: ${({theme, authenticated}) =>
-          authenticated ? theme.colors.success : theme.colors.error};
+  color: ${({theme, $authenticated}) =>
+          $authenticated ? theme.colors.success : theme.colors.error};
 `;
 
 const HeadersPanel: React.FC<HeadersPanelProps> = ({acceptHeader, onAcceptHeaderChange}) => {

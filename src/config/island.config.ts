@@ -144,7 +144,7 @@ export const islands: IslandConfig[] = [
 ];
 
 export const createDefaultIsland = (categoryName: string, index: number): IslandConfig => {
-    const positions = [
+    const positions: [number, number, number][] = [
         [-18, 0, 15],
         [18, 0, 15],
         [25, 0, 0],
@@ -155,7 +155,7 @@ export const createDefaultIsland = (categoryName: string, index: number): Island
         [0, 0, -22],
     ];
 
-    const position = positions[index % positions.length] || [20, 0, 20];
+    const position: [number, number, number] = positions[index % positions.length] || [20, 0, 20];
 
     return {
         path: `/${categoryName.toLowerCase()}`,

@@ -13,6 +13,7 @@ import {
 interface BasicPaginationParams {
     page?: number;
     size?: number;
+    sort?: string;
 }
 
 export const usePosts = (params?: BasicPaginationParams) => {

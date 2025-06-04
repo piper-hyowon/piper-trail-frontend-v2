@@ -1,11 +1,19 @@
 import React, {useRef, useEffect, Suspense, useMemo, useState, useCallback} from 'react';
-import {Canvas, useFrame} from '@react-three/fiber';
+import {Canvas, extend, useFrame} from '@react-three/fiber';
 import {useGLTF, PerspectiveCamera, OrbitControls, Text} from '@react-three/drei';
-import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry.js';
+// import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry.js';
+import {TextGeometry} from 'three/addons/geometries/TextGeometry.js';
+
 import {FontLoader} from 'three/examples/jsm/loaders/FontLoader.js';
 import {Font} from 'three/examples/jsm/loaders/FontLoader.js';
 import * as THREE from 'three';
 import {CanvasLoadingScreen} from "../../three/LoadingScreen.tsx";
+
+extend({
+    AmbientLight: THREE.AmbientLight,
+    DirectionalLight: THREE.DirectionalLight,
+    PointLight: THREE.PointLight
+});
 
 interface Mailbox3DProps {
     hasEntries: boolean;

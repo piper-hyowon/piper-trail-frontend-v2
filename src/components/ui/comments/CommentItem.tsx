@@ -7,6 +7,7 @@ import {useLanguage} from "../../../context/LanguageContext.tsx";
 interface CommentItemProps {
     comment: CommentResponse;
     postId: string;
+    isAdmin: boolean;
 }
 
 const CommentContainer = styled.div<{ $reviewNeeded?: boolean }>`
@@ -123,7 +124,7 @@ const DeleteInput = styled.input`
   border-radius: ${({theme}) => theme.borderRadius};
 `;
 
-export const CommentItem: React.FC<CommentItemProps> = ({comment, postId}) => {
+export const CommentItem: React.FC<CommentItemProps> = ({comment, postId, isAdmin}) => {
     const {t, language} = useLanguage();
 
     const [showDeleteForm, setShowDeleteForm] = useState(false);

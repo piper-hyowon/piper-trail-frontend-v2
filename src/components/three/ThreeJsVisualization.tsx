@@ -106,7 +106,7 @@ const SceneContent: React.FC<{
                 shadow-mapSize-height={1024}
             />
 
-            <Sea isDay={isDay}/>
+            <Sea/>
             <Dolphin position={[-60, -15, -100]} scale={0.05} isDay={isDay}
                      onClick={handleDolphinClick}/>
 

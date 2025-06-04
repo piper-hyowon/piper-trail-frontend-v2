@@ -23,13 +23,8 @@ const FPS_LIMIT = 30;
 export const Sea: React.FC = React.memo(() => {
     const {themeMode, isDay} = useTheme();
 
-    const seaColors = useMemo(() => {
-        const currentTheme = theme[themeMode];
-        return currentTheme.skyColors;
-    }, [themeMode]);
-
     const meshRef = useRef<THREE.Mesh>(new THREE.Mesh());
-    let lastUpdate = 0;
+    const lastUpdateRef = useRef(0);
 
     const verticesCount = useMemo(() => {
         const [, , widthSegments, heightSegments] = MESH_CONFIG.planeArgs;
@@ -99,11 +94,11 @@ export const Sea: React.FC = React.memo(() => {
 
     useFrame(({clock}) => {
         const now = performance.now();
-        if (now - lastUpdate < 1000 / FPS_LIMIT) return;
+        if (now - lastUpdateRef.current < 1000 / FPS_LIMIT) return;
 
         const time = clock.getElapsedTime() * WAVE_CONFIG.speed;
         updateWave(time);
-        lastUpdate = now;
+        lastUpdateRef.current = now;
     });
 
     return (
@@ -117,7 +112,7 @@ export const Sea: React.FC = React.memo(() => {
                 <GradientTexture stops={[0, 0.5, 1]} colors={colors} attach="map"/>
             </meshStandardMaterial>
             <mesh position={[0, 0, -30]}>
-                <boxGeometry args={[MESH_CONFIG.planeArgs[[0]] + 10, MESH_CONFIG.planeArgs[1] + 10, 60]}/>
+                <boxGeometry args={[MESH_CONFIG.planeArgs[0] + 10, MESH_CONFIG.planeArgs[1] + 10, 60]}/>
                 <meshStandardMaterial
                     color={"#0ad2e8"}
                     transparent={true}

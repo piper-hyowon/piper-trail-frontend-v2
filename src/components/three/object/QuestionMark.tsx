@@ -2,7 +2,9 @@ import {useFrame, useLoader} from '@react-three/fiber'
 import React, {useRef, useMemo} from 'react'
 import * as THREE from 'three'
 import {FontLoader} from 'three/examples/jsm/loaders/FontLoader.js'
-import {TextGeometry} from "three/examples/jsm/geometries/TextGeometry";
+// import {TextGeometry} from "three/examples/jsm/geometries/TextGeometry";
+import {TextGeometry} from "three/addons/geometries/TextGeometry.js";
+
 
 const QuestionMark: React.FC<{
     position: [number, number, number],
