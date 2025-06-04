@@ -1,5 +1,6 @@
 import React from 'react';
 import styled, {css, keyframes} from 'styled-components';
+import {useLanguage} from '../../../context/LanguageContext';
 
 interface StampSVGProps {
     stampType: string;
@@ -57,7 +58,7 @@ const StampContainer = styled.div<{ $size: number; $selected: boolean; $showPres
     animation: ${stampClick} 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   `}
 
-  
+
     /* 우표 톱니 테두리 효과 */
   &::before {
     content: '';
@@ -103,26 +104,43 @@ const StampContainer = styled.div<{ $size: number; $selected: boolean; $showPres
   }
 `;
 
-const StampPressed = styled.div<{ $visible: boolean; $color: string }>`
+const StampPressed = styled.div<{ $visible: boolean; $color: string; $language: 'ko' | 'en' }>`
   opacity: ${({$visible}) => $visible ? 0.7 : 0};
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%) rotate(-5deg);
   color: ${({$color}) => $color};
-  font-size: 10px;
+  font-size: ${({$language}) => $language === 'ko' ? '9px' : '10px'};
   font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: ${({$language}) => $language === 'ko' ? '0px' : '1px'};
   transition: opacity 0.3s ease;
   z-index: 10;
   text-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+}
 
+;
 
-  ${({$visible}) => $visible && css`
-    animation: ${stampPress} 0.3s ease;
-  `}
+${({$visible}) => $visible && css`
+  animation: ${stampPress} 0.3s ease;
+`}
 `;
+
+const STAMP_PRESSED_TEXTS: Record<string, { ko: string; en: string }> = {
+    'awesome': { ko: '멋짐', en: 'COOL' },
+    'interesting': { ko: '흥미', en: 'INTERESTING' },
+    'helpful': { ko: '도움', en: 'HELPFUL' },
+    'inspiring': { ko: '영감', en: 'INSPIRING' },
+    'thank_you': { ko: '감사', en: 'THANKFUL' },
+    'love_it': { ko: '사랑', en: 'LOVE' },
+    'default': { ko: '도장', en: 'STAMP' }
+};
+
+const getStampPressedText = (stampType: string, language: 'ko' | 'en') => {
+    const texts = STAMP_PRESSED_TEXTS[stampType] || STAMP_PRESSED_TEXTS['default'];
+    return texts[language];
+};
 
 const StampDesign: React.FC<{ type: string; size: number }> = ({type, size}) => {
     const iconSize = size * 0.8;
@@ -332,6 +350,8 @@ const StampSVG: React.FC<StampSVGProps> = ({
                                                size = 80,
                                                showPressed = false
                                            }) => {
+    const {language} = useLanguage();
+
     const stampColors = {
         awesome: {border: '#87ceeb', stamp: '#4682b4'},
         interesting: {border: '#dda0dd', stamp: '#9932cc'},
@@ -357,30 +377,12 @@ const StampSVG: React.FC<StampSVGProps> = ({
             <StampPressed
                 $visible={selected}
                 $color={colors.stamp}
+                $language={language}
             >
-                {getStampPressedText(stampType)}
+                {getStampPressedText(stampType, language)}
             </StampPressed>
         </StampContainer>
     );
-};
-
-const getStampPressedText = (stampType: string) => {
-    switch (stampType) {
-        case 'awesome':
-            return 'COOL';
-        case 'interesting':
-            return 'INTERESTING';
-        case 'helpful':
-            return 'HELPFUL';
-        case 'inspiring':
-            return 'INSPIRING';
-        case 'thank_you':
-            return 'THANKFUL';
-        case 'love_it':
-            return 'LOVE';
-        default:
-            return 'STAMP';
-    }
 };
 
 export default StampSVG;

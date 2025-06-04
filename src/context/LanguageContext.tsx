@@ -1,31 +1,13 @@
 import React, {createContext, useState, useContext, ReactNode} from 'react';
+import {translations, TranslationKey} from '../translations';
 
 type Language = 'ko' | 'en';
 
 interface LanguageContextType {
     language: Language;
     toggleLanguage: () => void;
-    t: (key: string) => string;
+    t: (key: TranslationKey) => string;
 }
-
-const translations = {
-    en: {
-        'blogTitle': 'Footprints out of the well',
-        'adminAccess': 'Admin access only',
-        'login': 'Login',
-        'dolphin.title': '🌊 Mystical Ocean Friend 🐬',
-        'dolphin.clickHint': '💫 Click the dolphin! 💫',
-        'dolphin.altText': 'Dolphin',
-    },
-    ko: {
-        'blogTitle': '우물 밖으로의 발자국을 기록하는 공간',
-        'adminAccess': '관리자 전용',
-        'login': '로그인',
-        'dolphin.title': '🌊 신비로운 바다 친구 🐬',
-        'dolphin.clickHint': '💫 돌고래를 클릭해보세요! 💫',
-        'dolphin.altText': '돌고래',
-    }
-};
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
@@ -40,8 +22,19 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({children}) =>
         setLanguage(prev => (prev === 'ko' ? 'en' : 'ko'));
     };
 
-    const t = (key: string): string => {
-        return translations[language][key] || key;
+    const t = (key: TranslationKey): string => {
+        const keys = key.split('.');
+        let value: any = translations[language];
+
+        for (const k of keys) {
+            value = value?.[k];
+            if (value === undefined) {
+                console.warn(`Translation key '${key}' not found for language '${language}'`);
+                return key;
+            }
+        }
+
+        return typeof value === 'string' ? value : key;
     };
 
     return (
@@ -58,3 +51,9 @@ export const useLanguage = (): LanguageContextType => {
     }
     return context;
 };
+
+export const useNamespaceT = (namespace: string) => {
+    const {t} = useLanguage();
+    return (key: string) => t(`${namespace}.${key}` as TranslationKey);
+};
+

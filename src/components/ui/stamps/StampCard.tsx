@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import StampSVG from './StampSVG';
+import {useLanguage} from '../../../context/LanguageContext';
 
 interface StampCardProps {
     stamp: {
@@ -50,22 +51,47 @@ const CARD_PATTERNS: Record<string, string> = {
     `
 };
 
-const STAMP_TEXTS: Record<string, { title: string; subtitle: string }> = {
-    'awesome': {title: '멋져요~', subtitle: 'really cool!'},
-    'interesting': {title: '흥미로워요!', subtitle: 'so interesting'},
-    'helpful': {title: '도움돼요', subtitle: 'very helpful'},
-    'inspiring': {title: '영감받았어요~', subtitle: 'inspiring!'},
-    'thank_you': {title: '고마워요♥', subtitle: 'thank you so much'},
-    'love_it': {title: '사랑해요💕', subtitle: 'love it!'},
-    'default': {title: '도장', subtitle: 'stamp'}
+const STAMP_HANDWRITING: Record<string, {
+    ko: { title: string; subtitle: string },
+    en: { title: string; subtitle: string }
+}> = {
+    'awesome': {
+        ko: {title: '멋져요~', subtitle: 'really cool!'},
+        en: {title: 'So Cool!', subtitle: 'amazing stuff'}
+    },
+    'interesting': {
+        ko: {title: '흥미로워요!', subtitle: 'so interesting'},
+        en: {title: 'Fascinating!', subtitle: 'very intriguing'}
+    },
+    'helpful': {
+        ko: {title: '도움돼요', subtitle: 'very helpful'},
+        en: {title: 'So Helpful!', subtitle: 'thanks a lot'}
+    },
+    'inspiring': {
+        ko: {title: '영감받았어요~', subtitle: 'inspiring!'},
+        en: {title: 'Inspiring!', subtitle: 'love this idea'}
+    },
+    'thank_you': {
+        ko: {title: '고마워요♥', subtitle: 'thank you so much'},
+        en: {title: 'Thank You!', subtitle: 'appreciate it ♥'}
+    },
+    'love_it': {
+        ko: {title: '사랑해요💕', subtitle: 'love it!'},
+        en: {title: 'Love It!', subtitle: 'absolutely love 💕'}
+    },
+    'default': {
+        ko: {title: '도장', subtitle: 'stamp'},
+        en: {title: 'Stamp', subtitle: 'pressed'}
+    }
 };
 
 const getCardPattern = (stampType: string): string => {
     return CARD_PATTERNS[stampType] || CARD_PATTERNS['default'];
 };
 
-const getStampTexts = (stampType: string) => {
-    return STAMP_TEXTS[stampType] || STAMP_TEXTS['default'];
+const getStampHandwriting = (stampType: string, language: 'ko' | 'en') => {
+    const texts = STAMP_HANDWRITING[stampType] || STAMP_HANDWRITING['default'];
+    return texts[language];
 };
 
 const CardContainer = styled.div<{ $stampType: string }>`
@@ -88,8 +114,12 @@ const CardContainer = styled.div<{ $stampType: string }>`
   }
 `;
 
-const WrittenText = styled.div`
-  font-family: 'Dancing Script', cursive;
+const WrittenText = styled.div<{ $language: 'ko' | 'en' }>`
+  font-family: ${({$language}) =>
+          $language === 'ko'
+                  ? "'Nanum Pen Script', 'Dancing Script', cursive"
+                  : "'Dancing Script', 'Kalam', cursive"
+  };
   color: #2c3e50;
   margin-bottom: 20px;
   position: relative;
@@ -119,23 +149,25 @@ const WrittenText = styled.div`
   }
 `;
 
-const StampTitle = styled.div`
-  font-size: 24px;
+const StampTitle = styled.div<{ $language: 'ko' | 'en' }>`
+  font-size: ${({$language}) => $language === 'ko' ? '22px' : '20px'};
   font-weight: 700;
   margin-bottom: 8px;
   transform: rotate(-1.2deg);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   color: #34495e;
   line-height: 1.2;
+  letter-spacing: ${({$language}) => $language === 'ko' ? '0px' : '0.5px'};
 `;
 
-const StampSubtitle = styled.div`
-  font-size: 16px;
+const StampSubtitle = styled.div<{ $language: 'ko' | 'en' }>`
+  font-size: ${({$language}) => $language === 'ko' ? '14px' : '16px'};
   font-weight: 400;
   color: #7f8c8d;
   transform: rotate(0.8deg);
   font-style: italic;
   margin-left: 20px;
+  letter-spacing: ${({$language}) => $language === 'ko' ? '0px' : '0.3px'};
 `;
 
 const StampContainer = styled.div`
@@ -145,13 +177,22 @@ const StampContainer = styled.div`
 `;
 
 const StampCard: React.FC<StampCardProps> = React.memo(({stamp, selected, onClick}) => {
-    const texts = React.useMemo(() => getStampTexts(stamp.id), [stamp.id]);
+    const {language} = useLanguage();
+
+    const handwritingTexts = React.useMemo(() =>
+            getStampHandwriting(stamp.id, language),
+        [stamp.id, language]
+    );
 
     return (
         <CardContainer $stampType={stamp.id} onClick={onClick}>
-            <WrittenText>
-                <StampTitle>{texts.title}</StampTitle>
-                <StampSubtitle>{texts.subtitle}</StampSubtitle>
+            <WrittenText $language={language}>
+                <StampTitle $language={language}>
+                    {handwritingTexts.title}
+                </StampTitle>
+                <StampSubtitle $language={language}>
+                    {handwritingTexts.subtitle}
+                </StampSubtitle>
             </WrittenText>
 
             <StampContainer>

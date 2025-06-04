@@ -5,6 +5,7 @@ import StampCard from '../components/ui/stamps/StampCard';
 import PostcardCard from '../components/ui/stamps/PostcardCard';
 import {usePostcards, useCreatePostcard} from '../hooks/useApi';
 import {StampType} from '../types/api';
+import {useLanguage} from "../context/LanguageContext.tsx";
 
 interface Stamp {
     id: string;
@@ -57,6 +58,7 @@ const PageDescription = styled.p`
   color: ${({theme}) => `${theme.colors.text}80`};
   font-size: ${({theme}) => theme.fontSizes.large};
   line-height: 1.6;
+  white-space: pre-line;
 `;
 
 const MailboxSection = styled.section`
@@ -362,6 +364,16 @@ const PostcardsPage: React.FC = () => {
     const {data: postcardsResponse, isLoading, error, refetch} = usePostcards(0, 50);
     const createPostcardMutation = useCreatePostcard();
 
+    const {t} = useLanguage();
+
+    const formatMessage = (key: string, params: Record<string, any> = {}): string => {
+        let message = t(key as any);
+        Object.entries(params).forEach(([param, value]) => {
+            message = message.replace(`{${param}}`, String(value));
+        });
+        return message;
+    };
+
     useEffect(() => {
         const handleOpenModal = () => {
             setShowModal(true);
@@ -377,41 +389,41 @@ const PostcardsPage: React.FC = () => {
     const availableStamps: Stamp[] = useMemo(() => [
         {
             id: 'awesome',
-            name: '멋져요',
+            name: t('postcard.stamps.awesome.name' as any),
             color: '#87CEEB',
-            description: '정말 멋진 콘텐츠!'
+            description: t('postcard.stamps.awesome.description' as any)
         },
         {
             id: 'interesting',
-            name: '흥미로워요',
+            name: t('postcard.stamps.interesting.name' as any),
             color: '#DDA0DD',
-            description: '흥미롭고 유익해요'
+            description: t('postcard.stamps.interesting.description' as any)
         },
         {
             id: 'helpful',
-            name: '도움돼요',
+            name: t('postcard.stamps.helpful.name' as any),
             color: '#90EE90',
-            description: '많은 도움이 됐어요'
+            description: t('postcard.stamps.helpful.description' as any)
         },
         {
             id: 'inspiring',
-            name: '영감받았어요',
+            name: t('postcard.stamps.inspiring.name' as any),
             color: '#FFE4B5',
-            description: '새로운 아이디어를 얻었어요'
+            description: t('postcard.stamps.inspiring.description' as any)
         },
         {
             id: 'thank_you',
-            name: '고마워요',
+            name: t('postcard.stamps.thank_you.name' as any),
             color: '#FFDAB9',
-            description: '감사한 마음을 전해요'
+            description: t('postcard.stamps.thank_you.description' as any)
         },
         {
             id: 'love_it',
-            name: '사랑해요',
+            name: t('postcard.stamps.love_it.name' as any),
             color: '#FFB6C1',
-            description: '정말 사랑하는 콘텐츠!'
+            description: t('postcard.stamps.love_it.description' as any)
         }
-    ], []);
+    ], [t]);
 
     const stampEntries = useMemo(() =>
             postcardsResponse?.content
@@ -482,7 +494,7 @@ const PostcardsPage: React.FC = () => {
 
     const handleStampSubmit = async () => {
         if (!selectedStampId) {
-            alert('도장을 선택해주세요!');
+            alert(t('postcard.messages.selectStampAlert' as any));
             return;
         }
 
@@ -502,7 +514,7 @@ const PostcardsPage: React.FC = () => {
             setMessage('');
             setShowModal(false);
 
-            alert('엽서를 우체통에 넣었어요! 📮✨');
+            alert(t('postcard.messages.success' as any));
 
             // 목록 새로고침
             refetch();
@@ -515,10 +527,10 @@ const PostcardsPage: React.FC = () => {
 
                 setIsRateLimited(true);
                 setRateLimitCountdown(60);
-                setRateLimitMessage('너무 빨라요');
+                setRateLimitMessage(t('postcard.rateLimit.notice' as any));
                 setShowModal(false);
             } else {
-                alert('엽서 등록에 실패했습니다. 다시 시도해주세요.');
+                alert(t('postcard.messages.submitError' as any));
             }
         }
     };
@@ -551,7 +563,7 @@ const PostcardsPage: React.FC = () => {
     if (isLoading) {
         return (
             <StampsContainer>
-                <LoadingMessage>엽서들을 불러오고 있어요... 📮</LoadingMessage>
+                <LoadingMessage>{t('postcard.messages.loadingPostcards' as any)}</LoadingMessage>
             </StampsContainer>
         );
     }
@@ -560,9 +572,9 @@ const PostcardsPage: React.FC = () => {
         return (
             <StampsContainer>
                 <ErrorMessage>
-                    엽서를 불러오는데 실패했어요 😢
+                    {t('postcard.messages.loadingError' as any)}
                     <br/>
-                    <button onClick={() => refetch()}>다시 시도</button>
+                    <button onClick={() => refetch()}>{t('postcard.messages.retry' as any)}</button>
                 </ErrorMessage>
             </StampsContainer>
         );
@@ -571,18 +583,17 @@ const PostcardsPage: React.FC = () => {
     return (
         <StampsContainer>
             <PageHeader>
-                <PageTitle>📮 방문자 우체통</PageTitle>
+                <PageTitle>{t('postcard.title' as any)}</PageTitle>
                 <PageDescription>
-                    여러분의 마음을 담은 엽서를 보내주세요.<br/>
-                    예쁜 도장과 함께 따뜻한 메시지를 남겨주시면 큰 힘이 됩니다. ✨
+                    {t('postcard.description' as any)}
                 </PageDescription>
             </PageHeader>
 
             {isRateLimited && (
                 <RateLimitNotice>
-                    ⏰ {rateLimitMessage}
+                    {rateLimitMessage}
                     <br/>
-                    {rateLimitCountdown}초 후 다시 시도할 수 있어요
+                    {formatMessage('postcard.rateLimit.countdown', {seconds: rateLimitCountdown})}
                 </RateLimitNotice>
             )}
 
@@ -594,14 +605,14 @@ const PostcardsPage: React.FC = () => {
                         entries={stampEntries}
                     />
                     <ClickHint $visible={showClickHint && stampEntries.length > 0}>
-                        👆 한 번 더 클릭하면 엽서를 볼 수 있어요!
+                        {t('postcard.mailbox.clickHint' as any)}
                     </ClickHint>
                 </div>
 
                 <MailboxText $hasEntries={stampEntries.length > 0}>
                     {stampEntries.length > 0
-                        ? `📬 ${stampEntries.length}통의 엽서가 도착했어요! (클릭해서 확인)`
-                        : '📭 아직 엽서가 없어요. 첫 번째 엽서를 보내주세요!'
+                        ? formatMessage('postcard.mailbox.hasEntries', {count: stampEntries.length})
+                        : t('postcard.mailbox.empty' as any)
                     }
                 </MailboxText>
 
@@ -611,11 +622,14 @@ const PostcardsPage: React.FC = () => {
                         onClick={() => setShowModal(true)}
                         disabled={createPostcardMutation.isPending}
                     >
-                        ✍️ {createPostcardMutation.isPending ? '보내는 중...' : '엽서 보내기'}
+                        {createPostcardMutation.isPending
+                            ? t('postcard.buttons.sending' as any)
+                            : t('postcard.buttons.writePostcard' as any)
+                        }
                     </ActionButton>
                     {stampEntries.length > 0 && (
                         <ActionButton $variant="secondary" onClick={handleMailboxClick}>
-                            📮 엽서 보기 ({stampEntries.length}개)
+                            {formatMessage('postcard.buttons.viewPostcards', {count: stampEntries.length})}
                         </ActionButton>
                     )}
                 </ActionButtons>
@@ -624,10 +638,10 @@ const PostcardsPage: React.FC = () => {
             <PostcardOverlay $isVisible={showPostcards && stampEntries.length > 0}>
                 <PostcardListHeader>
                     <PostcardListTitle>
-                        📮 도착한 엽서들 ({stampEntries.length}개)
+                        {formatMessage('postcard.list.title', {count: stampEntries.length})}
                     </PostcardListTitle>
                     <ClosePostcardsButton onClick={handlePostcardsClose}>
-                        ✕ 우체통 닫기
+                        {t('postcard.buttons.closeMailbox' as any)}
                     </ClosePostcardsButton>
                 </PostcardListHeader>
 
@@ -640,22 +654,22 @@ const PostcardsPage: React.FC = () => {
             <Modal $isOpen={showModal}>
                 <ModalContent>
                     <ModalHeader>
-                        <ModalTitle>✍️ 엽서 작성하기</ModalTitle>
+                        <ModalTitle>{t('postcard.modal.title' as any)}</ModalTitle>
                         <CloseButton onClick={handleModalClose}>×</CloseButton>
                     </ModalHeader>
 
                     <FormGroup>
-                        <FormLabel $required>어떤 도장을 찍어주실건가요?</FormLabel>
+                        <FormLabel $required>{t('postcard.modal.selectStamp' as any)}</FormLabel>
                         <StampGrid>
                             {renderedStampCards}
                         </StampGrid>
                     </FormGroup>
 
                     <FormGroup>
-                        <FormLabel>닉네임</FormLabel>
+                        <FormLabel>{t('postcard.modal.nickname' as any)}</FormLabel>
                         <FormInput
                             type="text"
-                            placeholder="어떻게 불러드릴까요? (비워두면 '익명의 방문자')"
+                            placeholder={t('postcard.modal.nicknamePlaceholder' as any)}
                             value={nickname}
                             onChange={(e) => setNickname(e.target.value)}
                             maxLength={20}
@@ -663,9 +677,9 @@ const PostcardsPage: React.FC = () => {
                     </FormGroup>
 
                     <FormGroup>
-                        <FormLabel>한줄 메시지 (선택)</FormLabel>
+                        <FormLabel>{t('postcard.modal.message' as any)}</FormLabel>
                         <FormTextarea
-                            placeholder="더 전하고 싶은 말이 있으시면 적어주세요!"
+                            placeholder={t('postcard.modal.messagePlaceholder' as any)}
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             maxLength={200}
@@ -678,10 +692,10 @@ const PostcardsPage: React.FC = () => {
                         disabled={!selectedStampId || createPostcardMutation.isPending}
                     >
                         {createPostcardMutation.isPending
-                            ? '📮 우체통에 넣는 중...'
+                            ? t('postcard.modal.submitSending' as any)
                             : selectedStampId
-                                ? '📮 우체통에 넣기'
-                                : '도장을 선택해주세요'
+                                ? t('postcard.modal.submitSelected' as any)
+                                : t('postcard.modal.submitSelectStamp' as any)
                         }
                     </SubmitButton>
                 </ModalContent>
