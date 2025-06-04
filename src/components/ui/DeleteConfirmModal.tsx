@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import {useLanguage} from '../../context/LanguageContext';
 
 interface DeleteConfirmModalProps {
     postTitle: string;
@@ -116,30 +117,32 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
                                                                    onCancel,
                                                                    isDeleting = false
                                                                }) => {
+    const {t} = useLanguage();
+
     return (
         <ModalOverlay onClick={onCancel}>
             <ModalContent onClick={e => e.stopPropagation()}>
                 <ModalHeader>
                     <ModalTitle>
-                        🗑️ 포스트 삭제
+                        {t('post.delete.title' as any)}
                     </ModalTitle>
                 </ModalHeader>
 
                 <PostTitleDisplay>
-                    <span>삭제할 포스트:</span>
+                    <span>{t('post.delete.targetPost' as any)}</span>
                     <p>"{postTitle}"</p>
                 </PostTitleDisplay>
 
                 <WarningText>
-                    ⚠️ 이 작업은 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?
+                    {t('post.delete.warning' as any)}
                 </WarningText>
 
                 <ButtonGroup>
                     <CancelButton type="button" onClick={onCancel} disabled={isDeleting}>
-                        취소
+                        {t('post.delete.cancel' as any)}
                     </CancelButton>
                     <DeleteButton type="button" onClick={onConfirm} disabled={isDeleting}>
-                        {isDeleting ? '삭제 중...' : '삭제'}
+                        {isDeleting ? t('post.delete.deleting' as any) : t('post.delete.confirm' as any)}
                     </DeleteButton>
                 </ButtonGroup>
             </ModalContent>

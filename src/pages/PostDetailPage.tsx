@@ -9,6 +9,7 @@ import DeleteConfirmModal from "../components/ui/DeleteConfirmModal";
 import AuthModal from "../components/ui/AuthModal";
 import ApiLink from "../components/ui/ApiLink";
 import {CommentSection} from "../components/ui/comments/CommentSection.tsx";
+import {useLanguage} from "../context/LanguageContext";
 
 const PostDetailContainer = styled.article`
   max-width: 1000px;
@@ -408,15 +409,24 @@ const PostDetailPage: React.FC = () => {
         postSlug: string;
     }>();
     const navigate = useNavigate();
-    const {isAuthenticated, login, fetchApiData} = useApi(); // fetchApiData 추가
+    const {isAuthenticated, login, fetchApiData} = useApi();
+    const {t, language} = useLanguage();
+
+    const formatMessage = (key: string, params: Record<string, any> = {}): string => {
+        let message = t(key as any);
+        Object.entries(params).forEach(([param, value]) => {
+            message = message.replace(`{${param}}`, String(value));
+        });
+        return message;
+    };
 
     if (!postSlug) {
         return (
             <PostDetailContainer>
                 <ErrorContainer>
-                    <ErrorTitle>잘못된 포스트 URL</ErrorTitle>
-                    <ErrorMessage>포스트 slug 를 찾을 수 없습니다.</ErrorMessage>
-                    <BackButton to="/">홈으로 돌아가기</BackButton>
+                    <ErrorTitle>{t('post.detail.errors.invalidUrl' as any)}</ErrorTitle>
+                    <ErrorMessage>{t('post.detail.errors.noSlug' as any)}</ErrorMessage>
+                    <BackButton to="/">{t('post.detail.backToHome' as any)}</BackButton>
                 </ErrorContainer>
             </PostDetailContainer>
         );
@@ -517,7 +527,7 @@ const PostDetailPage: React.FC = () => {
     const updatePost = useCallback(async (postData: any) => {
         try {
             if (!post?.id) {
-                throw new Error('포스트 ID를 찾을 수 없습니다.');
+                throw new Error(t('post.form.errors.noPostId' as any));
             }
 
             await updatePostMutation.mutateAsync({
@@ -532,33 +542,33 @@ const PostDetailPage: React.FC = () => {
             setShowUpdateForm(false);
             setFormData(null);
             setPendingAction(null);
-            alert('포스트가 수정되었습니다!');
+            alert(t('post.form.success.updated' as any));
             window.location.reload();
 
         } catch (error: any) {
             console.error('Post update failed:', error);
-            alert(`포스트 수정에 실패했습니다: ${error.message}`);
+            alert(formatMessage('post.form.errors.updateFailed', {error: error.message}));
         }
-    }, [updatePostMutation, post]);
+    }, [updatePostMutation, post, t, formatMessage]);
 
     const deletePost = useCallback(async () => {
         try {
             if (!post?.id) {
-                throw new Error('포스트 ID를 찾을 수 없습니다.');
+                throw new Error(t('post.form.errors.noPostId' as any));
             }
 
             await deletePostMutation.mutateAsync(post.id.toString());
 
             setShowDeleteModal(false);
             setPendingAction(null);
-            alert('포스트가 삭제되었습니다!');
+            alert('Post deleted successfully!');
             navigate(`/${post.category}`);
 
         } catch (error: any) {
             console.error('Post deletion failed:', error);
-            alert(`포스트 삭제에 실패했습니다: ${error.message}`);
+            alert(formatMessage('post.form.errors.deleteFailed', {error: error.message}));
         }
-    }, [deletePostMutation, post, navigate]);
+    }, [deletePostMutation, post, navigate, t, formatMessage]);
 
     const handleUpdateSubmit = useCallback(async (formData: any) => {
         try {
@@ -566,23 +576,29 @@ const PostDetailPage: React.FC = () => {
                 setFormData(formData);
                 setPendingAction('update');
                 setShowUpdateForm(false);
-                setAuthMessage(`${post?.category} 포스트를 수정하려면 인증이 필요합니다.`);
+                setAuthMessage(formatMessage('post.auth.required', {
+                    action: t('post.auth.actions.edit' as any),
+                    category: post?.category || ''
+                }));
                 setShowAuthModal(true);
                 return;
             }
 
             await updatePost(formData);
         } catch (error) {
-            console.error('Form submission failed:', error);
+            console.error(t('post.form.errors.formSubmission' as any), error);
         }
-    }, [isAuthenticated, post, updatePost]);
+    }, [isAuthenticated, post, updatePost, formatMessage, t]);
 
     const handleDeleteConfirm = useCallback(async () => {
         try {
             if (!isAuthenticated) {
                 setPendingAction('delete');
                 setShowDeleteModal(false);
-                setAuthMessage(`${post?.category} 포스트를 삭제하려면 인증이 필요합니다.`);
+                setAuthMessage(formatMessage('post.auth.required', {
+                    action: t('post.auth.actions.delete' as any),
+                    category: post?.category || ''
+                }));
                 setShowAuthModal(true);
                 return;
             }
@@ -591,7 +607,7 @@ const PostDetailPage: React.FC = () => {
         } catch (error) {
             console.error('Delete confirmation failed:', error);
         }
-    }, [isAuthenticated, post, deletePost]);
+    }, [isAuthenticated, post, deletePost, formatMessage, t]);
 
     const handleLogin = useCallback(async (credentials: LoginCredentials): Promise<boolean> => {
         try {
@@ -615,10 +631,10 @@ const PostDetailPage: React.FC = () => {
 
             return false;
         } catch (error: any) {
-            console.error('Login failed:', error);
+            console.error(t('post.form.errors.loginFailed' as any), error);
             return false;
         }
-    }, [login, pendingAction, formData, updatePost, deletePost]);
+    }, [login, pendingAction, formData, updatePost, deletePost, t]);
 
     const handleAuthCancel = () => {
         setShowAuthModal(false);
@@ -636,7 +652,7 @@ const PostDetailPage: React.FC = () => {
     if (isLoading) {
         return (
             <PostDetailContainer>
-                <LoadingContainer>📖 포스트를 불러오는 중...</LoadingContainer>
+                <LoadingContainer>{t('post.detail.loading' as any)}</LoadingContainer>
             </PostDetailContainer>
         );
     }
@@ -645,18 +661,18 @@ const PostDetailPage: React.FC = () => {
         return (
             <PostDetailContainer>
                 <ErrorContainer>
-                    <ErrorTitle>포스트를 찾을 수 없습니다</ErrorTitle>
+                    <ErrorTitle>{t('post.detail.notFound' as any)}</ErrorTitle>
                     <ErrorMessage>
-                        요청하신 포스트가 존재하지 않거나 삭제되었습니다.
+                        {t('post.detail.notFoundDetail' as any)}
                     </ErrorMessage>
-                    <BackButton to="/">홈으로 돌아가기</BackButton>
+                    <BackButton to="/">{t('post.detail.backToHome' as any)}</BackButton>
                 </ErrorContainer>
             </PostDetailContainer>
         );
     }
 
     const formatDate = (date: Date) => {
-        return new Date(date).toLocaleDateString("ko-KR", {
+        return new Date(date).toLocaleDateString(language === 'ko' ? "ko-KR" : "en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
@@ -675,16 +691,28 @@ const PostDetailPage: React.FC = () => {
             });
         } else {
             navigator.clipboard.writeText(window.location.href);
-            alert("링크가 클립보드에 복사되었습니다!");
+            alert(t('post.detail.shareSuccess' as any));
         }
     };
 
     const postIdString = post.id?.toString() || "";
 
+    const getCategoryDisplayName = (category: string | null) => {
+        if (!category) return t('post.detail.meta.uncategorized' as any);
+        switch (category) {
+            case 'tech':
+                return t('post.categories.tech' as any);
+            case 'food':
+                return t('post.categories.food' as any);
+            default:
+                return category;
+        }
+    };
+
     return (
         <PostDetailContainer>
             <BackButton to={`/${post.category || 'uncategorized'}`}>
-                {post.category || 'uncategorized'} 목록으로
+                {formatMessage('post.detail.backTo', {category: getCategoryDisplayName(post.category)})}
             </BackButton>
 
             <PostHeader>
@@ -693,17 +721,17 @@ const PostDetailPage: React.FC = () => {
                 <PostMeta>
                     <PostMetaItem>
                         <MetaIcon>📅</MetaIcon>
-                        {post.createdAt ? formatDate(post.createdAt) : '날짜 없음'}
+                        {post.createdAt ? formatDate(post.createdAt) : 'No date'}
                     </PostMetaItem>
 
                     <CategoryLink to={`/${post.category || 'uncategorized'}`}>
                         <MetaIcon>📁</MetaIcon>
-                        {post.category || '미분류'}
+                        {getCategoryDisplayName(post.category)}
                     </CategoryLink>
 
                     <PostMetaItem>
                         <MetaIcon>👀</MetaIcon>
-                        {post.viewCount || 0} views
+                        {formatMessage('post.detail.meta.views', {count: post.viewCount || 0})}
                     </PostMetaItem>
                 </PostMeta>
 
@@ -721,20 +749,20 @@ const PostDetailPage: React.FC = () => {
             <PostFooter>
                 <FooterContent>
                     <BackButton to={`/${post.category || 'uncategorized'}`}>
-                        {post.category || 'uncategorized'} 목록으로 돌아가기
+                        {formatMessage('post.detail.backToList', {category: getCategoryDisplayName(post.category)})}
                     </BackButton>
 
                     <ShareSection>
-                        <ShareText>이 글이 도움이 되셨나요?</ShareText>
-                        <ShareButton onClick={handleShare}>📤 공유하기</ShareButton>
+                        <ShareText>{t('post.detail.actions.shareText' as any)}</ShareText>
+                        <ShareButton onClick={handleShare}>{t('post.detail.actions.share' as any)}</ShareButton>
                     </ShareSection>
 
                     <ActionSection>
                         <ActionButton $variant="edit" onClick={handleUpdateClick}>
-                            ✏️ 수정
+                            {t('post.detail.actions.edit' as any)}
                         </ActionButton>
                         <ActionButton $variant="delete" onClick={handleDeleteClick}>
-                            🗑️ 삭제
+                            {t('post.detail.actions.delete' as any)}
                         </ActionButton>
                     </ActionSection>
                 </FooterContent>
@@ -742,7 +770,7 @@ const PostDetailPage: React.FC = () => {
 
             {post._links && Object.keys(post._links).length > 0 && (
                 <ResourceLinksSection>
-                    <ResourceLinksTitle>API Resource Links</ResourceLinksTitle>
+                    <ResourceLinksTitle>{t('post.detail.resourceLinks' as any)}</ResourceLinksTitle>
                     <ApiNavLinks>
                         {Object.entries(post._links).map(([key, link]) => (
                             <ApiLink
@@ -762,7 +790,7 @@ const PostDetailPage: React.FC = () => {
                 <FormModal>
                     <ModalContent>
                         <ModalHeader>
-                            <ModalTitle>포스트 수정</ModalTitle>
+                            <ModalTitle>{t('post.form.titles.edit' as any)}</ModalTitle>
                             <CloseButton onClick={handleFormCancel}>×</CloseButton>
                         </ModalHeader>
                         <PostForm

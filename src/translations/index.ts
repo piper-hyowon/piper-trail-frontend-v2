@@ -3,23 +3,27 @@ import {dolphinTranslations} from './dolphin';
 import {projectsTranslations} from './projects';
 import {commonTranslations} from './common';
 import {postcardTranslations} from "./postcard.ts";
+import {postTranslations} from "./post.ts";
 
 export const translations = {
-    en: {
-        ...layoutTranslations.en,
-        ...dolphinTranslations.en,
-        ...projectsTranslations.en,
-        ...commonTranslations.en,
-        ...postcardTranslations.en,
-    },
-    ko: {
-        ...layoutTranslations.ko,
-        ...dolphinTranslations.ko,
-        ...projectsTranslations.ko,
-        ...commonTranslations.ko,
-        ...postcardTranslations.ko,
+        en: {
+            ...layoutTranslations.en,
+            ...dolphinTranslations.en,
+            ...projectsTranslations.en,
+            ...commonTranslations.en,
+            ...postcardTranslations.en,
+            ...postTranslations.en,
+        },
+        ko: {
+            ...layoutTranslations.ko,
+            ...dolphinTranslations.ko,
+            ...projectsTranslations.ko,
+            ...commonTranslations.ko,
+            ...postcardTranslations.ko,
+            ...postTranslations.ko
+        }
     }
-};
+;
 
 type DeepKeys<T> = T extends object
     ? {

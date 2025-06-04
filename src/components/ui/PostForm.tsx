@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import styled from 'styled-components';
+import {useLanguage} from '../../context/LanguageContext';
 
 interface PostFormProps {
     category: string;
@@ -290,7 +291,17 @@ const CancelButton = styled.button`
   }
 `;
 
+const NewCategoryNotice = styled.div`
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  border: 1px solid #e9ecef;
+`;
+
 const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onCancel}) => {
+    const {t} = useLanguage();
+
     const [formData, setFormData] = useState({
         title: '',
         summary: '',
@@ -309,6 +320,14 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
     const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+    const formatMessage = (key: string, params: Record<string, any> = {}): string => {
+        let message = t(key as any);
+        Object.entries(params).forEach(([param, value]) => {
+            message = message.replace(`{${param}}`, String(value));
+        });
+        return message;
+    };
 
     useEffect(() => {
         if (initialData) {
@@ -380,7 +399,7 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                 if (file.type.startsWith('image/')) {
                     handleImageAdd(file);
                 } else {
-                    alert('이미지 파일만 업로드 가능합니다.');
+                    alert(t('post.form.imageSection.onlyImages' as any));
                 }
             });
         }
@@ -416,9 +435,9 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
 
     // 이미지 URL 삽입
     const handleInsertImageUrl = () => {
-        const url = prompt('이미지 URL을 입력하세요:');
+        const url = prompt(t('post.form.imageSection.urlPrompt' as any));
         if (url) {
-            const altText = prompt('이미지 설명을 입력하세요 (선택사항):') || 'image';
+            const altText = prompt(t('post.form.imageSection.altPrompt' as any)) || 'image';
             const markdownImage = `![${altText}](${url})`;
             insertTextAtCursor(markdownImage);
         }
@@ -478,9 +497,9 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
 
     const validateForm = () => {
         const newErrors = {
-            title: formData.title.trim() ? '' : '제목을 입력해주세요',
-            summary: category !== 'stamps' && formData.summary.trim() ? '' : (category !== 'stamps' ? '요약을 입력해주세요' : ''),
-            content: formData.content.trim() ? '' : '내용을 입력해주세요'
+            title: formData.title.trim() ? '' : t('post.form.validation.titleRequired' as any),
+            summary: category !== 'stamps' && formData.summary.trim() ? '' : (category !== 'stamps' ? t('post.form.validation.summaryRequired' as any) : ''),
+            content: formData.content.trim() ? '' : t('post.form.validation.contentRequired' as any)
         };
 
         setErrors(newErrors);
@@ -505,8 +524,8 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
     const getContentField = () => (
         <FormField>
             <FormLabel htmlFor="content">
-                {category === 'food' ? '메뉴 추천 및 설명' :
-                    category === 'stamps' ? '메시지' : '내용'}
+                {category === 'food' ? t('post.form.fields.menuRecommendation' as any) :
+                    category === 'stamps' ? t('post.form.fields.message' as any) : t('post.form.fields.content' as any)}
             </FormLabel>
 
             <ImageToolbar>
@@ -514,21 +533,21 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                     type="button"
                     onClick={() => fileInputRef.current!.click()}
                 >
-                    📷 이미지 추가
+                    {t('post.form.toolbar.addImage' as any)}
                 </ToolbarButton>
 
                 <ToolbarButton
                     type="button"
                     onClick={handleInsertImageUrl}
                 >
-                    🔗 이미지 URL
+                    {t('post.form.toolbar.imageUrl' as any)}
                 </ToolbarButton>
 
                 <ToolbarButton
                     type="button"
                     onClick={() => setShowPreview(!showPreview)}
                 >
-                    {showPreview ? '✏️ 편집' : '👁️ 미리보기'}
+                    {showPreview ? t('post.form.toolbar.edit' as any) : t('post.form.toolbar.preview' as any)}
                 </ToolbarButton>
             </ImageToolbar>
 
@@ -544,7 +563,7 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
             {imageFiles.length > 0 && (
                 <ImagePreviewContainer>
                     <div style={{width: '100%', marginBottom: '8px', fontSize: '12px', fontWeight: 'bold'}}>
-                        첨부된 이미지 ({imageFiles.length}개)
+                        {formatMessage('post.form.imageSection.attached', {count: imageFiles.length})}
                     </div>
                     {imageFiles.map(imageFile => (
                         <ImagePreviewItem key={imageFile.id}>
@@ -572,16 +591,16 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                             value={formData.content}
                             onChange={handleChange}
                             placeholder={
-                                category === 'food' ? '# 마크다운 형식으로 메뉴 추천과 설명을 작성하세요' :
-                                    category === 'stamps' ? '방명록에 남길 메시지를 입력하세요' :
-                                        '# 마크다운 형식으로 내용을 작성하세요'
+                                category === 'food' ? t('post.form.placeholders.food.content' as any) :
+                                    category === 'stamps' ? t('post.form.placeholders.stamps.content' as any) :
+                                        t('post.form.placeholders.default.content' as any)
                             }
                         />
                     </TextareaContainer>
 
                     <PreviewPanel>
                         <div dangerouslySetInnerHTML={{
-                            __html: renderMarkdown(formData.content || '미리보기가 여기에 표시됩니다...')
+                            __html: renderMarkdown(formData.content || t('post.form.imageSection.previewText' as any))
                         }}/>
                     </PreviewPanel>
                 </PreviewContainer>
@@ -593,9 +612,9 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                     value={formData.content}
                     onChange={handleChange}
                     placeholder={
-                        category === 'food' ? '# 마크다운 형식으로 메뉴 추천과 설명을 작성하세요' :
-                            category === 'stamps' ? '방명록에 남길 메시지를 입력하세요' :
-                                '# 마크다운 형식으로 내용을 작성하세요'
+                        category === 'food' ? t('post.form.placeholders.food.content' as any) :
+                            category === 'stamps' ? t('post.form.placeholders.stamps.content' as any) :
+                                t('post.form.placeholders.default.content' as any)
                     }
                 />
             )}
@@ -610,25 +629,25 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                 return (
                     <>
                         <FormField>
-                            <FormLabel htmlFor="title">제목</FormLabel>
+                            <FormLabel htmlFor="title">{t('post.form.fields.title' as any)}</FormLabel>
                             <FormInput
                                 id="title"
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                placeholder="기술 글의 제목을 입력하세요"
+                                placeholder={t('post.form.placeholders.tech.title' as any)}
                             />
                             {errors.title && <FormHint style={{color: 'red'}}>{errors.title}</FormHint>}
                         </FormField>
 
                         <FormField>
-                            <FormLabel htmlFor="summary">요약</FormLabel>
+                            <FormLabel htmlFor="summary">{t('post.form.fields.summary' as any)}</FormLabel>
                             <FormInput
                                 id="summary"
                                 name="summary"
                                 value={formData.summary}
                                 onChange={handleChange}
-                                placeholder="글의 간단한 요약을 입력하세요"
+                                placeholder={t('post.form.placeholders.tech.summary' as any)}
                             />
                             {errors.summary && <FormHint style={{color: 'red'}}>{errors.summary}</FormHint>}
                         </FormField>
@@ -636,16 +655,16 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                         {getContentField()}
 
                         <FormField>
-                            <FormLabel htmlFor="tags">태그</FormLabel>
+                            <FormLabel htmlFor="tags">{t('post.form.fields.tags' as any)}</FormLabel>
                             <FormInput
                                 id="currentTag"
                                 name="currentTag"
                                 value={formData.currentTag}
                                 onChange={handleChange}
                                 onKeyDown={handleTagKeyDown}
-                                placeholder="태그를 입력하고 Enter를 누르세요"
+                                placeholder={t('post.form.tags.placeholder' as any)}
                             />
-                            <FormHint>Enter 키를 눌러 태그를 추가하세요</FormHint>
+                            <FormHint>{t('post.form.tags.hint' as any)}</FormHint>
 
                             {formData.tags.length > 0 && (
                                 <TagsContainer>
@@ -665,25 +684,25 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                 return (
                     <>
                         <FormField>
-                            <FormLabel htmlFor="title">장소</FormLabel>
+                            <FormLabel htmlFor="title">{t('post.form.fields.place' as any)}</FormLabel>
                             <FormInput
                                 id="title"
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                placeholder="장소를 입력하세요"
+                                placeholder={t('post.form.placeholders.food.title' as any)}
                             />
                             {errors.title && <FormHint style={{color: 'red'}}>{errors.title}</FormHint>}
                         </FormField>
 
                         <FormField>
-                            <FormLabel htmlFor="summary">소개</FormLabel>
+                            <FormLabel htmlFor="summary">{t('post.form.fields.intro' as any)}</FormLabel>
                             <FormInput
                                 id="summary"
                                 name="summary"
                                 value={formData.summary}
                                 onChange={handleChange}
-                                placeholder="음식점에 대한 간단한 소개를 입력하세요"
+                                placeholder={t('post.form.placeholders.food.summary' as any)}
                             />
                             {errors.summary && <FormHint style={{color: 'red'}}>{errors.summary}</FormHint>}
                         </FormField>
@@ -691,14 +710,14 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                         {getContentField()}
 
                         <FormField>
-                            <FormLabel htmlFor="tags">태그</FormLabel>
+                            <FormLabel htmlFor="tags">{t('post.form.fields.tags' as any)}</FormLabel>
                             <FormInput
                                 id="currentTag"
                                 name="currentTag"
                                 value={formData.currentTag}
                                 onChange={handleChange}
                                 onKeyDown={handleTagKeyDown}
-                                placeholder="태그를 입력하고 Enter를 누르세요 (예: 한식, 파스타, 간식)"
+                                placeholder={t('post.form.placeholders.food.tags' as any)}
                             />
 
                             {formData.tags.length > 0 && (
@@ -719,13 +738,13 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                 return (
                     <>
                         <FormField>
-                            <FormLabel htmlFor="title">이름</FormLabel>
+                            <FormLabel htmlFor="title">{t('post.form.fields.name' as any)}</FormLabel>
                             <FormInput
                                 id="title"
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                placeholder="당신의 이름을 입력하세요"
+                                placeholder={t('post.form.placeholders.stamps.title' as any)}
                             />
                             {errors.title && <FormHint style={{color: 'red'}}>{errors.title}</FormHint>}
                         </FormField>
@@ -737,24 +756,18 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
             default:
                 return (
                     <>
-                        <div style={{
-                            padding: '10px',
-                            backgroundColor: '#f8f9fa',
-                            borderRadius: '4px',
-                            marginBottom: '15px',
-                            border: '1px solid #e9ecef'
-                        }}>
-                            <p>📝 {`"${category}" 신규 카테고리`}</p>
-                        </div>
+                        <NewCategoryNotice>
+                            <p>📝 {formatMessage('post.form.newCategory', {category})}</p>
+                        </NewCategoryNotice>
 
                         <FormField>
-                            <FormLabel htmlFor="title">제목</FormLabel>
+                            <FormLabel htmlFor="title">{t('post.form.fields.title' as any)}</FormLabel>
                             <FormInput
                                 id="title"
                                 name="title"
                                 value={formData.title}
                                 onChange={handleChange}
-                                placeholder="제목을 입력하세요"
+                                placeholder={t('post.form.placeholders.default.title' as any)}
                             />
                             {errors.title && <FormHint style={{color: 'red'}}>{errors.title}</FormHint>}
                         </FormField>
@@ -772,10 +785,10 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
 
                 <ButtonGroup>
                     <CancelButton type="button" onClick={onCancel}>
-                        취소
+                        {t('post.form.buttons.cancel' as any)}
                     </CancelButton>
                     <SubmitButton type="submit">
-                        {initialData ? '수정' : '제출'}
+                        {initialData ? t('post.form.buttons.update' as any) : t('post.form.buttons.submit' as any)}
                     </SubmitButton>
                 </ButtonGroup>
             </form>

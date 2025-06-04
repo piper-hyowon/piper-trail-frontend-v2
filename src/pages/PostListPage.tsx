@@ -10,6 +10,7 @@ import PostForm from "../components/ui/PostForm.tsx";
 import {IoAddCircleOutline} from "react-icons/io5";
 import {usePostsByCategory, usePostsByTag, useSearchPosts, useCreatePost} from '../hooks/useApi';
 import {LoginCredentials, useApi} from '../context/ApiContext';
+import {useLanguage} from '../context/LanguageContext';
 
 const PAGE_SIZE = 4;
 const DEFAULT_SORT = 'createdAt,desc';
@@ -243,6 +244,7 @@ const PostListPage: React.FC = () => {
 
     // ApiContext에서 인증 상태와 함수들 가져오기
     const {isAuthenticated, login} = useApi();
+    const {t} = useLanguage();
 
     const isTagRoute = location.pathname.startsWith('/tag/');
     const isSearchRoute = location.pathname.startsWith('/search');
@@ -267,6 +269,14 @@ const PostListPage: React.FC = () => {
     const [formData, setFormData] = useState<any>(null);
 
     const createPostMutation = useCreatePost();
+
+    const formatMessage = (key: string, params: Record<string, any> = {}): string => {
+        let message = t(key as any);
+        Object.entries(params).forEach(([param, value]) => {
+            message = message.replace(`{${param}}`, String(value));
+        });
+        return message;
+    };
 
     // API 호출
     let postsQuery;
@@ -314,26 +324,33 @@ const PostListPage: React.FC = () => {
     const pageTitle = useMemo(() => {
         if (isSearchRoute) {
             if (searchQuery) {
-                return `Search: "${searchQuery}"${searchCategory ? ` in ${searchCategory}` : ''}`;
+                return searchCategory
+                    ? formatMessage('post.list.title.searchWithCategory', {
+                        query: searchQuery,
+                        category: searchCategory
+                    })
+                    : formatMessage('post.list.title.searchWithQuery', {query: searchQuery});
             }
-            return 'Search Results';
+            return t('post.list.title.search' as any);
         }
-        if (isTagRoute && params.tagName) return `Tag: #${params.tagName}`;
+        if (isTagRoute && params.tagName) return formatMessage('post.list.title.tag', {tag: params.tagName});
         if (currentCategory) {
-            if (currentCategory === 'null') return 'Uncategorized';
+            if (currentCategory === 'null') return t('post.list.title.uncategorized' as any);
             return currentCategory.charAt(0).toUpperCase() + currentCategory.slice(1);
         }
         return 'Category Not Found';
-    }, [currentCategory, params.tagName, isTagRoute, isSearchRoute, searchQuery, searchCategory]);
+    }, [currentCategory, params.tagName, isTagRoute, isSearchRoute, searchQuery, searchCategory, t, formatMessage]);
 
     const getCategoryName = (category: string): string => {
-        if (isSearchRoute) return 'Search';
+        if (isSearchRoute) return t('post.list.title.search' as any);
         if (isTagRoute) return pageTitle;
         switch (category) {
             case 'tech':
-                return 'Tech';
+                return t('post.categories.tech' as any);
             case 'food':
-                return 'Food';
+                return t('post.categories.food' as any);
+            case 'null':
+                return t('post.categories.uncategorized' as any);
             default:
                 return category?.charAt(0).toUpperCase() + category?.slice(1) || 'Unknown';
         }
@@ -350,16 +367,14 @@ const PostListPage: React.FC = () => {
 
             setShowPostForm(false);
             setFormData(null);
-            alert('포스트가 생성되었습니다!');
-            // window.location.reload();
+            alert(t('post.form.success.created' as any));
             window.open(window.location.href, '_self'); // TODO:
 
         } catch (error: any) {
             console.error('포스트 생성 실패:', error);
-            alert(`포스트 생성에 실패했습니다: ${error.message}`);
-
+            alert(formatMessage('post.form.errors.createFailed', {error: error.message}));
         }
-    }, [createPostMutation, currentCategory]);
+    }, [createPostMutation, currentCategory, t, formatMessage]);
 
     useEffect(() => {
         if (!searchParams.has('page')) {
@@ -418,7 +433,10 @@ const PostListPage: React.FC = () => {
                 // 인증되지 않았으면 폼 데이터 저장하고 인증 모달 표시
                 setFormData(formData);
                 setShowPostForm(false);
-                setAuthMessage(`${getCategoryName(currentCategory || '')} 카테고리에 새 글을 작성하려면 인증이 필요합니다.`);
+                setAuthMessage(formatMessage('post.auth.required', {
+                    action: t('post.auth.actions.create' as any),
+                    category: getCategoryName(currentCategory || '')
+                }));
                 setShowAuthModal(true);
                 return;
             }
@@ -426,9 +444,9 @@ const PostListPage: React.FC = () => {
             // 인증되어 있으면 바로 포스트 생성
             await createPost(formData);
         } catch (error) {
-            console.error('Form submission failed:', error);
+            console.error(t('post.form.errors.formSubmission' as any), error);
         }
-    }, [isAuthenticated, currentCategory, createPost]);
+    }, [isAuthenticated, currentCategory, createPost, formatMessage, t, getCategoryName]);
 
     const handleLogin = useCallback(async (credentials: LoginCredentials): Promise<boolean> => {
         try {
@@ -449,10 +467,10 @@ const PostListPage: React.FC = () => {
 
             return false;
         } catch (error: any) {
-            console.error('Login failed:', error);
+            console.error(t('post.form.errors.loginFailed' as any), error);
             return false;
         }
-    }, [login, formData, createPost]);
+    }, [login, formData, createPost, t]);
 
     const handleAuthCancel = () => {
         setShowAuthModal(false);
@@ -467,8 +485,8 @@ const PostListPage: React.FC = () => {
     if (isLoading) {
         return (
             <LoadingContainer>
-                <h2>Loading {pageTitle} content...</h2>
-                <p>Please wait while we retrieve the posts.</p>
+                <h2>{formatMessage('post.list.loading', {title: pageTitle})}</h2>
+                <p>{t('post.list.loadingSubtext' as any)}</p>
             </LoadingContainer>
         );
     }
@@ -476,10 +494,10 @@ const PostListPage: React.FC = () => {
     if (error) {
         return (
             <ErrorContainer>
-                <h2>Error Loading Posts</h2>
+                <h2>{t('post.list.error' as any)}</h2>
                 <p>{error.message}</p>
                 <button onClick={() => window.location.reload()}>
-                    Try Again
+                    {t('post.list.tryAgain' as any)}
                 </button>
             </ErrorContainer>
         );
@@ -488,8 +506,8 @@ const PostListPage: React.FC = () => {
     if (!postsData) {
         return (
             <ErrorContainer>
-                <h2>No Posts Available</h2>
-                <p>Could not load posts for {pageTitle}</p>
+                <h2>{t('post.list.noData' as any)}</h2>
+                <p>{formatMessage('post.list.noDataDetail', {title: pageTitle})}</p>
             </ErrorContainer>
         );
     }
@@ -503,7 +521,7 @@ const PostListPage: React.FC = () => {
                 <TitleRow>
                     <PostListTitleSection>
                         <PostListTitle>{pageTitle}</PostListTitle>
-                        <PostCount>총 {postsData.total || 0}개의 포스트</PostCount>
+                        <PostCount>{formatMessage('post.list.count', {count: postsData.total || 0})}</PostCount>
                     </PostListTitleSection>
 
                     {/* 검색 라우트가 아닐 때만 글 작성 버튼 표시 */}
@@ -513,7 +531,7 @@ const PostListPage: React.FC = () => {
                             disabled={createPostMutation.isPending}
                         >
                             <IoAddCircleOutline size={16}/>
-                            {createPostMutation.isPending ? '작성 중...' : '글 작성하기'}
+                            {createPostMutation.isPending ? t('post.list.creating' as any) : t('post.list.createButton' as any)}
                         </CreatePostButton>
                     )}
                 </TitleRow>
@@ -521,7 +539,7 @@ const PostListPage: React.FC = () => {
                 <FilterContainer>
                     {availableTags.length > 0 && !isSearchRoute && (
                         <TagFilterSection>
-                            <h4>Filter by tags:</h4>
+                            <h4>{t('post.list.filters.tagFilter' as any)}</h4>
                             <TagList
                                 tags={availableTags}
                                 selectedTags={selectedTags}
@@ -532,14 +550,17 @@ const PostListPage: React.FC = () => {
 
                     {isSearchRoute && availableTags.length > 0 && (
                         <TagFilterSection>
-                            <h4>Search Results for: "{searchQuery}"</h4>
+                            <h4>{formatMessage('post.list.filters.searchResults', {query: searchQuery})}</h4>
                             {searchCategory && (
                                 <p style={{margin: '0 0 8px 0', fontSize: '0.9rem', opacity: 0.8}}>
-                                    in category: {searchCategory}
+                                    {formatMessage('post.list.filters.categoryFilter', {category: searchCategory})}
                                 </p>
                             )}
                             <div style={{marginTop: '12px'}}>
-                                <span style={{fontSize: '0.9rem', fontWeight: 600}}>Filter by tags:</span>
+                                <span style={{
+                                    fontSize: '0.9rem',
+                                    fontWeight: 600
+                                }}>{t('post.list.filters.tagFilter' as any)}</span>
                                 <div style={{marginTop: '4px'}}>
                                     <TagList
                                         tags={availableTags}
@@ -554,17 +575,17 @@ const PostListPage: React.FC = () => {
                     {/* 검색 페이지에서 검색어만 있고 태그가 없는 경우 */}
                     {isSearchRoute && availableTags.length === 0 && searchQuery && (
                         <TagFilterSection>
-                            <h4>Search Results for: "{searchQuery}"</h4>
+                            <h4>{formatMessage('post.list.filters.searchResults', {query: searchQuery})}</h4>
                             {searchCategory && (
                                 <p style={{margin: 0, fontSize: '0.9rem', opacity: 0.8}}>
-                                    in category: {searchCategory}
+                                    {formatMessage('post.list.filters.categoryFilter', {category: searchCategory})}
                                 </p>
                             )}
                         </TagFilterSection>
                     )}
 
                     <SortContainer>
-                        <SortLabel>Sort by:</SortLabel>
+                        <SortLabel>{t('post.list.filters.sortBy' as any)}</SortLabel>
                         <SortSelector
                             options={SORT_OPTIONS}
                             currentSort={currentSort}
@@ -605,13 +626,18 @@ const PostListPage: React.FC = () => {
                     <NoPostsMessage>
                         <p>
                             {isSearchRoute
-                                ? `No posts found for "${searchQuery}"${searchCategory ? ` in ${searchCategory}` : ''}`
-                                : `No posts found${selectedTags.length > 0 ? ' matching your filter criteria' : ''}`
-                            }.
+                                ? formatMessage('post.list.noResults.search', {
+                                    query: searchQuery,
+                                    category: searchCategory ? ` in ${searchCategory}` : ''
+                                })
+                                : selectedTags.length > 0
+                                    ? t('post.list.noResults.filtered' as any)
+                                    : t('post.list.noResults.empty' as any)
+                            }
                         </p>
                         {isSearchRoute && (
                             <p style={{marginTop: '0.5rem', fontSize: '0.9rem', opacity: 0.8}}>
-                                Try different keywords or search in all categories.
+                                {t('post.list.noResults.searchTip' as any)}
                             </p>
                         )}
                     </NoPostsMessage>
@@ -631,7 +657,7 @@ const PostListPage: React.FC = () => {
                 <FormModal>
                     <ModalContent>
                         <ModalHeader>
-                            <ModalTitle>새 {getCategoryName(currentCategory || '')} 포스트 작성</ModalTitle>
+                            <ModalTitle>{formatMessage('post.form.titles.create', {category: getCategoryName(currentCategory || '')})}</ModalTitle>
                             <CloseButton onClick={handleFormCancel}>×</CloseButton>
                         </ModalHeader>
                         <PostForm

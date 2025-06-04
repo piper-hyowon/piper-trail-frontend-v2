@@ -1,6 +1,13 @@
 import {createGlobalStyle} from 'styled-components';
 
 export const GlobalStyles = createGlobalStyle`
+  @font-face {
+    font-family: 'CatBold';
+    src: url('/fonts/cat.ttf') format('truetype');
+    font-display: swap;
+    font-weight: bold;
+  }
+
   * {
     box-sizing: border-box;
     margin: 0;
