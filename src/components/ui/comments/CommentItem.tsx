@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import styled from 'styled-components';
 import {CommentResponse, FontFamily, TextColor} from "../../../types/api.ts";
 import {useDeleteComment} from "../../../hooks/useApi.ts";
+import {useLanguage} from "../../../context/LanguageContext.tsx";
 
 interface CommentItemProps {
     comment: CommentResponse;
@@ -123,14 +124,24 @@ const DeleteInput = styled.input`
 `;
 
 export const CommentItem: React.FC<CommentItemProps> = ({comment, postId}) => {
+    const {t, language} = useLanguage();
+
     const [showDeleteForm, setShowDeleteForm] = useState(false);
     const [deletePassword, setDeletePassword] = useState('');
 
     const deleteCommentMutation = useDeleteComment();
 
+    const formatMessage = (key: string, params: Record<string, any> = {}): string => {
+        let message = t(key as any);
+        Object.entries(params).forEach(([param, value]) => {
+            message = message.replace(`{${param}}`, String(value));
+        });
+        return message;
+    };
+
     const handleDelete = async () => {
         if (!deletePassword.trim()) {
-            alert('비밀번호를 입력해주세요.');
+            alert(t('comment.item.deletePasswordRequired' as any));
             return;
         }
 
@@ -142,22 +153,22 @@ export const CommentItem: React.FC<CommentItemProps> = ({comment, postId}) => {
             });
             setShowDeleteForm(false);
             setDeletePassword('');
-            alert('댓글이 성공적으로 삭제되었습니다.');
+            alert(t('comment.item.deleteSuccess' as any));
         } catch (error) {
             console.error('Delete error details:', error);
 
             if (error.message.includes('HTTP 401') || error.message.includes('HTTP 403')) {
-                alert('비밀번호가 일치하지 않습니다.');
+                alert(t('comment.item.deleteErrors.wrongPassword' as any));
             } else if (error.message.includes('HTTP 404')) {
-                alert('댓글을 찾을 수 없습니다.');
+                alert(t('comment.item.deleteErrors.notFound' as any));
             } else {
-                alert(`삭제 실패: ${error.message}`);
+                alert(formatMessage('comment.item.deleteErrors.failed', {error: error.message}));
             }
         }
     };
 
     const formatDate = (date: Date) => {
-        return new Date(date).toLocaleDateString('ko-KR', {
+        return new Date(date).toLocaleDateString(language === 'ko' ? 'ko-KR' : 'en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric',
@@ -187,7 +198,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({comment, postId}) => {
             {!comment.reviewNeeded && (
                 <CommentActions>
                     <ActionButton onClick={() => setShowDeleteForm(!showDeleteForm)}>
-                        삭제
+                        {t('comment.item.delete' as any)}
                     </ActionButton>
                 </CommentActions>
             )}
@@ -196,7 +207,7 @@ export const CommentItem: React.FC<CommentItemProps> = ({comment, postId}) => {
                 <DeleteForm>
                     <DeleteInput
                         type="password"
-                        placeholder="댓글 작성 시 입력한 비밀번호"
+                        placeholder={t('comment.item.deletePasswordPlaceholder' as any)}
                         value={deletePassword}
                         onChange={(e) => setDeletePassword(e.target.value)}
                     />
@@ -204,10 +215,13 @@ export const CommentItem: React.FC<CommentItemProps> = ({comment, postId}) => {
                         onClick={handleDelete}
                         disabled={deleteCommentMutation.isPending}
                     >
-                        {deleteCommentMutation.isPending ? '삭제 중...' : '삭제 확인'}
+                        {deleteCommentMutation.isPending
+                            ? t('comment.item.deleting' as any)
+                            : t('comment.item.deleteConfirm' as any)
+                        }
                     </ActionButton>
                     <ActionButton onClick={() => setShowDeleteForm(false)}>
-                        취소
+                        {t('comment.item.cancel' as any)}
                     </ActionButton>
                 </DeleteForm>
             )}

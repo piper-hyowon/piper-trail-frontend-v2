@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import styled from 'styled-components';
 import {CreateCommentRequest, FontFamily, TextColor} from "../../../types/api.ts";
 import {useCreateComment} from "../../../hooks/useApi.ts";
+import {useLanguage} from "../../../context/LanguageContext.tsx";
 
 interface CommentFormProps {
     postId: string;
@@ -182,6 +183,8 @@ const PreviewContainer = styled.div<{ $fontFamily?: FontFamily; $textColor?: Tex
 `;
 
 export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => {
+    const {t} = useLanguage();
+
     const [formData, setFormData] = useState({
         author: '',
         password: '',
@@ -204,13 +207,13 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
         const newErrors: Record<string, string> = {};
 
         if (!formData.author.trim()) {
-            newErrors.author = '닉네임을 입력해주세요.';
+            newErrors.author = t('comment.form.validation.nicknameRequired' as any);
         }
         if (!formData.password.trim() || formData.password.length < 4) {
-            newErrors.password = '비밀번호를 4글자 이상 입력해주세요.';
+            newErrors.password = t('comment.form.validation.passwordTooShort' as any);
         }
         if (!formData.content.trim()) {
-            newErrors.content = '댓글 내용을 입력해주세요.';
+            newErrors.content = t('comment.form.validation.contentRequired' as any);
         }
 
         setErrors(newErrors);
@@ -250,15 +253,15 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
 
     return (
         <FormContainer>
-            <FormTitle>댓글 작성</FormTitle>
+            <FormTitle>{t('comment.form.title' as any)}</FormTitle>
 
             <form onSubmit={handleSubmit}>
                 <FormRow>
                     <FormGroup>
-                        <FormLabel>닉네임</FormLabel>
+                        <FormLabel>{t('comment.form.fields.nickname' as any)}</FormLabel>
                         <FormInput
                             type="text"
-                            placeholder="닉네임을 입력하세요"
+                            placeholder={t('comment.form.placeholders.nickname' as any)}
                             value={formData.author}
                             onChange={(e) => handleChange('author', e.target.value)}
                             $hasError={!!errors.author}
@@ -267,10 +270,10 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
                     </FormGroup>
 
                     <FormGroup>
-                        <FormLabel>비밀번호</FormLabel>
+                        <FormLabel>{t('comment.form.fields.password' as any)}</FormLabel>
                         <FormInput
                             type="password"
-                            placeholder="댓글 삭제 시 사용됩니다(4글자 이상)"
+                            placeholder={t('comment.form.placeholders.password' as any)}
                             value={formData.password}
                             onChange={(e) => handleChange('password', e.target.value)}
                             $hasError={!!errors.password}
@@ -281,37 +284,39 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
 
                 <FormRow>
                     <FormGroup>
-                        <FormLabel>폰트</FormLabel>
+                        <FormLabel>{t('comment.form.fields.font' as any)}</FormLabel>
                         <FormSelect
                             value={formData.fontFamily}
                             onChange={(e) => handleChange('fontFamily', e.target.value as FontFamily)}
                         >
-                            <option value={FontFamily.DEFAULT}>기본</option>
-                            <option value={FontFamily.SERIF}>세리프</option>
-                            <option value={FontFamily.SANS_SERIF}>산세리프</option>
-                            <option value={FontFamily.MONOSPACE}>모노스페이스</option>
+                            <option value={FontFamily.DEFAULT}>{t('comment.form.options.font.default' as any)}</option>
+                            <option value={FontFamily.SERIF}>{t('comment.form.options.font.serif' as any)}</option>
+                            <option
+                                value={FontFamily.SANS_SERIF}>{t('comment.form.options.font.sansSerif' as any)}</option>
+                            <option
+                                value={FontFamily.MONOSPACE}>{t('comment.form.options.font.monospace' as any)}</option>
                         </FormSelect>
                     </FormGroup>
 
                     <FormGroup>
-                        <FormLabel>글자 색상</FormLabel>
+                        <FormLabel>{t('comment.form.fields.textColor' as any)}</FormLabel>
                         <FormSelect
                             value={formData.textColor}
                             onChange={(e) => handleChange('textColor', e.target.value as TextColor)}
                         >
-                            <option value={TextColor.DEFAULT}>기본</option>
-                            <option value={TextColor.BLACK}>검정</option>
-                            <option value={TextColor.BLUE}>파랑</option>
-                            <option value={TextColor.RED}>빨강</option>
-                            <option value={TextColor.GREEN}>초록</option>
+                            <option value={TextColor.DEFAULT}>{t('comment.form.options.color.default' as any)}</option>
+                            <option value={TextColor.BLACK}>{t('comment.form.options.color.black' as any)}</option>
+                            <option value={TextColor.BLUE}>{t('comment.form.options.color.blue' as any)}</option>
+                            <option value={TextColor.RED}>{t('comment.form.options.color.red' as any)}</option>
+                            <option value={TextColor.GREEN}>{t('comment.form.options.color.green' as any)}</option>
                         </FormSelect>
                     </FormGroup>
                 </FormRow>
 
                 <FormGroup>
-                    <FormLabel>댓글 내용</FormLabel>
+                    <FormLabel>{t('comment.form.fields.content' as any)}</FormLabel>
                     <FormTextarea
-                        placeholder="댓글을 입력하세요..."
+                        placeholder={t('comment.form.placeholders.content' as any)}
                         value={formData.content}
                         onChange={(e) => handleChange('content', e.target.value)}
                         $hasError={!!errors.content}
@@ -323,7 +328,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
 
                 {formData.content && (
                     <FormGroup>
-                        <FormLabel>미리보기</FormLabel>
+                        <FormLabel>{t('comment.form.preview' as any)}</FormLabel>
                         <PreviewContainer
                             $fontFamily={formData.fontFamily}
                             $textColor={formData.textColor}
@@ -338,7 +343,10 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
                         type="submit"
                         disabled={createCommentMutation.isPending}
                     >
-                        {createCommentMutation.isPending ? '작성 중...' : '댓글 작성'}
+                        {createCommentMutation.isPending
+                            ? t('comment.form.submitting' as any)
+                            : t('comment.form.submit' as any)
+                        }
                     </SubmitButton>
                 </ButtonGroup>
             </form>

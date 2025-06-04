@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import styled from 'styled-components';
+import {useLanguage} from '../../context/LanguageContext';
 
 interface LoginCredentials {
     username: string;
@@ -143,6 +144,8 @@ const TwoFactorInfo = styled.div`
 `;
 
 const AuthModal: React.FC<AuthModalProps> = ({onLogin, onCancel, message}) => {
+    const {t} = useLanguage();
+
     const [authState, setAuthState] = useState<AuthState>({
         step: 'login',
         username: '',
@@ -160,7 +163,7 @@ const AuthModal: React.FC<AuthModalProps> = ({onLogin, onCancel, message}) => {
         e.preventDefault();
 
         if (!authState.username.trim() || !authState.password.trim()) {
-            updateAuthState({error: '아이디와 비밀번호를 모두 입력해주세요.'});
+            updateAuthState({error: t('layout.auth.modal.errors.fillRequired' as any)});
             return;
         }
 
@@ -191,7 +194,7 @@ const AuthModal: React.FC<AuthModalProps> = ({onLogin, onCancel, message}) => {
                 });
             } else {
                 updateAuthState({
-                    error: '아이디 또는 비밀번호가 올바르지 않습니다.'
+                    error: t('layout.auth.modal.errors.invalidCredentials' as any)
                 });
             }
         } finally {
@@ -203,7 +206,7 @@ const AuthModal: React.FC<AuthModalProps> = ({onLogin, onCancel, message}) => {
         e.preventDefault();
 
         if (!authState.totpCode.trim()) {
-            updateAuthState({error: '인증 코드를 입력해주세요.'});
+            updateAuthState({error: t('layout.auth.modal.errors.enterAuthCode' as any)});
             return;
         }
 
@@ -217,10 +220,10 @@ const AuthModal: React.FC<AuthModalProps> = ({onLogin, onCancel, message}) => {
             });
 
             if (!success) {
-                updateAuthState({error: '인증 코드가 올바르지 않습니다.'});
+                updateAuthState({error: t('layout.auth.modal.errors.invalidAuthCode' as any)});
             }
         } catch (err) {
-            updateAuthState({error: '인증 중 오류가 발생했습니다.'});
+            updateAuthState({error: t('layout.auth.modal.errors.authError' as any)});
         } finally {
             updateAuthState({isLoading: false});
         }
@@ -239,7 +242,10 @@ const AuthModal: React.FC<AuthModalProps> = ({onLogin, onCancel, message}) => {
             <ModalContent onClick={e => e.stopPropagation()}>
                 <ModalHeader>
                     <ModalTitle>
-                        {authState.step === 'login' ? '로그인' : '2단계 인증'}
+                        {authState.step === 'login'
+                            ? t('layout.auth.modal.login' as any)
+                            : t('layout.auth.modal.twoFactorAuth' as any)
+                        }
                     </ModalTitle>
                     {message && <MessageText>{message}</MessageText>}
                 </ModalHeader>
@@ -249,35 +255,38 @@ const AuthModal: React.FC<AuthModalProps> = ({onLogin, onCancel, message}) => {
                         {authState.error && <ErrorMessage>{authState.error}</ErrorMessage>}
 
                         <FormField>
-                            <FormLabel htmlFor="username">아이디</FormLabel>
+                            <FormLabel htmlFor="username">{t('layout.auth.modal.username' as any)}</FormLabel>
                             <FormInput
                                 id="username"
                                 type="text"
                                 value={authState.username}
                                 onChange={e => updateAuthState({username: e.target.value})}
-                                placeholder="아이디를 입력하세요"
+                                placeholder={t('layout.auth.modal.usernamePlaceholder' as any)}
                                 disabled={authState.isLoading}
                             />
                         </FormField>
 
                         <FormField>
-                            <FormLabel htmlFor="password">비밀번호</FormLabel>
+                            <FormLabel htmlFor="password">{t('layout.auth.modal.password' as any)}</FormLabel>
                             <FormInput
                                 id="password"
                                 type="password"
                                 value={authState.password}
                                 onChange={e => updateAuthState({password: e.target.value})}
-                                placeholder="비밀번호를 입력하세요"
+                                placeholder={t('layout.auth.modal.passwordPlaceholder' as any)}
                                 disabled={authState.isLoading}
                             />
                         </FormField>
 
                         <ButtonGroup>
                             <CancelButton type="button" onClick={onCancel} disabled={authState.isLoading}>
-                                취소
+                                {t('layout.auth.modal.cancel' as any)}
                             </CancelButton>
                             <LoginButton type="submit" disabled={authState.isLoading}>
-                                {authState.isLoading ? '로그인 중...' : '다음'}
+                                {authState.isLoading
+                                    ? t('layout.auth.modal.loggingIn' as any)
+                                    : t('layout.auth.modal.next' as any)
+                                }
                             </LoginButton>
                         </ButtonGroup>
                     </form>
@@ -286,17 +295,17 @@ const AuthModal: React.FC<AuthModalProps> = ({onLogin, onCancel, message}) => {
                         {authState.error && <ErrorMessage>{authState.error}</ErrorMessage>}
 
                         <TwoFactorInfo>
-                            <p>인증 앱에서 생성된 6자리 코드를 입력하세요.</p>
+                            <p>{t('layout.auth.modal.twoFactorInfo' as any)}</p>
                         </TwoFactorInfo>
 
                         <FormField>
-                            <FormLabel htmlFor="totpCode">인증 코드</FormLabel>
+                            <FormLabel htmlFor="totpCode">{t('layout.auth.modal.authCode' as any)}</FormLabel>
                             <FormInput
                                 id="totpCode"
                                 type="text"
                                 value={authState.totpCode}
                                 onChange={e => updateAuthState({totpCode: e.target.value})}
-                                placeholder="000000"
+                                placeholder={t('layout.auth.modal.authCodePlaceholder' as any)}
                                 maxLength={6}
                                 disabled={authState.isLoading}
                                 autoComplete="one-time-code"
@@ -305,10 +314,13 @@ const AuthModal: React.FC<AuthModalProps> = ({onLogin, onCancel, message}) => {
 
                         <ButtonGroup>
                             <CancelButton type="button" onClick={handleBackToLogin} disabled={authState.isLoading}>
-                                뒤로
+                                {t('layout.auth.modal.back' as any)}
                             </CancelButton>
                             <LoginButton type="submit" disabled={authState.isLoading}>
-                                {authState.isLoading ? '인증 중...' : '로그인'}
+                                {authState.isLoading
+                                    ? t('layout.auth.modal.authenticating' as any)
+                                    : t('layout.auth.modal.login' as any)
+                                }
                             </LoginButton>
                         </ButtonGroup>
                     </form>

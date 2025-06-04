@@ -319,6 +319,14 @@ const NavigationBar: React.FC = () => {
         return 'unknown';
     };
 
+    const formatMessage = (key: string, params: Record<string, any> = {}): string => {
+        let message = t(key as any);
+        Object.entries(params).forEach(([param, value]) => {
+            message = message.replace(`{${param}}`, String(value));
+        });
+        return message;
+    };
+
     const extractCategoryFromUrl = (url: string): string => {
         const pathOnly = url.split('?')[0];
         const pathParts = pathOnly.split('/').filter(Boolean);
@@ -361,21 +369,21 @@ const NavigationBar: React.FC = () => {
 
             setShowPostForm(false);
             setFormData(null);
-            alert('포스트가 생성되었습니다!');
+            alert(t('layout.form.postCreated' as any));
             window.location.reload();
 
         } catch (error: any) {
             console.error('Post creation failed:', error);
             setApiStatus('error');
             setStatusCode(error.status || 500);
-            setApiError('포스트 생성에 실패했습니다.');
+            setApiError(t('layout.form.createFailed' as any));
         }
     }, [createPostMutation, currentCategory, setApiStatus, setStatusCode, setApiError]);
 
     const updatePost = useCallback(async (postData: any) => {
         try {
             if (!currentPostData?.id) {
-                throw new Error('포스트 ID를 찾을 수 없습니다.');
+                alert(t('layout.method.postDataError' as any));
             }
 
             await updatePostMutation.mutateAsync({
@@ -390,7 +398,7 @@ const NavigationBar: React.FC = () => {
             setShowUpdateForm(false);
             setFormData(null);
             setPendingAction(null);
-            alert('포스트가 수정되었습니다!');
+            alert(t('layout.form.postUpdated' as any));
             window.location.reload();
 
         } catch (error: any) {
@@ -404,21 +412,21 @@ const NavigationBar: React.FC = () => {
     const deletePost = useCallback(async () => {
         try {
             if (!currentPostData?.id) {
-                throw new Error('포스트 ID를 찾을 수 없습니다.');
+                alert(t('layout.method.postDataError' as any));
             }
 
             await deletePostMutation.mutateAsync(currentPostData.id.toString());
 
             setShowDeleteModal(false);
             setPendingAction(null);
-            alert('포스트가 삭제되었습니다!');
+            alert(t('layout.form.postDeleted' as any));
             navigateTo(`/${currentCategory}`);
 
         } catch (error: any) {
             console.error('Post deletion failed:', error);
             setApiStatus('error');
             setStatusCode(error.status || 500);
-            setApiError('포스트 삭제에 실패했습니다.');
+            setApiError(t('layout.form.deleteFailed' as any));
         }
     }, [deletePostMutation, currentPostData, currentCategory, navigateTo, setApiStatus, setStatusCode, setApiError]);
 
@@ -432,8 +440,14 @@ const NavigationBar: React.FC = () => {
                 setShowUpdateForm(false);
                 setAuthMessage(
                     action === 'create'
-                        ? `${getCategoryName(currentCategory)} 카테고리에 새 글을 작성하려면 인증이 필요합니다.`
-                        : `${getCategoryName(currentCategory)} 포스트를 수정하려면 인증이 필요합니다.`
+                        ? formatMessage('post.auth.required', {
+                            action: t('post.auth.actions.create' as any),
+                            category: getCategoryName(currentCategory)
+                        })
+                        : formatMessage('post.auth.required', {
+                            action: t('post.auth.actions.edit' as any),
+                            category: getCategoryName(currentCategory)
+                        })
                 );
                 setShowAuthModal(true);
                 return;
@@ -455,7 +469,10 @@ const NavigationBar: React.FC = () => {
             if (!isAuthenticated) {
                 setPendingAction('delete');
                 setShowDeleteModal(false);
-                setAuthMessage(`${getCategoryName(currentCategory)} 포스트를 삭제하려면 인증이 필요합니다.`);
+                setAuthMessage(formatMessage('post.auth.required', {
+                    action: t('post.auth.actions.delete' as any),
+                    category: getCategoryName(currentCategory)
+                }));
                 setShowAuthModal(true);
                 return;
             }
@@ -612,7 +629,7 @@ const NavigationBar: React.FC = () => {
                     setCurrentPostData(postData);
                     setShowUpdateForm(true);
                 } else {
-                    alert('포스트 데이터를 가져올 수 없습니다.');
+                    alert(t('layout.method.postDataError' as any));
                     return;
                 }
             } else {
@@ -636,14 +653,14 @@ const NavigationBar: React.FC = () => {
 
     const handleAuthButtonClick = () => {
         if (!isAuthenticated) {
-            setAuthMessage('관리자 기능을 사용하려면 로그인하세요');
+            setAuthMessage(t('layout.auth.loginRequired' as any));
             setShowAuthModal(true);
         }
     };
 
     const handleLogout = () => {
         logout();
-        alert('로그아웃 되었습니다.');
+        alert(t('layout.auth.logoutSuccess' as any));
     };
 
     const toggleHeadersPanel = () => {
@@ -717,7 +734,7 @@ const NavigationBar: React.FC = () => {
                         </LogoTextContainer>
                     </Logo>
 
-                    <RightControls $hasSearch={showSearch}>
+                    <RightControls>
                         <TopRightControls>
                             <LanguageToggle onClick={toggleLanguage}>
                                 {language === 'en' ? '한국어' : 'English'}
@@ -728,18 +745,18 @@ const NavigationBar: React.FC = () => {
 
                             <AuthStatusContainer $authenticated={isAuthenticated}>
                                 {isAuthenticated ? '🔒' : '🔓'}
-                                {isAuthenticated ? 'Authenticated' : 'Not authenticated'}
+                                {isAuthenticated ? t('layout.auth.authenticated' as any) : t('layout.auth.notAuthenticated' as any)}
                             </AuthStatusContainer>
 
                             <AuthButtonGroup>
                                 {!isAuthenticated ? (
-                                    <Tooltip content="관리자 로그인">
+                                    <Tooltip content={t('layout.auth.adminLogin' as any)}>
                                         <AuthButton onClick={handleAuthButtonClick}>
                                             <IoPersonOutline size={16}/>
                                         </AuthButton>
                                     </Tooltip>
                                 ) : (
-                                    <Tooltip content="로그아웃">
+                                    <Tooltip content={t('layout.auth.logout' as any)}>
                                         <LogoutButton onClick={handleLogout}>
                                             <IoLogOutOutline size={16}/>
                                         </LogoutButton>
@@ -775,15 +792,16 @@ const NavigationBar: React.FC = () => {
                 </ApiControls>
 
                 {showMethodChangeAlert && (
-                    <MethodAlert>
-                        메서드가 <strong>{method}</strong>로 변경되었습니다.
-                    </MethodAlert>
+                    <MethodAlert dangerouslySetInnerHTML={{
+                        __html: formatMessage('layout.method.changed', {method})
+                    }}/>
                 )}
 
+
                 {showMethodNotAllowedAlert && (
-                    <ErrorAlert>
-                        <strong>405 Method Not Allowed</strong> - 이 페이지는 {attemptedMethod}를 지원하지 않습니다.
-                    </ErrorAlert>
+                    <ErrorAlert dangerouslySetInnerHTML={{
+                        __html: formatMessage('layout.method.notAllowed', {method: attemptedMethod})
+                    }}/>
                 )}
 
                 {showHeadersPanel && (
@@ -801,7 +819,7 @@ const NavigationBar: React.FC = () => {
                 <FormModal>
                     <ModalContent>
                         <ModalHeader>
-                            <ModalTitle>새 {getCategoryName(currentCategory)} 포스트 작성</ModalTitle>
+                            <ModalTitle>{formatMessage('layout.form.createPost', {category: getCategoryName(currentCategory)})}</ModalTitle>
                             <CloseButton onClick={handleFormCancel}>×</CloseButton>
                         </ModalHeader>
                         <PostForm
@@ -818,7 +836,7 @@ const NavigationBar: React.FC = () => {
                 <FormModal>
                     <ModalContent>
                         <ModalHeader>
-                            <ModalTitle>{getCategoryName(currentCategory)} 포스트 수정</ModalTitle>
+                            <ModalTitle>{formatMessage('layout.form.editPost', {category: getCategoryName(currentCategory)})}</ModalTitle>
                             <CloseButton onClick={handleFormCancel}>×</CloseButton>
                         </ModalHeader>
                         <PostForm

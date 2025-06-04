@@ -4,6 +4,7 @@ import {CommentForm} from './CommentForm';
 import {CommentItem} from './CommentItem';
 import {usePostComments} from "../../../hooks/useApi.ts";
 import Pagination from "../Pagination.tsx";
+import {useLanguage} from "../../../context/LanguageContext.tsx";
 
 interface CommentSectionProps {
     postId: string;
@@ -45,21 +46,29 @@ const NoComments = styled.div`
 `;
 
 export const CommentSection: React.FC<CommentSectionProps> = ({postId, isAdmin = false}) => {
+    const {t} = useLanguage();
     const [currentPage, setCurrentPage] = React.useState(0);
     const pageSize = 10;
 
     const {data: commentsData, isLoading, error} = usePostComments(postId, currentPage, pageSize);
 
+    const formatMessage = (key: string, params: Record<string, any> = {}): string => {
+        let message = t(key as any);
+        Object.entries(params).forEach(([param, value]) => {
+            message = message.replace(`{${param}}`, String(value));
+        });
+        return message;
+    };
+
     const handleCommentSuccess = () => {
         // 댓글 작성 성공 시 첫 페이지로 이동
         setCurrentPage(0);
-
     };
 
     if (error) {
         return (
             <CommentSectionContainer>
-                <CommentTitle>댓글을 불러오는데 실패했습니다.</CommentTitle>
+                <CommentTitle>{t('comment.section.loadingError' as any)}</CommentTitle>
             </CommentSectionContainer>
         );
     }
@@ -71,13 +80,14 @@ export const CommentSection: React.FC<CommentSectionProps> = ({postId, isAdmin =
     return (
         <CommentSectionContainer>
             <CommentTitle>
-                댓글 <CommentCount>{totalComments}</CommentCount>
+                {t('comment.section.title' as any)}
+                <CommentCount>{formatMessage('comment.section.count', {count: totalComments})}</CommentCount>
             </CommentTitle>
 
             <CommentForm postId={postId} onSuccess={handleCommentSuccess}/>
 
             {isLoading ? (
-                <LoadingMessage>댓글을 불러오는 중...</LoadingMessage>
+                <LoadingMessage>{t('comment.section.loading' as any)}</LoadingMessage>
             ) : comments.length > 0 ? (
                 <>
                     {comments.map((comment) => (
@@ -99,7 +109,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({postId, isAdmin =
                 </>
             ) : (
                 <NoComments>
-                    아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!
+                    {t('comment.section.noComments' as any)}
                 </NoComments>
             )}
         </CommentSectionContainer>
