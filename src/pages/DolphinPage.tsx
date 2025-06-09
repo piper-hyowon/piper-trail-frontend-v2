@@ -254,7 +254,13 @@ const dolphinTranslations = {
             "같이 수영할래요?",
             "파도 소리 들어보세요~",
             "여기 경치가 정말 좋죠?",
-            "가끔 이렇게 방문자가 와요"
+            "가끔 이렇게 방문자가 와요",
+            "API Resource Links 는 RESTFUL 의 HATEOAS 를 표현한거래요~",
+            "제가 바다의 비밀 주소들을 알려드릴게요~",
+            "가끔 주소창에서 쿼리 파라미터를 직접 바꿔보세요!",
+            "주소창에 hello 라고 인사해주세요!",
+            "Coffee 좋아하세요? 주소창에 coffee 를 입력하면 한 잔 드릴게요!",
+            "고양이 좋아하세요? 주소창에 cats 를 입력해보세요! 😽"
         ]
     },
     en: {
@@ -284,7 +290,13 @@ const dolphinTranslations = {
             "Want to swim together?",
             "Listen to the sound of the waves~",
             "The scenery here is really beautiful, right?",
-            "Sometimes visitors come like this"
+            "Sometimes visitors come like this",
+            "API Resource Links represent HATEOAS in RESTful architecture~",
+            "Let me share the secret addresses of this ocean~",
+            "Try changing the query parameters in the address bar sometimes!",
+            "Say hello by typing 'hello' in the address bar!",
+            "Do you like coffee? Type 'coffee' in the address bar and I'll give you a cup!",
+            "Do you like cats? Try typing 'cats' in the address bar! 😽"
         ]
     }
 };
