@@ -12,7 +12,6 @@ export interface PostSummary {
     preview: string;
     category: string;
     tags: string[];
-    viewCount: number;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -26,6 +25,13 @@ export interface LinkInfo {
 export interface PostDetail extends PostSummary {
     content: string;
     _links: Map<string, LinkInfo>;
+}
+
+export interface PostStat {
+    postId: string;
+    slug: string;
+    viewCount: number;
+    lastUpdated: Date;
 }
 
 export interface CreatePostRequest {
@@ -49,22 +55,22 @@ export interface PostSearchRequest {
     page: number;
     size: number;
     sortBy: string;
-    sortDirection: 'asc' | 'desc';
+    sortDirection: "asc" | "desc";
 }
 
 export enum FontFamily {
-    DEFAULT = 'DEFAULT',
-    SERIF = 'SERIF',
-    SANS_SERIF = 'SANS_SERIF',
-    MONOSPACE = 'MONOSPACE'
+    DEFAULT = "DEFAULT",
+    SERIF = "SERIF",
+    SANS_SERIF = "SANS_SERIF",
+    MONOSPACE = "MONOSPACE",
 }
 
 export enum TextColor {
-    DEFAULT = 'DEFAULT',
-    BLACK = 'BLACK',
-    BLUE = 'BLUE',
-    RED = 'RED',
-    GREEN = 'GREEN'
+    DEFAULT = "DEFAULT",
+    BLACK = "BLACK",
+    BLUE = "BLUE",
+    RED = "RED",
+    GREEN = "GREEN",
 }
 
 export enum StampType {
@@ -73,7 +79,7 @@ export enum StampType {
     HELPFUL = "HELPFUL",
     INSPIRING = "INSPIRING",
     THANK_YOU = "THANK_YOU",
-    LOVE_IT = "LOVE_IT"
+    LOVE_IT = "LOVE_IT",
 }
 
 export interface CreateCommentRequest {
@@ -112,14 +118,13 @@ export interface CommentAdminResponse {
     textColor: TextColor;
     ipAddress: string;
     approved: boolean;
-    hidden: boolean
+    hidden: boolean;
     needsReview: boolean;
     riskScore: number;
     reviewedAt: Date;
     reviewResponse: string;
     createdAt: Date;
     updatedAt: Date;
-
 }
 
 export interface PostStatisticsResponse {
@@ -168,7 +173,6 @@ export interface AuthResponse {
     refreshToken: string; // 2단계 인증 완료시 포함
     qrCodeDataUrl: string; // TOTP 설정 필요시(최초1 회)
     accessTokenExpiresInSeconds: number;
-
 }
 
 export interface RefreshTokenRequest {
@@ -180,6 +184,5 @@ export class PostcardResponse {
     stampType: StampType;
     nickname: string;
     message: string;
-    createdAt: Date
+    createdAt: Date;
 }
-

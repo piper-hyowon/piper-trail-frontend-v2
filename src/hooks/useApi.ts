@@ -1,5 +1,5 @@
-import {useQuery, useMutation, useQueryClient} from '@tanstack/react-query';
-import apiClient from '../services/apiClient';
+import {useQuery, useMutation, useQueryClient} from "@tanstack/react-query";
+import apiClient from "../services/apiClient";
 import {
     PostSearchRequest,
     CreatePostRequest,
@@ -7,8 +7,9 @@ import {
     CreateCommentRequest,
     CommentReviewRequest,
     LoginRequest,
-    TwoFactorRequest, StampType
-} from '../types/api';
+    TwoFactorRequest,
+    StampType,
+} from "../types/api";
 
 interface BasicPaginationParams {
     page?: number;
@@ -16,42 +17,66 @@ interface BasicPaginationParams {
     sort?: string;
 }
 
-export const usePosts = (params?: BasicPaginationParams) => {
-    return useQuery({
-        queryKey: ['posts', params],
-        queryFn: () => apiClient.getPosts(params),
-    });
-};
+// export const usePosts = (params?: BasicPaginationParams) => {
+//     return useQuery({
+//         queryKey: ['posts', params],
+//         queryFn: () => apiClient.getPosts(params),
+//     });
+// };
 
-export const usePostsByCategory = (categoryName: string | null, params?: BasicPaginationParams) => {
+export const usePostsByCategory = (
+    categoryName: string | null,
+    params?: BasicPaginationParams
+) => {
     return useQuery({
-        queryKey: ['posts', 'category', categoryName, params],
+        queryKey: ["posts", "category", categoryName, params],
         queryFn: () => apiClient.getPostsByCategory(categoryName, params),
+        staleTime: 60 * 60 * 1000, // 1시간
+        gcTime: 2 * 60 * 60 * 1000, // 2시간
         enabled: categoryName !== undefined, // categoryName이 정의되어 있을 때만 실행 (null 포함)
     });
 };
 
-export const usePostsByTag = (tagName: string, params?: BasicPaginationParams) => {
+export const usePostsByTag = (
+    tagName: string,
+    params?: BasicPaginationParams
+) => {
     return useQuery({
-        queryKey: ['posts', 'tag', tagName, params],
+        queryKey: ["posts", "tag", tagName, params],
         queryFn: () => apiClient.getPostsByTag(tagName, params),
         enabled: !!tagName, // tagName이 있을 때만 실행
+        staleTime: 60 * 60 * 1000, // 1시간
+        gcTime: 2 * 60 * 60 * 1000, // 2시간
     });
 };
 
 export const useSearchPosts = (searchRequest: PostSearchRequest) => {
     return useQuery({
-        queryKey: ['posts', 'search', searchRequest],
+        queryKey: ["posts", "search", searchRequest],
         queryFn: () => apiClient.searchPosts(searchRequest),
         enabled: !!searchRequest.keyword, // 검색어가 있을 때만 실행
+        staleTime: 60 * 60 * 1000, // 1시간
+        gcTime: 2 * 60 * 60 * 1000, // 2시간
+    });
+};
+
+export const usePostStats = (slug: string) => {
+    return useQuery({
+        queryKey: ["post-stats", slug],
+        queryFn: () => apiClient.getPostStats(slug),
+        staleTime: 60 * 1000, // 1분
+        gcTime: 5 * 60 * 1000, // 5분
+        enabled: !!slug,
     });
 };
 
 export const usePost = (slug: string) => {
     return useQuery({
-        queryKey: ['post', slug],
+        queryKey: ["post", slug],
         queryFn: () => apiClient.getPost(slug),
         enabled: !!slug, // slug가 있을 때만 실행
+        staleTime: 2 * 60 * 60 * 1000, // 2시간 (백엔드 HTTP 캐시)
+        gcTime: 4 * 60 * 60 * 1000, // 4시간
     });
 };
 
@@ -62,7 +87,7 @@ export const useCreatePost = () => {
         mutationFn: (post: CreatePostRequest) => apiClient.createPost(post),
         onSuccess: () => {
             // React Query 메모리 캐시만 무효화 (HTTP 캐시는 서버에서 자동 처리)
-            queryClient.invalidateQueries({queryKey: ['posts']});
+            queryClient.invalidateQueries({queryKey: ["posts"]});
         },
     });
 };
@@ -71,12 +96,17 @@ export const useUpdatePost = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({postId, post}: { postId: string; post: UpdatePostRequest }) =>
-            apiClient.updatePost(postId, post),
+        mutationFn: ({
+                         postId,
+                         post,
+                     }: {
+            postId: string;
+            post: UpdatePostRequest;
+        }) => apiClient.updatePost(postId, post),
         onSuccess: (_, variables) => {
             // React Query 메모리 캐시만 무효화
-            queryClient.invalidateQueries({queryKey: ['posts']});
-            queryClient.invalidateQueries({queryKey: ['post', variables.postId]});
+            queryClient.invalidateQueries({queryKey: ["posts"]});
+            queryClient.invalidateQueries({queryKey: ["post", variables.postId]});
         },
     });
 };
@@ -88,29 +118,32 @@ export const useDeletePost = () => {
         mutationFn: (postId: string) => apiClient.deletePost(postId),
         onSuccess: () => {
             // React Query 메모리 캐시만 무효화
-            queryClient.invalidateQueries({queryKey: ['posts']});
+            queryClient.invalidateQueries({queryKey: ["posts"]});
         },
     });
 };
 
 export const useCategories = () => {
-
     return useQuery({
-        queryKey: ['categories'],
+        queryKey: ["categories"],
         queryFn: () => apiClient.getCategories(),
+        staleTime: 24 * 60 * 60 * 1000,
+        gcTime: 48 * 60 * 60 * 1000,
     });
 };
 
 export const useTags = () => {
     return useQuery({
-        queryKey: ['tags'],
+        queryKey: ["tags"],
         queryFn: () => apiClient.getTags(),
+        staleTime: 24 * 60 * 60 * 1000, // 1일
+        gcTime: 48 * 60 * 60 * 1000, // 2일
     });
 };
 
 export const usePostComments = (postId: string, page = 0, size = 20) => {
     return useQuery({
-        queryKey: ['comments', 'post', postId, page, size],
+        queryKey: ["comments", "post", postId, page, size],
         queryFn: () => apiClient.getPostComments(postId, page, size),
         enabled: !!postId,
     });
@@ -119,7 +152,7 @@ export const usePostComments = (postId: string, page = 0, size = 20) => {
 // 전체 댓글 조회 (/comments) - (대시보드에서 사용 인증 필요)
 export const useAllComments = (page = 0, size = 20) => {
     return useQuery({
-        queryKey: ['comments', 'all', page, size],
+        queryKey: ["comments", "all", page, size],
         queryFn: () => apiClient.getAllComments(page, size),
     });
 };
@@ -128,12 +161,19 @@ export const useCreateComment = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({postId, comment}: { postId: string; comment: CreateCommentRequest }) =>
-            apiClient.createComment(postId, comment),
+        mutationFn: ({
+                         postId,
+                         comment,
+                     }: {
+            postId: string;
+            comment: CreateCommentRequest;
+        }) => apiClient.createComment(postId, comment),
         onSuccess: (_, variables) => {
             // React Query 메모리 캐시만 무효화 (HTTP 캐시는 서버가 자동 처리)
-            queryClient.invalidateQueries({queryKey: ['comments', 'post', variables.postId]});
-            queryClient.invalidateQueries({queryKey: ['post', variables.postId]});
+            queryClient.invalidateQueries({
+                queryKey: ["comments", "post", variables.postId],
+            });
+            queryClient.invalidateQueries({queryKey: ["post", variables.postId]});
         },
     });
 };
@@ -142,11 +182,20 @@ export const useDeleteComment = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({postId, commentId, password}: { postId: string; commentId: string; password: string }) =>
-            apiClient.deleteComment(postId, commentId, {password}),
+        mutationFn: ({
+                         postId,
+                         commentId,
+                         password,
+                     }: {
+            postId: string;
+            commentId: string;
+            password: string;
+        }) => apiClient.deleteComment(postId, commentId, {password}),
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({queryKey: ['comments', 'post', variables.postId]});
-            queryClient.invalidateQueries({queryKey: ['comments', 'all']});
+            queryClient.invalidateQueries({
+                queryKey: ["comments", "post", variables.postId],
+            });
+            queryClient.invalidateQueries({queryKey: ["comments", "all"]});
         },
     });
 };
@@ -156,23 +205,26 @@ export const useReviewComment = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({postId, commentId, review}: {
+        mutationFn: ({
+                         postId,
+                         commentId,
+                         review,
+                     }: {
             postId: string;
             commentId: string;
-            review: CommentReviewRequest
-        }) =>
-            apiClient.reviewComment(postId, commentId, review),
+            review: CommentReviewRequest;
+        }) => apiClient.reviewComment(postId, commentId, review),
         onSuccess: (_, variables) => {
             // React Query 메모리 캐시만 무효화
-            queryClient.invalidateQueries({queryKey: ['comments']});
-            queryClient.invalidateQueries({queryKey: ['dashboard']});
+            queryClient.invalidateQueries({queryKey: ["comments"]});
+            queryClient.invalidateQueries({queryKey: ["dashboard"]});
         },
     });
 };
 
 export const usePostcards = (page = 0, size = 20) => {
     return useQuery({
-        queryKey: ['postcards', page, size],
+        queryKey: ["postcards", page, size],
         queryFn: () => apiClient.getPostcards(page, size),
     });
 };
@@ -181,13 +233,17 @@ export const useCreatePostcard = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({stampType, nickname, message}: {
-            stampType: StampType,
-            nickname?: string,
-            message?: string
+        mutationFn: ({
+                         stampType,
+                         nickname,
+                         message,
+                     }: {
+            stampType: StampType;
+            nickname?: string;
+            message?: string;
         }) => apiClient.createPostcard(stampType, nickname, message),
         onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ['postcards']});
+            queryClient.invalidateQueries({queryKey: ["postcards"]});
         },
     });
 };
@@ -213,17 +269,18 @@ export const useTwoFactorAuth = () => {
 // 대시보드 요약 (/dashboard/summary) - 인증 필요
 export const useDashboardSummary = () => {
     return useQuery({
-        queryKey: ['dashboard', 'summary'],
+        queryKey: ["dashboard", "summary"],
         queryFn: () => apiClient.getDashboardSummary(),
     });
 };
 
+
+// TODO: 함수 이름 개선
 // 포스트 통계 (/dashboard/posts/{postId}/stats) - 인증 필요
-export const usePostStats = (postId: string) => {
+export const usePostsStats = (postId: string) => {
     return useQuery({
-        queryKey: ['dashboard', 'post-stats', postId],
+        queryKey: ["dashboard", "posts-stats", postId],
         queryFn: () => apiClient.getPostStats(postId),
         enabled: !!postId,
     });
 };
-

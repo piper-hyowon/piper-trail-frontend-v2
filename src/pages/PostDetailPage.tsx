@@ -1,7 +1,12 @@
 import React, {useState, useCallback} from "react";
 import styled from "styled-components";
 import {useParams, Link, useNavigate} from "react-router-dom";
-import {usePost, useUpdatePost, useDeletePost} from "../hooks/useApi";
+import {
+    usePost,
+    useUpdatePost,
+    useDeletePost,
+    usePostStats,
+} from "../hooks/useApi";
 import {useApi, LoginCredentials} from "../context/ApiContext";
 import TagList from "../components/ui/TagList";
 import PostForm from "../components/ui/PostForm";
@@ -125,7 +130,12 @@ const PostContent = styled.div`
   border-radius: ${({theme}) => theme.borderRadius};
   box-shadow: 0 2px 8px ${({theme}) => `${theme.colors.primary}10`};
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: ${({theme}) => theme.colors.primary};
     margin-top: ${({theme}) => theme.spacing.xl};
     margin-bottom: ${({theme}) => theme.spacing.md};
@@ -190,7 +200,8 @@ const PostContent = styled.div`
     color: ${({theme}) => `${theme.colors.text}90`};
   }
 
-  ul, ol {
+  ul,
+  ol {
     margin-bottom: ${({theme}) => theme.spacing.md};
     padding-left: ${({theme}) => theme.spacing.lg};
   }
@@ -218,7 +229,8 @@ const PostContent = styled.div`
     overflow: hidden;
   }
 
-  th, td {
+  th,
+  td {
     padding: ${({theme}) => theme.spacing.sm};
     text-align: left;
     border-bottom: 1px solid ${({theme}) => `${theme.colors.primary}20`};
@@ -280,9 +292,9 @@ const ShareButton = styled.button`
   }
 `;
 
-const ActionButton = styled.button<{ $variant?: 'edit' | 'delete' }>`
+const ActionButton = styled.button<{ $variant?: "edit" | "delete" }>`
   background: ${({theme, $variant}) =>
-          $variant === 'delete' ? theme.colors.error : theme.colors.primary};
+          $variant === "delete" ? theme.colors.error : theme.colors.primary};
   color: white;
   border: none;
   padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
@@ -412,7 +424,10 @@ const PostDetailPage: React.FC = () => {
     const {isAuthenticated, login, fetchApiData} = useApi();
     const {t, language} = useLanguage();
 
-    const formatMessage = (key: string, params: Record<string, any> = {}): string => {
+    const formatMessage = (
+        key: string,
+        params: Record<string, any> = {}
+    ): string => {
         let message = t(key as any);
         Object.entries(params).forEach(([param, value]) => {
             message = message.replace(`{${param}}`, String(value));
@@ -424,23 +439,26 @@ const PostDetailPage: React.FC = () => {
         return (
             <PostDetailContainer>
                 <ErrorContainer>
-                    <ErrorTitle>{t('post.detail.errors.invalidUrl' as any)}</ErrorTitle>
-                    <ErrorMessage>{t('post.detail.errors.noSlug' as any)}</ErrorMessage>
-                    <BackButton to="/">{t('post.detail.backToHome' as any)}</BackButton>
+                    <ErrorTitle>{t("post.detail.errors.invalidUrl" as any)}</ErrorTitle>
+                    <ErrorMessage>{t("post.detail.errors.noSlug" as any)}</ErrorMessage>
+                    <BackButton to="/">{t("post.detail.backToHome" as any)}</BackButton>
                 </ErrorContainer>
             </PostDetailContainer>
         );
     }
 
     const {data: post, isLoading, error} = usePost(postSlug!);
+    const {data: stat, isLoading: isStatLoading, error: statError} = usePostStats(postSlug!);
 
     // 모달 상태 관리
     const [showUpdateForm, setShowUpdateForm] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
-    const [authMessage, setAuthMessage] = useState('');
+    const [authMessage, setAuthMessage] = useState("");
     const [formData, setFormData] = useState<any>(null);
-    const [pendingAction, setPendingAction] = useState<'update' | 'delete' | null>(null);
+    const [pendingAction, setPendingAction] = useState<
+        "update" | "delete" | null
+    >(null);
 
     const updatePostMutation = useUpdatePost();
     const deletePostMutation = useDeletePost();
@@ -455,186 +473,210 @@ const PostDetailPage: React.FC = () => {
         setShowDeleteModal(true);
     }, [post]);
 
-    const handleApiLinkClick = useCallback(async (href: string, linkMethod?: string) => {
-        try {
-            console.log(`API 링크 클릭: ${linkMethod} ${href}`);
+    const handleApiLinkClick = useCallback(
+        async (href: string, linkMethod?: string) => {
+            try {
+                console.log(`API 링크 클릭: ${linkMethod} ${href}`);
 
-            switch (linkMethod?.toUpperCase()) {
-                case 'PUT':
-                    if (href.includes('/posts/')) {
-                        handleUpdateClick();
-                    }
-                    break;
-
-                case 'DELETE':
-                    if (href.includes('/posts/')) {
-                        handleDeleteClick();
-                    }
-                    break;
-
-                case 'GET':
-                    if (href.includes('/category/')) {
-                        const categoryMatch = href.match(/\/category\/(.+)$/);
-                        if (categoryMatch) {
-                            const category = categoryMatch[1];
-                            navigate(`/${category === 'null' ? 'uncategorized' : category}`);
+                switch (linkMethod?.toUpperCase()) {
+                    case "PUT":
+                        if (href.includes("/posts/")) {
+                            handleUpdateClick();
                         }
-                    } else if (href.includes('/posts/')) {
-                        // 현재 포스트 새로고침 (self 링크)
-                        window.location.reload();
-                    } else {
-                        navigate(href);
-                    }
-                    break;
+                        break;
 
-                default:
-                    if (fetchApiData) {
-                        await fetchApiData(href, linkMethod as any);
-                    } else {
-                        navigate(href);
-                    }
-                    break;
+                    case "DELETE":
+                        if (href.includes("/posts/")) {
+                            handleDeleteClick();
+                        }
+                        break;
+
+                    case "GET":
+                        if (href.includes("/category/")) {
+                            const categoryMatch = href.match(/\/category\/(.+)$/);
+                            if (categoryMatch) {
+                                const category = categoryMatch[1];
+                                navigate(
+                                    `/${category === "null" ? "uncategorized" : category}`
+                                );
+                            }
+                        } else if (href.includes("/posts/")) {
+                            // 현재 포스트 새로고침 (self 링크)
+                            window.location.reload();
+                        } else {
+                            navigate(href);
+                        }
+                        break;
+
+                    default:
+                        if (fetchApiData) {
+                            await fetchApiData(href, linkMethod as any);
+                        } else {
+                            navigate(href);
+                        }
+                        break;
+                }
+            } catch (error) {
+                console.error("Failed to handle API link click", error);
             }
-        } catch (error) {
-            console.error('Failed to handle API link click', error);
-        }
-    }, [fetchApiData, navigate, handleUpdateClick, handleDeleteClick]);
+        },
+        [fetchApiData, navigate, handleUpdateClick, handleDeleteClick]
+    );
 
     // NavigationBar와의 통신을 위한 이벤트 리스너
     React.useEffect(() => {
         const handleRequestPostData = () => {
             if (post) {
-                window.dispatchEvent(new CustomEvent('postData', {
-                    detail: {
-                        id: post.id,
-                        title: post.title,
-                        markdownContent: post.content || post.content,
-                        content: post.content,
-                        tags: post.tags,
-                        category: post.category
-                    }
-                }));
+                window.dispatchEvent(
+                    new CustomEvent("postData", {
+                        detail: {
+                            id: post.id,
+                            title: post.title,
+                            markdownContent: post.content || post.content,
+                            content: post.content,
+                            tags: post.tags,
+                            category: post.category,
+                        },
+                    })
+                );
             }
         };
 
-        window.addEventListener('requestPostData', handleRequestPostData);
+        window.addEventListener("requestPostData", handleRequestPostData);
 
         return () => {
-            window.removeEventListener('requestPostData', handleRequestPostData);
+            window.removeEventListener("requestPostData", handleRequestPostData);
         };
     }, [post]);
 
-    const updatePost = useCallback(async (postData: any) => {
-        try {
-            if (!post?.id) {
-                throw new Error(t('post.form.errors.noPostId' as any));
-            }
-
-            await updatePostMutation.mutateAsync({
-                postId: post.id.toString(),
-                post: {
-                    title: postData.title,
-                    markdownContent: postData.content,
-                    tags: postData.tags || []
+    const updatePost = useCallback(
+        async (postData: any) => {
+            try {
+                if (!post?.id) {
+                    throw new Error(t("post.form.errors.noPostId" as any));
                 }
-            });
 
-            setShowUpdateForm(false);
-            setFormData(null);
-            setPendingAction(null);
-            alert(t('post.form.success.updated' as any));
-            window.location.reload();
+                await updatePostMutation.mutateAsync({
+                    postId: post.id.toString(),
+                    post: {
+                        title: postData.title,
+                        markdownContent: postData.content,
+                        tags: postData.tags || [],
+                    },
+                });
 
-        } catch (error: any) {
-            console.error('Post update failed:', error);
-            alert(formatMessage('post.form.errors.updateFailed', {error: error.message}));
-        }
-    }, [updatePostMutation, post, t, formatMessage]);
+                setShowUpdateForm(false);
+                setFormData(null);
+                setPendingAction(null);
+                alert(t("post.form.success.updated" as any));
+                window.location.reload();
+            } catch (error: any) {
+                console.error("Post update failed:", error);
+                alert(
+                    formatMessage("post.form.errors.updateFailed", {
+                        error: error.message,
+                    })
+                );
+            }
+        },
+        [updatePostMutation, post, t, formatMessage]
+    );
 
     const deletePost = useCallback(async () => {
         try {
             if (!post?.id) {
-                throw new Error(t('post.form.errors.noPostId' as any));
+                throw new Error(t("post.form.errors.noPostId" as any));
             }
 
             await deletePostMutation.mutateAsync(post.id.toString());
 
             setShowDeleteModal(false);
             setPendingAction(null);
-            alert('Post deleted successfully!');
+            alert("Post deleted successfully!");
             navigate(`/${post.category}`);
-
         } catch (error: any) {
-            console.error('Post deletion failed:', error);
-            alert(formatMessage('post.form.errors.deleteFailed', {error: error.message}));
+            console.error("Post deletion failed:", error);
+            alert(
+                formatMessage("post.form.errors.deleteFailed", {error: error.message})
+            );
         }
     }, [deletePostMutation, post, navigate, t, formatMessage]);
 
-    const handleUpdateSubmit = useCallback(async (formData: any) => {
-        try {
-            if (!isAuthenticated) {
-                setFormData(formData);
-                setPendingAction('update');
-                setShowUpdateForm(false);
-                setAuthMessage(formatMessage('post.auth.required', {
-                    action: t('post.auth.actions.edit' as any),
-                    category: post?.category || ''
-                }));
-                setShowAuthModal(true);
-                return;
-            }
+    const handleUpdateSubmit = useCallback(
+        async (formData: any) => {
+            try {
+                if (!isAuthenticated) {
+                    setFormData(formData);
+                    setPendingAction("update");
+                    setShowUpdateForm(false);
+                    setAuthMessage(
+                        formatMessage("post.auth.required", {
+                            action: t("post.auth.actions.edit" as any),
+                            category: post?.category || "",
+                        })
+                    );
+                    setShowAuthModal(true);
+                    return;
+                }
 
-            await updatePost(formData);
-        } catch (error) {
-            console.error(t('post.form.errors.formSubmission' as any), error);
-        }
-    }, [isAuthenticated, post, updatePost, formatMessage, t]);
+                await updatePost(formData);
+            } catch (error) {
+                console.error(t("post.form.errors.formSubmission" as any), error);
+            }
+        },
+        [isAuthenticated, post, updatePost, formatMessage, t]
+    );
 
     const handleDeleteConfirm = useCallback(async () => {
         try {
             if (!isAuthenticated) {
-                setPendingAction('delete');
+                setPendingAction("delete");
                 setShowDeleteModal(false);
-                setAuthMessage(formatMessage('post.auth.required', {
-                    action: t('post.auth.actions.delete' as any),
-                    category: post?.category || ''
-                }));
+                setAuthMessage(
+                    formatMessage("post.auth.required", {
+                        action: t("post.auth.actions.delete" as any),
+                        category: post?.category || "",
+                    })
+                );
                 setShowAuthModal(true);
                 return;
             }
 
             await deletePost();
         } catch (error) {
-            console.error('Delete confirmation failed:', error);
+            console.error("Delete confirmation failed:", error);
         }
     }, [isAuthenticated, post, deletePost, formatMessage, t]);
 
-    const handleLogin = useCallback(async (credentials: LoginCredentials): Promise<boolean> => {
-        try {
-            const success = await login(credentials);
+    const handleLogin = useCallback(
+        async (credentials: LoginCredentials): Promise<boolean> => {
+            try {
+                const success = await login(credentials);
 
-            if (success) {
-                setShowAuthModal(false);
+                if (success) {
+                    setShowAuthModal(false);
 
-                if (pendingAction === 'update') {
-                    if (formData) {
-                        await updatePost(formData);
-                    } else {
-                        setShowUpdateForm(true);
+                    if (pendingAction === "update") {
+                        if (formData) {
+                            await updatePost(formData);
+                        } else {
+                            setShowUpdateForm(true);
+                        }
+                    } else if (pendingAction === "delete") {
+                        await deletePost();
                     }
-                } else if (pendingAction === 'delete') {
-                    await deletePost();
+
+                    return true;
                 }
 
-                return true;
+                return false;
+            } catch (error: any) {
+                console.error(t("post.form.errors.loginFailed" as any), error);
+                return false;
             }
-
-            return false;
-        } catch (error: any) {
-            console.error(t('post.form.errors.loginFailed' as any), error);
-            return false;
-        }
-    }, [login, pendingAction, formData, updatePost, deletePost, t]);
+        },
+        [login, pendingAction, formData, updatePost, deletePost, t]
+    );
 
     const handleAuthCancel = () => {
         setShowAuthModal(false);
@@ -652,7 +694,7 @@ const PostDetailPage: React.FC = () => {
     if (isLoading) {
         return (
             <PostDetailContainer>
-                <LoadingContainer>{t('post.detail.loading' as any)}</LoadingContainer>
+                <LoadingContainer>{t("post.detail.loading" as any)}</LoadingContainer>
             </PostDetailContainer>
         );
     }
@@ -661,22 +703,23 @@ const PostDetailPage: React.FC = () => {
         return (
             <PostDetailContainer>
                 <ErrorContainer>
-                    <ErrorTitle>{t('post.detail.notFound' as any)}</ErrorTitle>
-                    <ErrorMessage>
-                        {t('post.detail.notFoundDetail' as any)}
-                    </ErrorMessage>
-                    <BackButton to="/">{t('post.detail.backToHome' as any)}</BackButton>
+                    <ErrorTitle>{t("post.detail.notFound" as any)}</ErrorTitle>
+                    <ErrorMessage>{t("post.detail.notFoundDetail" as any)}</ErrorMessage>
+                    <BackButton to="/">{t("post.detail.backToHome" as any)}</BackButton>
                 </ErrorContainer>
             </PostDetailContainer>
         );
     }
 
     const formatDate = (date: Date) => {
-        return new Date(date).toLocaleDateString(language === 'ko' ? "ko-KR" : "en-US", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-        });
+        return new Date(date).toLocaleDateString(
+            language === "ko" ? "ko-KR" : "en-US",
+            {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+            }
+        );
     };
 
     const handleTagClick = (tag: string) => {
@@ -691,19 +734,19 @@ const PostDetailPage: React.FC = () => {
             });
         } else {
             navigator.clipboard.writeText(window.location.href);
-            alert(t('post.detail.shareSuccess' as any));
+            alert(t("post.detail.shareSuccess" as any));
         }
     };
 
     const postIdString = post.id?.toString() || "";
 
     const getCategoryDisplayName = (category: string | null) => {
-        if (!category) return t('post.detail.meta.uncategorized' as any);
+        if (!category) return t("post.detail.meta.uncategorized" as any);
         switch (category) {
-            case 'tech':
-                return t('post.categories.tech' as any);
-            case 'food':
-                return t('post.categories.food' as any);
+            case "tech":
+                return t("post.categories.tech" as any);
+            case "food":
+                return t("post.categories.food" as any);
             default:
                 return category;
         }
@@ -711,8 +754,10 @@ const PostDetailPage: React.FC = () => {
 
     return (
         <PostDetailContainer>
-            <BackButton to={`/${post.category || 'uncategorized'}`}>
-                {formatMessage('post.detail.backTo', {category: getCategoryDisplayName(post.category)})}
+            <BackButton to={`/${post.category || "uncategorized"}`}>
+                {formatMessage("post.detail.backTo", {
+                    category: getCategoryDisplayName(post.category),
+                })}
             </BackButton>
 
             <PostHeader>
@@ -721,17 +766,19 @@ const PostDetailPage: React.FC = () => {
                 <PostMeta>
                     <PostMetaItem>
                         <MetaIcon>📅</MetaIcon>
-                        {post.createdAt ? formatDate(post.createdAt) : 'No date'}
+                        {post.createdAt ? formatDate(post.createdAt) : "No date"}
                     </PostMetaItem>
 
-                    <CategoryLink to={`/${post.category || 'uncategorized'}`}>
+                    <CategoryLink to={`/${post.category || "uncategorized"}`}>
                         <MetaIcon>📁</MetaIcon>
                         {getCategoryDisplayName(post.category)}
                     </CategoryLink>
 
                     <PostMetaItem>
                         <MetaIcon>👀</MetaIcon>
-                        {formatMessage('post.detail.meta.views', {count: post.viewCount || 0})}
+                        {formatMessage("post.detail.meta.views", {
+                            count: stat?.viewCount || 0,
+                        })}
                     </PostMetaItem>
                 </PostMeta>
 
@@ -748,21 +795,25 @@ const PostDetailPage: React.FC = () => {
 
             <PostFooter>
                 <FooterContent>
-                    <BackButton to={`/${post.category || 'uncategorized'}`}>
-                        {formatMessage('post.detail.backToList', {category: getCategoryDisplayName(post.category)})}
+                    <BackButton to={`/${post.category || "uncategorized"}`}>
+                        {formatMessage("post.detail.backToList", {
+                            category: getCategoryDisplayName(post.category),
+                        })}
                     </BackButton>
 
                     <ShareSection>
-                        <ShareText>{t('post.detail.actions.shareText' as any)}</ShareText>
-                        <ShareButton onClick={handleShare}>{t('post.detail.actions.share' as any)}</ShareButton>
+                        <ShareText>{t("post.detail.actions.shareText" as any)}</ShareText>
+                        <ShareButton onClick={handleShare}>
+                            {t("post.detail.actions.share" as any)}
+                        </ShareButton>
                     </ShareSection>
 
                     <ActionSection>
                         <ActionButton $variant="edit" onClick={handleUpdateClick}>
-                            {t('post.detail.actions.edit' as any)}
+                            {t("post.detail.actions.edit" as any)}
                         </ActionButton>
                         <ActionButton $variant="delete" onClick={handleDeleteClick}>
-                            {t('post.detail.actions.delete' as any)}
+                            {t("post.detail.actions.delete" as any)}
                         </ActionButton>
                     </ActionSection>
                 </FooterContent>
@@ -770,12 +821,14 @@ const PostDetailPage: React.FC = () => {
 
             {post._links && Object.keys(post._links).length > 0 && (
                 <ResourceLinksSection>
-                    <ResourceLinksTitle>{t('post.detail.resourceLinks' as any)}</ResourceLinksTitle>
+                    <ResourceLinksTitle>
+                        {t("post.detail.resourceLinks" as any)}
+                    </ResourceLinksTitle>
                     <ApiNavLinks>
                         {Object.entries(post._links).map(([key, link]) => (
                             <ApiLink
                                 key={key}
-                                method={link.method || 'GET'}
+                                method={link.method || "GET"}
                                 path={link.href}
                                 title={link.title || key}
                                 onClick={() => handleApiLinkClick(link.href, link.method)}
@@ -790,15 +843,15 @@ const PostDetailPage: React.FC = () => {
                 <FormModal>
                     <ModalContent>
                         <ModalHeader>
-                            <ModalTitle>{t('post.form.titles.edit' as any)}</ModalTitle>
+                            <ModalTitle>{t("post.form.titles.edit" as any)}</ModalTitle>
                             <CloseButton onClick={handleFormCancel}>×</CloseButton>
                         </ModalHeader>
                         <PostForm
-                            category={post.category || 'uncategorized'}
+                            category={post.category || "uncategorized"}
                             initialData={{
                                 title: post.title,
                                 content: post.content || post.content,
-                                tags: post.tags || []
+                                tags: post.tags || [],
                             }}
                             onSubmit={handleUpdateSubmit}
                             onCancel={handleFormCancel}

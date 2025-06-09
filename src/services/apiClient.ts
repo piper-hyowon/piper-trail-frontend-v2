@@ -13,9 +13,9 @@ import {
     LoginRequest,
     TwoFactorRequest,
     AuthResponse,
-    RefreshTokenRequest,
     DashboardSummaryResponse,
-    PostStatisticsResponse, PostcardResponse, StampType
+    PostStatisticsResponse, PostcardResponse, StampType,
+    PostStat
 } from '../types/api';
 
 class ApiClient {
@@ -174,6 +174,10 @@ class ApiClient {
         return this.request<PostDetail>(`/posts/${slug}`);
     }
 
+    async getPostStats(slug: string): Promise<PostStat> {
+        return this.request<PostStat>(`/posts/${slug}/stats`);
+    }
+
     async createPost(post: CreatePostRequest): Promise<PostDetail> {
         return this.request<PostDetail>('/posts', {
             method: 'POST',
@@ -300,7 +304,7 @@ class ApiClient {
         return this.request<DashboardSummaryResponse>('/dashboard/summary');
     }
 
-    async getPostStats(postId: string): Promise<PostStatisticsResponse> {
+    async getPostsStats(postId: string): Promise<PostStatisticsResponse> {
         return this.request<PostStatisticsResponse>(`/dashboard/posts/${postId}/stats`);
     }
 
