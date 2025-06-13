@@ -791,7 +791,7 @@ const NavigationBar: React.FC = () => {
                         value={inputUrl}
                         onChange={handleUrlChange}
                         onSubmit={handleUrlSubmit}
-                        suggestions={ALL_CATEGORIES.map(e => e.path)}
+                        suggestions={[...ALL_CATEGORIES.map(e => e.path), '/null']}
                     />
 
                     <HeadersButton

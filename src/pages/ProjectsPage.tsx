@@ -672,9 +672,9 @@ const projects: Project[] = [
         myRole: {
             ko: [
                 "프로덕트 오너 & 스크럼 마스터 (프로젝트 관리, 팀 리딩)",
-                "프로젝트 문서 담당(기획서, 화면 설계서, 수행 계획서, 개발 보고서 등 모든 산출물 작성",
+                "프로젝트 문서 담당(기획서, 화면 설계서, 수행 계획서, 개발 보고서 등 산출물 작성",
                 "스마트 컨트랙트 설계 및 개발 (ERC-20/ERC-721, 시즌 시스템, 토큰 권한 관리, NFT 발행/교환)",
-                "백엔드 API 서버 구축 (WebSocket 기반 실시간 미니게임, 블록체인 트랜잭션 수집 스케줄러, 퍼즐/아이템 NFT 현황 데이터 관리, 랭킹, 거래, 유저 프로필, 고객센터)",
+                "백엔드 API 서버 구축 (WebSocket 기반 실시간 미니게임, 블록체인 트랜잭션 수집 스케줄러, 퍼즐/아이템 NFT 현황 데이터 관리, 랭킹, 거래, 마이페이지)",
                 "인프라 구축 및 배포",
                 "프론트엔드 일부 개발(지갑 로그인/유저 NFT 조회/NFT 거래 등 블록체인 연동, 3D 모델 렌더링, 웹소켓 연동)",
                 "3D 모델링 및 NFT 메타데이터 설계"
@@ -683,7 +683,7 @@ const projects: Project[] = [
                 "Product Owner & Scrum Master (Project Management, Team Leadership)",
                 "Project Documentation Lead (Planning, UI/UX Design, Development Reports)",
                 "Smart Contract Design & Development (ERC-20/ERC-721, Season System, Token Permission Management, NFT Minting/Trading)",
-                "Backend API Server Development (WebSocket-based Real-time Mini-games, Blockchain Transaction Collection Scheduler, Puzzle/Item NFT Status Management, Ranking, Trading, User Profile, Customer Service)",
+                "Backend API Server Development (WebSocket-based Real-time Mini-games, Blockchain Transaction Collection Scheduler, Puzzle/Item NFT Status Management, Ranking, Trading, MyPage)",
                 "Infrastructure Setup and Deployment",
                 "Partial Frontend Development (Blockchain Integration for Wallet Login/User NFT Inquiry/NFT Trading, 3D Model Rendering, WebSocket Integration)",
                 "3D Modeling and NFT Metadata Design"
