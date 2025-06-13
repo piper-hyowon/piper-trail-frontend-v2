@@ -37,18 +37,24 @@ export interface PostStat {
 
 export interface CreatePostRequest {
     title: string;
-    markdownContent: string;
     titleEn?: string;
-    subtitleEn?: string;
+    markdownContent: string;
     markdownContentEn?: string;
+    subtitle: string;
+    subtitleEn?: string;
     tags: string[];
+    category: string;
 }
 
 export interface UpdatePostRequest {
     title: string;
+    titleEn?: string;
     markdownContent: string;
-    category?: string;
+    markdownContentEn?: string;
+    subtitle: string;
+    subtitleEn?: string;
     tags: string[];
+    category: string;
 }
 
 export interface PostSearchRequest {

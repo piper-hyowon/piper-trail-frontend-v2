@@ -568,9 +568,13 @@ const PostDetailPage: React.FC = () => {
                     postId: post.id.toString(),
                     post: {
                         title: postData.title,
+                        titleEn: postData.titleEn,
                         subtitle: postData.subtitle,
+                        subtitleEn: postData.subtitleEn,
                         markdownContent: postData.content,
+                        markdownContentEn: postData.contentEn,
                         tags: postData.tags || [],
+                        category: category ?? '',
                     },
                 });
 

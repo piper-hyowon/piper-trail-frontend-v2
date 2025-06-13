@@ -224,7 +224,7 @@ const ModalContent = styled.div`
   background-color: ${({theme}) => theme.colors.background};
   padding: ${({theme}) => theme.spacing.lg};
   border-radius: ${({theme}) => theme.borderRadius};
-  max-width: 600px;
+  max-width: 1000px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
@@ -362,7 +362,11 @@ const NavigationBar: React.FC = () => {
         try {
             await createPostMutation.mutateAsync({
                 title: postData.title,
+                titleEn: postData.titleEn,
+                subtitle: postData.subtitle,
+                subtitleEn: postData.subtitleEn,
                 markdownContent: postData.content,
+                markdownContentEn: postData.contentEn,
                 category: currentCategory,
                 tags: postData.tags || []
             });
@@ -390,8 +394,13 @@ const NavigationBar: React.FC = () => {
                 postId: currentPostData.id.toString(),
                 post: {
                     title: postData.title,
+                    titleEn: postData.titleEn,
+                    subtitle: postData.subtitle,
+                    subtitleEn: postData.subtitleEn,
                     markdownContent: postData.content,
-                    tags: postData.tags || []
+                    markdownContentEn: postData.contentEn,
+                    tags: postData.tags || [],
+                    category: currentCategory
                 }
             });
 
@@ -843,7 +852,11 @@ const NavigationBar: React.FC = () => {
                             category={currentCategory}
                             initialData={{
                                 title: currentPostData.title,
+                                titleEn: currentPostData.titleEn,
+                                subtitle: currentPostData.subtitle,
+                                subtitleEn: currentPostData.subtitleEn,
                                 content: currentPostData.markdownContent || currentPostData.content,
+                                contentEn: currentPostData.markdownContentEn || currentPostData.contentEn,
                                 tags: currentPostData.tags || []
                             }}
                             onSubmit={handleUpdateFormSubmit}  // update용
