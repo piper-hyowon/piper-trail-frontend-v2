@@ -8,6 +8,7 @@ export interface PaginatedResponse<T> {
 export interface PostSummary {
     id: string;
     title: string;
+    subtitle: string;
     slug: string;
     preview: string;
     category: string;

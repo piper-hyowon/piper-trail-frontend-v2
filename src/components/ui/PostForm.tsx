@@ -304,7 +304,7 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
 
     const [formData, setFormData] = useState({
         title: '',
-        summary: '',
+        subtitle: '',
         content: '',
         currentTag: '',
         tags: [] as string[]
@@ -312,7 +312,7 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
 
     const [errors, setErrors] = useState({
         title: '',
-        summary: '',
+        subtitle: '',
         content: ''
     });
 
@@ -498,7 +498,7 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
     const validateForm = () => {
         const newErrors = {
             title: formData.title.trim() ? '' : t('post.form.validation.titleRequired' as any),
-            summary: category !== 'stamps' && formData.summary.trim() ? '' : (category !== 'stamps' ? t('post.form.validation.summaryRequired' as any) : ''),
+            subtitle: category !== 'stamps' && formData.subtitle.trim() ? '' : (category !== 'stamps' ? t('post.form.validation.subtitleRequired' as any) : ''),
             content: formData.content.trim() ? '' : t('post.form.validation.contentRequired' as any)
         };
 
@@ -513,7 +513,7 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
             // 폼 데이터와 이미지 파일들을 함께 전달
             onSubmit({
                 title: formData.title,
-                summary: formData.summary,
+                subtitle: formData.subtitle,
                 content: formData.content,
                 tags: formData.tags,
                 imageFiles: imageFiles // 이미지 파일들 포함
@@ -641,15 +641,15 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                         </FormField>
 
                         <FormField>
-                            <FormLabel htmlFor="summary">{t('post.form.fields.summary' as any)}</FormLabel>
+                            <FormLabel htmlFor="subtitle">{t('post.form.fields.subtitle' as any)}</FormLabel>
                             <FormInput
-                                id="summary"
-                                name="summary"
-                                value={formData.summary}
+                                id="subtitle"
+                                name="subtitle"
+                                value={formData.subtitle}
                                 onChange={handleChange}
-                                placeholder={t('post.form.placeholders.tech.summary' as any)}
+                                placeholder={t('post.form.placeholders.tech.subtitle' as any)}
                             />
-                            {errors.summary && <FormHint style={{color: 'red'}}>{errors.summary}</FormHint>}
+                            {errors.subtitle && <FormHint style={{color: 'red'}}>{errors.subtitle}</FormHint>}
                         </FormField>
 
                         {getContentField()}
@@ -696,15 +696,15 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                         </FormField>
 
                         <FormField>
-                            <FormLabel htmlFor="summary">{t('post.form.fields.intro' as any)}</FormLabel>
+                            <FormLabel htmlFor="subtitle">{t('post.form.fields.intro' as any)}</FormLabel>
                             <FormInput
-                                id="summary"
-                                name="summary"
-                                value={formData.summary}
+                                id="subtitle"
+                                name="subtitle"
+                                value={formData.subtitle}
                                 onChange={handleChange}
-                                placeholder={t('post.form.placeholders.food.summary' as any)}
+                                placeholder={t('post.form.placeholders.food.subtitle' as any)}
                             />
-                            {errors.summary && <FormHint style={{color: 'red'}}>{errors.summary}</FormHint>}
+                            {errors.subtitle && <FormHint style={{color: 'red'}}>{errors.subtitle}</FormHint>}
                         </FormField>
 
                         {getContentField()}

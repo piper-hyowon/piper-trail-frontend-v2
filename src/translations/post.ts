@@ -63,7 +63,7 @@ export const postTranslations = {
                 },
                 fields: {
                     title: "Title",
-                    summary: "Summary",
+                    subtitle: "subtitle",
                     content: "Content",
                     tags: "Tags",
                     place: "Place",
@@ -75,12 +75,12 @@ export const postTranslations = {
                 placeholders: {
                     tech: {
                         title: "Enter the title of your tech article",
-                        summary: "Enter a brief summary of the article",
+                        subtitle: "Enter a brief subtitle of the article",
                         content: "# Write your content in Markdown format"
                     },
                     food: {
                         title: "Enter the place name",
-                        summary: "Enter a brief introduction about the restaurant",
+                        subtitle: "Enter a subtitle about the restaurant",
                         content: "# Write menu recommendations and descriptions in Markdown format",
                         tags: "Enter tags and press Enter (e.g., Korean, Pasta, Snacks)"
                     },
@@ -117,7 +117,7 @@ export const postTranslations = {
                 },
                 validation: {
                     titleRequired: "Please enter a title",
-                    summaryRequired: "Please enter a summary",
+                    subtitleRequired: "Please enter a subtitle",
                     contentRequired: "Please enter content"
                 },
                 success: {
@@ -221,7 +221,7 @@ export const postTranslations = {
                 },
                 fields: {
                     title: "제목",
-                    summary: "요약",
+                    subtitle: "부제",
                     content: "내용",
                     tags: "태그",
                     place: "장소",
@@ -233,12 +233,12 @@ export const postTranslations = {
                 placeholders: {
                     tech: {
                         title: "기술 글의 제목을 입력하세요",
-                        summary: "글의 간단한 요약을 입력하세요",
+                        subtitle: "글의 부제목을 입력하세요",
                         content: "# 마크다운 형식으로 내용을 작성하세요"
                     },
                     food: {
                         title: "장소를 입력하세요",
-                        summary: "음식점에 대한 간단한 소개를 입력하세요",
+                        subtitle: "음식점에 대한 간단한 소개를 입력하세요",
                         content: "# 마크다운 형식으로 메뉴 추천과 설명을 작성하세요",
                         tags: "태그를 입력하고 Enter를 누르세요 (예: 한식, 파스타, 간식)"
                     },
@@ -275,7 +275,7 @@ export const postTranslations = {
                 },
                 validation: {
                     titleRequired: "제목을 입력해주세요",
-                    summaryRequired: "요약을 입력해주세요",
+                    subtitleRequired: "부제를 입력해주세요",
                     contentRequired: "내용을 입력해주세요"
                 },
                 success: {

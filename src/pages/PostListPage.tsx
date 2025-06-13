@@ -60,6 +60,13 @@ const PostListTitle = styled.h1`
   margin: 0 0 ${({theme}) => theme.spacing.xs} 0;
 `;
 
+const CardSubtitle = styled.div`
+  color: ${({theme}) => theme.colors.text}80;
+  font-size: ${({theme}) => theme.fontSizes.small};
+  margin: -8px 0 12px 0;
+  font-style: italic;
+`;
+
 const PostCount = styled.p`
   margin: 0;
   color: ${({theme}) => theme.colors.text}80;
@@ -256,7 +263,7 @@ const PostListPage: React.FC = () => {
     const searchParams = new URLSearchParams(location.search);
     const currentPage = parseInt(searchParams.get('page') || '0');
     const currentSort = searchParams.get('sort') || DEFAULT_SORT;
-    const selectedTags = searchParams.get('tags')?.split(',').filter(Boolean) || [];
+    const selectedTags = (searchParams.get('tags') ?? '').split(',').filter(Boolean);
 
     // 검색 관련 파라미터
     const searchQuery = searchParams.get('q') || '';
@@ -399,7 +406,7 @@ const PostListPage: React.FC = () => {
 
     const handleTagFilterClick = useCallback((tag: string) => {
         const params = new URLSearchParams(location.search);
-        const currentTags = params.get('tags')?.split(',').filter(Boolean) || [];
+        const currentTags = (params.get('tags') ?? '').split(',').filter(Boolean);
 
         const newTags = currentTags.includes(tag)
             ? currentTags.filter(t => t !== tag)
@@ -600,6 +607,9 @@ const PostListPage: React.FC = () => {
                     posts.map((post) => (
                         <Card key={post.id} onClick={() => handleCardClick(post)}>
                             <CardTitle>{post.title}</CardTitle>
+                            {post.subtitle && (
+                                <CardSubtitle>{post.subtitle}</CardSubtitle>
+                            )}
                             <CardContent>
                                 <p>{post.preview}</p>
                                 {post.tags && post.tags.length > 0 && (

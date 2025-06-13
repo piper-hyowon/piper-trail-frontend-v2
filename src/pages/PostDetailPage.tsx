@@ -73,6 +73,16 @@ const PostTitle = styled.h1`
   word-break: keep-all;
 `;
 
+const PostSubtitle = styled.h2`
+  color: ${({theme}) => theme.colors.text}80;
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-weight: 400;
+  line-height: 1.4;
+  margin: -${({theme}) => theme.spacing.sm} 0 ${({theme}) => theme.spacing.md} 0;
+  font-style: italic;
+  word-break: keep-all;
+`;
+
 const PostMeta = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -560,6 +570,7 @@ const PostDetailPage: React.FC = () => {
                     postId: post.id.toString(),
                     post: {
                         title: postData.title,
+                        subtitle: postData.subtitle,
                         markdownContent: postData.content,
                         tags: postData.tags || [],
                     },
@@ -762,7 +773,9 @@ const PostDetailPage: React.FC = () => {
 
             <PostHeader>
                 <PostTitle>{post.title}</PostTitle>
-
+                {post.subtitle && (
+                    <PostSubtitle>{post.subtitle}</PostSubtitle>
+                )}
                 <PostMeta>
                     <PostMetaItem>
                         <MetaIcon>📅</MetaIcon>
@@ -850,6 +863,7 @@ const PostDetailPage: React.FC = () => {
                             category={post.category || "uncategorized"}
                             initialData={{
                                 title: post.title,
+                                subtitle: post.subtitle,
                                 content: post.content || post.content,
                                 tags: post.tags || [],
                             }}
