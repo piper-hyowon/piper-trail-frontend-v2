@@ -6,7 +6,11 @@ interface PostFormProps {
     category: string;
     initialData?: {
         title: string;
+        titleEn?: string;
+        subtitle?: string;
+        subtitleEn?: string;
         content: string;
+        contentEn?: string;
         tags: string[];
     };
     onSubmit: (formData: any) => void;
@@ -53,10 +57,12 @@ const FormInput = styled.input`
 
 const TextareaContainer = styled.div`
   position: relative;
+  height: 100%;
 `;
 
 const FormTextarea = styled.textarea`
   width: 100%;
+  height: 100%;
   min-height: 200px;
   padding: ${({theme}) => theme.spacing.sm};
   border: 2px solid ${({theme}) => `${theme.colors.primary}30`};
@@ -67,11 +73,54 @@ const FormTextarea = styled.textarea`
   font-size: 14px;
   line-height: 1.5;
   resize: vertical;
+  box-sizing: border-box;
 
   &:focus {
     border-color: ${({theme}) => theme.colors.primary};
     outline: none;
   }
+`;
+
+const TabContainer = styled.div`
+  display: flex;
+  gap: 1px;
+  background: ${({theme}) => `${theme.colors.primary}20`};
+  padding: 1px;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: -1px;
+`;
+
+const Tab = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: 12px 24px;
+  background: ${({theme, $active}) =>
+          $active ? theme.colors.background : theme.colors.secondaryBackground};
+  border: none;
+  cursor: pointer;
+  font-weight: ${({$active}) => $active ? '600' : '400'};
+  color: ${({theme, $active}) =>
+          $active ? theme.colors.primary : `${theme.colors.text}80`};
+  transition: all 0.2s;
+
+  &:first-child {
+    border-radius: 7px 0 0 0;
+  }
+
+  &:last-child {
+    border-radius: 0 7px 0 0;
+  }
+
+  &:hover {
+    background: ${({theme}) => theme.colors.background};
+  }
+`;
+
+const TabContent = styled.div`
+  background: ${({theme}) => theme.colors.background};
+  padding: 24px;
+  border: 2px solid ${({theme}) => `${theme.colors.primary}30`};
+  border-radius: 0 0 8px 8px;
+  margin-bottom: ${({theme}) => theme.spacing.md};
 `;
 
 const ImageToolbar = styled.div`
@@ -175,10 +224,12 @@ const PlaceholderCode = styled.code`
   font-size: 10px;
 `;
 
+// 미리보기 관련 스타일
 const PreviewContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: ${({theme}) => theme.spacing.md};
+  align-items: stretch;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -191,6 +242,10 @@ const PreviewPanel = styled.div`
   padding: ${({theme}) => theme.spacing.sm};
   background: ${({theme}) => theme.colors.background};
   min-height: 200px;
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  word-wrap: break-word;
 
   h1, h2, h3, h4, h5, h6 {
     color: ${({theme}) => theme.colors.primary};
@@ -217,6 +272,29 @@ const PreviewPanel = styled.div`
     padding-left: 16px;
     margin: 16px 0;
     color: ${({theme}) => `${theme.colors.text}CC`};
+  }
+
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+  }
+
+  table th,
+  table td {
+    border: 1px solid ${({theme}) => `${theme.colors.primary}30`};
+    padding: 8px 12px;
+    text-align: left;
+  }
+
+  table th {
+    background-color: ${({theme}) => `${theme.colors.primary}10`};
+    font-weight: bold;
+  }
+
+  table tr:nth-child(even) {
+    background-color: ${({theme}) => `${theme.colors.background}F5`};
   }
 `;
 
@@ -252,7 +330,7 @@ const RemoveTagButton = styled.button`
 
 const FormHint = styled.p`
   font-size: ${({theme}) => theme.fontSizes.small};
-  color: ${({theme}) => theme.colors.text}80;
+  color: ${({theme}) => `${theme.colors.text}80`};
   margin-top: 4px;
 `;
 
@@ -281,31 +359,41 @@ const CancelButton = styled.button`
   padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.lg}`};
   background: none;
   color: ${({theme}) => theme.colors.text};
-  border: 1px solid ${({theme}) => theme.colors.text}40;
+  border: 1px solid ${({theme}) => `${theme.colors.text}40`};
   border-radius: ${({theme}) => theme.borderRadius};
   font-weight: bold;
   cursor: pointer;
 
   &:hover {
-    background-color: ${({theme}) => theme.colors.text}10;
+    background-color: ${({theme}) => `${theme.colors.text}10`};
   }
 `;
 
 const NewCategoryNotice = styled.div`
   padding: 10px;
-  background-color: #f8f9fa;
+  background-color: ${({theme}) => theme.colors.secondaryBackground};
   border-radius: 4px;
   margin-bottom: 15px;
-  border: 1px solid #e9ecef;
+  border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+`;
+
+const LanguageIndicator = styled.span`
+  font-size: 0.8em;
+  opacity: 0.7;
+  margin-left: 4px;
 `;
 
 const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onCancel}) => {
     const {t} = useLanguage();
+    const [activeTab, setActiveTab] = useState<'ko' | 'en'>('ko');
 
     const [formData, setFormData] = useState({
         title: '',
         subtitle: '',
         content: '',
+        titleEn: '',
+        subtitleEn: '',
+        contentEn: '',
         currentTag: '',
         tags: [] as string[]
     });
@@ -319,7 +407,8 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
     const [showPreview, setShowPreview] = useState(false);
     const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const textareaRefKo = useRef<HTMLTextAreaElement | null>(null);
+    const textareaRefEn = useRef<HTMLTextAreaElement | null>(null);
 
     const formatMessage = (key: string, params: Record<string, any> = {}): string => {
         let message = t(key as any);
@@ -334,7 +423,11 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
             setFormData(prev => ({
                 ...prev,
                 title: initialData.title,
+                titleEn: initialData.titleEn || '',
+                subtitle: initialData.subtitle || '',
+                subtitleEn: initialData.subtitleEn || '',
                 content: initialData.content,
+                contentEn: initialData.contentEn || '',
                 tags: initialData.tags || []
             }));
         }
@@ -349,7 +442,6 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
         }
     };
 
-    // 이미지 파일 추가
     const handleImageAdd = (file: File) => {
         const imageId = `img_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
         const placeholder = `{{IMAGE:${imageId}}}`;
@@ -367,20 +459,20 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
         insertTextAtCursor(markdownImage);
     };
 
-    // 커서 위치에 텍스트 삽입
     const insertTextAtCursor = (text: string) => {
-        const textarea = textareaRef.current;
+        const textarea = activeTab === 'ko' ? textareaRefKo.current : textareaRefEn.current;
         if (!textarea) return;
 
         const start = textarea.selectionStart;
         const end = textarea.selectionEnd;
         const value = textarea.value;
+        const fieldName = activeTab === 'ko' ? 'content' : 'contentEn';
 
         const newValue = value.substring(0, start) + text + value.substring(end);
 
         setFormData(prev => ({
             ...prev,
-            content: newValue
+            [fieldName]: newValue
         }));
 
         setTimeout(() => {
@@ -391,7 +483,6 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
         }, 0);
     };
 
-    // 파일 선택 핸들러
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (files) {
@@ -403,51 +494,51 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                 }
             });
         }
-        // 파일 입력 값 초기화 (같은 파일 다시 선택 가능하게)
         if (fileInputRef.current) {
             fileInputRef.current!.value = '';
         }
     };
 
-    // 이미지 제거
     const handleRemoveImage = (imageId: string) => {
         const imageToRemove = imageFiles.find(img => img.id === imageId);
         if (imageToRemove) {
-            // 마크다운에서 해당 이미지 참조 제거
             const escapedPlaceholder = imageToRemove.placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            const updatedContent = formData.content.replace(
-                new RegExp(`!\\[.*?\\]\\(${escapedPlaceholder}\\)`, 'g'),
-                ''
-            );
 
             setFormData(prev => ({
                 ...prev,
-                content: updatedContent
+                content: prev.content.replace(
+                    new RegExp(`!\\[.*?\\]\\(${escapedPlaceholder}\\)`, 'g'),
+                    ''
+                ),
+                contentEn: prev.contentEn.replace(
+                    new RegExp(`!\\[.*?\\]\\(${escapedPlaceholder}\\)`, 'g'),
+                    ''
+                )
             }));
 
-            // 이미지 파일 목록에서 제거
             setImageFiles(prev => prev.filter(img => img.id !== imageId));
-
-            // 미리보기 URL 해제
             URL.revokeObjectURL(imageToRemove.preview);
         }
     };
 
-    // 이미지 URL 삽입
     const handleInsertImageUrl = () => {
-        const url = prompt(t('post.form.imageSection.urlPrompt' as any));
+        const url = prompt(activeTab === 'ko'
+            ? t('post.form.imageSection.urlPrompt' as any)
+            : 'Enter image URL:'
+        );
         if (url) {
-            const altText = prompt(t('post.form.imageSection.altPrompt' as any)) || 'image';
+            const altText = prompt(activeTab === 'ko'
+                ? t('post.form.imageSection.altPrompt' as any)
+                : 'Enter alt text (optional):'
+            ) || 'image';
             const markdownImage = `![${altText}](${url})`;
             insertTextAtCursor(markdownImage);
         }
     };
 
-    // 마크다운 렌더링 (플레이스홀더를 실제 이미지로 변환)
     const renderMarkdown = (content: string) => {
         let renderedContent = content;
 
-        // 플레이스홀더를 실제 이미지 URL로 교체
         imageFiles.forEach(imageFile => {
             const escapedPlaceholder = imageFile.placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             renderedContent = renderedContent.replace(
@@ -455,6 +546,33 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                 imageFile.preview
             );
         });
+
+        const renderTable = (tableText: string) => {
+            const lines = tableText.trim().split('\n');
+            if (lines.length < 2) return tableText;
+
+            let html = '<table>';
+            lines.forEach((line, index) => {
+                if (index === 1 && line.match(/^\|[\s\-:|]+\|$/)) return; // 구분선 건너뛰기
+
+                const cells = line.split('|').slice(1, -1); // 앞뒤 | 제거
+                const tag = index === 0 ? 'th' : 'td';
+
+                html += '<tr>';
+                cells.forEach(cell => {
+                    html += `<${tag}>${cell.trim()}</${tag}>`;
+                });
+                html += '</tr>';
+            });
+            html += '</table>';
+            return html;
+        };
+
+        // 표 찾아서 변환
+        renderedContent = renderedContent.replace(
+            /(\|.+\|[\r\n]+\|[\s\-:|]+\|[\r\n]+(\|.+\|[\r\n]*)+)/gm,
+            (match) => renderTable(match)
+        );
 
         return renderedContent
             .replace(/^# (.*$)/gim, '<h1>$1</h1>')
@@ -498,7 +616,9 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
     const validateForm = () => {
         const newErrors = {
             title: formData.title.trim() ? '' : t('post.form.validation.titleRequired' as any),
-            subtitle: category !== 'stamps' && formData.subtitle.trim() ? '' : (category !== 'stamps' ? t('post.form.validation.subtitleRequired' as any) : ''),
+            subtitle: category !== 'stamps' && !formData.subtitle?.trim()
+                ? t('post.form.validation.subtitleRequired' as any)
+                : '',
             content: formData.content.trim() ? '' : t('post.form.validation.contentRequired' as any)
         };
 
@@ -508,280 +628,234 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        console.log(formData);
 
         if (validateForm()) {
-            // 폼 데이터와 이미지 파일들을 함께 전달
             onSubmit({
                 title: formData.title,
                 subtitle: formData.subtitle,
                 content: formData.content,
+                titleEn: formData.titleEn,
+                subtitleEn: formData.subtitleEn,
+                contentEn: formData.contentEn,
                 tags: formData.tags,
-                imageFiles: imageFiles // 이미지 파일들 포함
+                // imageFiles: imageFiles
             });
         }
     };
 
-    const getContentField = () => (
-        <FormField>
-            <FormLabel htmlFor="content">
-                {category === 'food' ? t('post.form.fields.menuRecommendation' as any) :
-                    category === 'stamps' ? t('post.form.fields.message' as any) : t('post.form.fields.content' as any)}
-            </FormLabel>
+    const renderLanguageFields = (lang: 'ko' | 'en') => {
+        const isKorean = lang === 'ko';
+        const titleField = isKorean ? 'title' : 'titleEn';
+        const subtitleField = isKorean ? 'subtitle' : 'subtitleEn';
+        const contentField = isKorean ? 'content' : 'contentEn';
+        const textareaRef = isKorean ? textareaRefKo : textareaRefEn;
 
-            <ImageToolbar>
-                <ToolbarButton
-                    type="button"
-                    onClick={() => fileInputRef.current!.click()}
-                >
-                    {t('post.form.toolbar.addImage' as any)}
-                </ToolbarButton>
+        return (
+            <>
+                <FormField>
+                    <FormLabel htmlFor={titleField}>
+                        {isKorean ? t('post.form.fields.title' as any) : 'Title'}
+                        {!isKorean && <LanguageIndicator>(Optional)</LanguageIndicator>}
+                    </FormLabel>
+                    <FormInput
+                        id={titleField}
+                        name={titleField}
+                        value={formData[titleField as keyof typeof formData] as string}
+                        onChange={handleChange}
+                        placeholder={
+                            isKorean
+                                ? t('post.form.placeholders.blog.title' as any)
+                                : 'Enter title in English (optional)'
+                        }
+                    />
+                    {isKorean && errors.title && (
+                        <FormHint style={{color: 'red'}}>{errors.title}</FormHint>
+                    )}
+                </FormField>
 
-                <ToolbarButton
-                    type="button"
-                    onClick={handleInsertImageUrl}
-                >
-                    {t('post.form.toolbar.imageUrl' as any)}
-                </ToolbarButton>
-
-                <ToolbarButton
-                    type="button"
-                    onClick={() => setShowPreview(!showPreview)}
-                >
-                    {showPreview ? t('post.form.toolbar.edit' as any) : t('post.form.toolbar.preview' as any)}
-                </ToolbarButton>
-            </ImageToolbar>
-
-            <HiddenFileInput
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileSelect}
-            />
-
-            {/* 추가된 이미지 파일들 미리보기 */}
-            {imageFiles.length > 0 && (
-                <ImagePreviewContainer>
-                    <div style={{width: '100%', marginBottom: '8px', fontSize: '12px', fontWeight: 'bold'}}>
-                        {formatMessage('post.form.imageSection.attached', {count: imageFiles.length})}
-                    </div>
-                    {imageFiles.map(imageFile => (
-                        <ImagePreviewItem key={imageFile.id}>
-                            <RemoveImageButton onClick={() => handleRemoveImage(imageFile.id)}>
-                                ×
-                            </RemoveImageButton>
-                            <PreviewImage src={imageFile.preview} alt={imageFile.file.name}/>
-                            <ImageInfo>
-                                <div>{imageFile.file.name}</div>
-                                <div>{(imageFile.file.size / 1024).toFixed(1)}KB</div>
-                                <PlaceholderCode>{imageFile.placeholder}</PlaceholderCode>
-                            </ImageInfo>
-                        </ImagePreviewItem>
-                    ))}
-                </ImagePreviewContainer>
-            )}
-
-            {showPreview ? (
-                <PreviewContainer>
-                    <TextareaContainer>
-                        <FormTextarea
-                            ref={textareaRef}
-                            id="content"
-                            name="content"
-                            value={formData.content}
+                {category !== 'stamps' && (
+                    <FormField>
+                        <FormLabel htmlFor={subtitleField}>
+                            {isKorean ? t('post.form.fields.subtitle' as any) : 'Subtitle'}
+                            {!isKorean && <LanguageIndicator>(Optional)</LanguageIndicator>}
+                        </FormLabel>
+                        <FormInput
+                            id={subtitleField}
+                            name={subtitleField}
+                            value={formData[subtitleField as keyof typeof formData] as string}
                             onChange={handleChange}
                             placeholder={
-                                category === 'food' ? t('post.form.placeholders.food.content' as any) :
-                                    category === 'stamps' ? t('post.form.placeholders.stamps.content' as any) :
-                                        t('post.form.placeholders.default.content' as any)
+                                isKorean
+                                    ? t('post.form.placeholders.blog.subtitle' as any)
+                                    : 'Enter subtitle in English (optional)'
                             }
                         />
-                    </TextareaContainer>
+                        {isKorean && errors.subtitle && (
+                            <FormHint style={{color: 'red'}}>{errors.subtitle}</FormHint>
+                        )}
+                    </FormField>
+                )}
 
-                    <PreviewPanel>
-                        <div dangerouslySetInnerHTML={{
-                            __html: renderMarkdown(formData.content || t('post.form.imageSection.previewText' as any))
-                        }}/>
-                    </PreviewPanel>
-                </PreviewContainer>
-            ) : (
-                <FormTextarea
-                    ref={textareaRef}
-                    id="content"
-                    name="content"
-                    value={formData.content}
-                    onChange={handleChange}
-                    placeholder={
-                        category === 'food' ? t('post.form.placeholders.food.content' as any) :
-                            category === 'stamps' ? t('post.form.placeholders.stamps.content' as any) :
-                                t('post.form.placeholders.default.content' as any)
-                    }
-                />
-            )}
+                <FormField>
+                    <FormLabel htmlFor={contentField}>
+                        {isKorean ? t('post.form.fields.content' as any) : 'Content'}
+                        {!isKorean && <LanguageIndicator>(Optional)</LanguageIndicator>}
+                    </FormLabel>
 
-            {errors.content && <FormHint style={{color: 'red'}}>{errors.content}</FormHint>}
-        </FormField>
-    );
+                    <ImageToolbar>
+                        <ToolbarButton
+                            type="button"
+                            onClick={() => fileInputRef.current!.click()}
+                        >
+                            {isKorean ? t('post.form.toolbar.addImage' as any) : 'Add Image'}
+                        </ToolbarButton>
 
-    const getFormFields = () => {
-        switch (category) {
-            case 'tech':
-                return (
-                    <>
-                        <FormField>
-                            <FormLabel htmlFor="title">{t('post.form.fields.title' as any)}</FormLabel>
-                            <FormInput
-                                id="title"
-                                name="title"
-                                value={formData.title}
-                                onChange={handleChange}
-                                placeholder={t('post.form.placeholders.tech.title' as any)}
-                            />
-                            {errors.title && <FormHint style={{color: 'red'}}>{errors.title}</FormHint>}
-                        </FormField>
+                        <ToolbarButton
+                            type="button"
+                            onClick={handleInsertImageUrl}
+                        >
+                            {isKorean ? t('post.form.toolbar.imageUrl' as any) : 'Image URL'}
+                        </ToolbarButton>
 
-                        <FormField>
-                            <FormLabel htmlFor="subtitle">{t('post.form.fields.subtitle' as any)}</FormLabel>
-                            <FormInput
-                                id="subtitle"
-                                name="subtitle"
-                                value={formData.subtitle}
-                                onChange={handleChange}
-                                placeholder={t('post.form.placeholders.tech.subtitle' as any)}
-                            />
-                            {errors.subtitle && <FormHint style={{color: 'red'}}>{errors.subtitle}</FormHint>}
-                        </FormField>
+                        <ToolbarButton
+                            type="button"
+                            onClick={() => setShowPreview(!showPreview)}
+                        >
+                            {showPreview
+                                ? (isKorean ? t('post.form.toolbar.edit' as any) : 'Edit')
+                                : (isKorean ? t('post.form.toolbar.preview' as any) : 'Preview')
+                            }
+                        </ToolbarButton>
+                    </ImageToolbar>
 
-                        {getContentField()}
+                    {showPreview ? (
+                        <PreviewContainer>
+                            <TextareaContainer>
+                                <FormTextarea
+                                    ref={textareaRef}
+                                    id={contentField}
+                                    name={contentField}
+                                    value={formData[contentField as keyof typeof formData] as string}
+                                    onChange={handleChange}
+                                    placeholder={
+                                        isKorean
+                                            ? t('post.form.placeholders.default.content' as any)
+                                            : 'Enter content in English (optional)'
+                                    }
+                                />
+                            </TextareaContainer>
 
-                        <FormField>
-                            <FormLabel htmlFor="tags">{t('post.form.fields.tags' as any)}</FormLabel>
-                            <FormInput
-                                id="currentTag"
-                                name="currentTag"
-                                value={formData.currentTag}
-                                onChange={handleChange}
-                                onKeyDown={handleTagKeyDown}
-                                placeholder={t('post.form.tags.placeholder' as any)}
-                            />
-                            <FormHint>{t('post.form.tags.hint' as any)}</FormHint>
+                            <PreviewPanel>
+                                <div dangerouslySetInnerHTML={{
+                                    __html: renderMarkdown(
+                                        (formData[contentField as keyof typeof formData] as string) ||
+                                        (isKorean ? '미리보기' : 'Preview')
+                                    )
+                                }}/>
+                            </PreviewPanel>
+                        </PreviewContainer>
+                    ) : (
+                        <FormTextarea
+                            ref={textareaRef}
+                            id={contentField}
+                            name={contentField}
+                            value={formData[contentField as keyof typeof formData] as string}
+                            onChange={handleChange}
+                            placeholder={
+                                isKorean
+                                    ? t('post.form.placeholders.default.content' as any)
+                                    : 'Enter content in English (optional)'
+                            }
+                        />
+                    )}
 
-                            {formData.tags.length > 0 && (
-                                <TagsContainer>
-                                    {formData.tags.map(tag => (
-                                        <Tag key={tag}>
-                                            {tag}
-                                            <RemoveTagButton onClick={() => handleRemoveTag(tag)}>×</RemoveTagButton>
-                                        </Tag>
-                                    ))}
-                                </TagsContainer>
-                            )}
-                        </FormField>
-                    </>
-                );
-
-            case 'food':
-                return (
-                    <>
-                        <FormField>
-                            <FormLabel htmlFor="title">{t('post.form.fields.place' as any)}</FormLabel>
-                            <FormInput
-                                id="title"
-                                name="title"
-                                value={formData.title}
-                                onChange={handleChange}
-                                placeholder={t('post.form.placeholders.food.title' as any)}
-                            />
-                            {errors.title && <FormHint style={{color: 'red'}}>{errors.title}</FormHint>}
-                        </FormField>
-
-                        <FormField>
-                            <FormLabel htmlFor="subtitle">{t('post.form.fields.intro' as any)}</FormLabel>
-                            <FormInput
-                                id="subtitle"
-                                name="subtitle"
-                                value={formData.subtitle}
-                                onChange={handleChange}
-                                placeholder={t('post.form.placeholders.food.subtitle' as any)}
-                            />
-                            {errors.subtitle && <FormHint style={{color: 'red'}}>{errors.subtitle}</FormHint>}
-                        </FormField>
-
-                        {getContentField()}
-
-                        <FormField>
-                            <FormLabel htmlFor="tags">{t('post.form.fields.tags' as any)}</FormLabel>
-                            <FormInput
-                                id="currentTag"
-                                name="currentTag"
-                                value={formData.currentTag}
-                                onChange={handleChange}
-                                onKeyDown={handleTagKeyDown}
-                                placeholder={t('post.form.placeholders.food.tags' as any)}
-                            />
-
-                            {formData.tags.length > 0 && (
-                                <TagsContainer>
-                                    {formData.tags.map(tag => (
-                                        <Tag key={tag}>
-                                            {tag}
-                                            <RemoveTagButton onClick={() => handleRemoveTag(tag)}>×</RemoveTagButton>
-                                        </Tag>
-                                    ))}
-                                </TagsContainer>
-                            )}
-                        </FormField>
-                    </>
-                );
-
-            case 'stamps':
-                return (
-                    <>
-                        <FormField>
-                            <FormLabel htmlFor="title">{t('post.form.fields.name' as any)}</FormLabel>
-                            <FormInput
-                                id="title"
-                                name="title"
-                                value={formData.title}
-                                onChange={handleChange}
-                                placeholder={t('post.form.placeholders.stamps.title' as any)}
-                            />
-                            {errors.title && <FormHint style={{color: 'red'}}>{errors.title}</FormHint>}
-                        </FormField>
-
-                        {getContentField()}
-                    </>
-                );
-
-            default:
-                return (
-                    <>
-                        <NewCategoryNotice>
-                            <p>📝 {formatMessage('post.form.newCategory', {category})}</p>
-                        </NewCategoryNotice>
-
-                        <FormField>
-                            <FormLabel htmlFor="title">{t('post.form.fields.title' as any)}</FormLabel>
-                            <FormInput
-                                id="title"
-                                name="title"
-                                value={formData.title}
-                                onChange={handleChange}
-                                placeholder={t('post.form.placeholders.default.title' as any)}
-                            />
-                            {errors.title && <FormHint style={{color: 'red'}}>{errors.title}</FormHint>}
-                        </FormField>
-
-                        {getContentField()}
-                    </>
-                );
-        }
+                    {isKorean && errors.content && (
+                        <FormHint style={{color: 'red'}}>{errors.content}</FormHint>
+                    )}
+                </FormField>
+            </>
+        );
     };
 
     return (
         <FormContainer>
             <form onSubmit={handleSubmit}>
-                {getFormFields()}
+                <TabContainer>
+                    <Tab
+                        type="button"
+                        $active={activeTab === 'ko'}
+                        onClick={() => setActiveTab('ko')}
+                    >
+                        한국어
+                    </Tab>
+                    <Tab
+                        type="button"
+                        $active={activeTab === 'en'}
+                        onClick={() => setActiveTab('en')}
+                    >
+                        English
+                    </Tab>
+                </TabContainer>
+
+                <TabContent>
+                    {renderLanguageFields(activeTab)}
+                </TabContent>
+
+                <HiddenFileInput
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileSelect}
+                />
+
+                {imageFiles.length > 0 && (
+                    <ImagePreviewContainer>
+                        <div style={{width: '100%', marginBottom: '8px', fontSize: '12px', fontWeight: 'bold'}}>
+                            {formatMessage('post.form.imageSection.attached', {count: imageFiles.length})}
+                        </div>
+                        {imageFiles.map(imageFile => (
+                            <ImagePreviewItem key={imageFile.id}>
+                                <RemoveImageButton onClick={() => handleRemoveImage(imageFile.id)}>
+                                    ×
+                                </RemoveImageButton>
+                                <PreviewImage src={imageFile.preview} alt={imageFile.file.name}/>
+                                <ImageInfo>
+                                    <div>{imageFile.file.name}</div>
+                                    <div>{(imageFile.file.size / 1024).toFixed(1)}KB</div>
+                                    <PlaceholderCode>{imageFile.placeholder}</PlaceholderCode>
+                                </ImageInfo>
+                            </ImagePreviewItem>
+                        ))}
+                    </ImagePreviewContainer>
+                )}
+
+                {category !== 'stamps' && (
+                    <FormField>
+                        <FormLabel htmlFor="tags">{t('post.form.fields.tags' as any)}</FormLabel>
+                        <FormInput
+                            id="currentTag"
+                            name="currentTag"
+                            value={formData.currentTag}
+                            onChange={handleChange}
+                            onKeyDown={handleTagKeyDown}
+                            placeholder={t('post.form.tags.placeholder' as any)}
+                        />
+                        <FormHint>{t('post.form.tags.hint' as any)}</FormHint>
+
+                        {formData.tags.length > 0 && (
+                            <TagsContainer>
+                                {formData.tags.map(tag => (
+                                    <Tag key={tag}>
+                                        {tag}
+                                        <RemoveTagButton onClick={() => handleRemoveTag(tag)}>×</RemoveTagButton>
+                                    </Tag>
+                                ))}
+                            </TagsContainer>
+                        )}
+                    </FormField>
+                )}
 
                 <ButtonGroup>
                     <CancelButton type="button" onClick={onCancel}>

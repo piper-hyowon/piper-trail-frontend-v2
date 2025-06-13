@@ -17,15 +17,30 @@ import {
     PostStatisticsResponse, PostcardResponse, StampType,
     PostStat
 } from '../types/api';
+import {Language} from "../context/LanguageContext.tsx";
 
 class ApiClient {
     private baseURL: string;
     private accessToken: string | null = null;
     private refreshToken: string | null = null;
+    private language: Language = 'ko';
 
     constructor(baseURL: string) {
         this.baseURL = baseURL;
         this.loadTokensFromStorage();
+    }
+
+    public setLanguage(language: Language) {
+        this.language = language;
+    }
+
+    public getLanguage(): string {
+        return this.language;
+    }
+
+    private addLanguageParam(url: string): string {
+        const separator = url.includes('?') ? '&' : '?';
+        return `${url}${separator}lang=${this.language}`;
     }
 
     private loadTokensFromStorage() {
@@ -51,10 +66,11 @@ class ApiClient {
         endpoint: string,
         options: RequestInit = {}
     ): Promise<T> {
-        const url = `${this.baseURL}${endpoint}`;
+        const url = `${this.baseURL}${this.addLanguageParam(endpoint)}`;
 
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',
+            'Accept-Language': this.language,
         };
 
         // 기존 헤더가 있으면 병합
@@ -327,5 +343,12 @@ class ApiClient {
 const apiClient = new ApiClient(
     import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 );
+
+declare global {
+    interface Window {
+        apiClient: ApiClient;
+    }
+}
+window.apiClient = apiClient;
 
 export default apiClient;

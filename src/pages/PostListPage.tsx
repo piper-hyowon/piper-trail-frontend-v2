@@ -211,7 +211,7 @@ const ModalContent = styled.div`
   background-color: ${({theme}) => theme.colors.background};
   padding: ${({theme}) => theme.spacing.lg};
   border-radius: ${({theme}) => theme.borderRadius};
-  max-width: 600px;
+  max-width: 1000px;
   width: 90%;
   max-height: 90vh;
   overflow-y: auto;
@@ -251,7 +251,7 @@ const PostListPage: React.FC = () => {
 
     // ApiContext에서 인증 상태와 함수들 가져오기
     const {isAuthenticated, login} = useApi();
-    const {t} = useLanguage();
+    const {t, language} = useLanguage();
 
     const isTagRoute = location.pathname.startsWith('/tag/');
     const isSearchRoute = location.pathname.startsWith('/search');
@@ -367,7 +367,11 @@ const PostListPage: React.FC = () => {
         try {
             await createPostMutation.mutateAsync({
                 title: postData.title,
+                titleEn: postData.titleEn,
+                subtitle: postData.subtitle,
+                subtitleEn: postData.subtitleEn,
                 markdownContent: postData.content,
+                markdownContentEn: postData.contentEn,
                 category: currentCategory,
                 tags: postData.tags || []
             });
@@ -611,7 +615,6 @@ const PostListPage: React.FC = () => {
                                 <CardSubtitle>{post.subtitle}</CardSubtitle>
                             )}
                             <CardContent>
-                                <p>{post.preview}</p>
                                 {post.tags && post.tags.length > 0 && (
                                     <TagList
                                         tags={post.tags}

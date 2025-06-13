@@ -38,7 +38,9 @@ export interface PostStat {
 export interface CreatePostRequest {
     title: string;
     markdownContent: string;
-    category?: string;
+    titleEn?: string;
+    subtitleEn?: string;
+    markdownContentEn?: string;
     tags: string[];
 }
 

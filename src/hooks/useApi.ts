@@ -10,6 +10,8 @@ import {
     TwoFactorRequest,
     StampType,
 } from "../types/api";
+import {useEffect} from "react";
+import {useLanguage} from "../context/LanguageContext.tsx";
 
 interface BasicPaginationParams {
     page?: number;
@@ -24,12 +26,23 @@ interface BasicPaginationParams {
 //     });
 // };
 
+const useSyncApiLanguage = () => {
+    const {language} = useLanguage();
+
+    useEffect(() => {
+        apiClient.setLanguage(language);
+    }, [language]);
+};
+
 export const usePostsByCategory = (
     categoryName: string | null,
     params?: BasicPaginationParams
 ) => {
+    const {language} = useLanguage();
+    useSyncApiLanguage();
+
     return useQuery({
-        queryKey: ["posts", "category", categoryName, params],
+        queryKey: ["posts", "category", categoryName, params, language],
         queryFn: () => apiClient.getPostsByCategory(categoryName, params),
         staleTime: 60 * 60 * 1000, // 1시간
         gcTime: 2 * 60 * 60 * 1000, // 2시간
@@ -41,8 +54,11 @@ export const usePostsByTag = (
     tagName: string,
     params?: BasicPaginationParams
 ) => {
+    const {language} = useLanguage();
+    useSyncApiLanguage();
+
     return useQuery({
-        queryKey: ["posts", "tag", tagName, params],
+        queryKey: ["posts", "tag", tagName, params, language],
         queryFn: () => apiClient.getPostsByTag(tagName, params),
         enabled: !!tagName, // tagName이 있을 때만 실행
         staleTime: 60 * 60 * 1000, // 1시간
@@ -51,8 +67,11 @@ export const usePostsByTag = (
 };
 
 export const useSearchPosts = (searchRequest: PostSearchRequest) => {
+    const {language} = useLanguage();
+    useSyncApiLanguage();
+
     return useQuery({
-        queryKey: ["posts", "search", searchRequest],
+        queryKey: ["posts", "search", searchRequest, language],
         queryFn: () => apiClient.searchPosts(searchRequest),
         enabled: !!searchRequest.keyword, // 검색어가 있을 때만 실행
         staleTime: 60 * 60 * 1000, // 1시간
@@ -61,8 +80,11 @@ export const useSearchPosts = (searchRequest: PostSearchRequest) => {
 };
 
 export const usePostStats = (slug: string) => {
+    const {language} = useLanguage();
+    useSyncApiLanguage();
+
     return useQuery({
-        queryKey: ["post-stats", slug],
+        queryKey: ["post-stats", slug, language],
         queryFn: () => apiClient.getPostStats(slug),
         staleTime: 60 * 1000, // 1분
         gcTime: 5 * 60 * 1000, // 5분
@@ -71,8 +93,11 @@ export const usePostStats = (slug: string) => {
 };
 
 export const usePost = (slug: string) => {
+    const {language} = useLanguage();
+    useSyncApiLanguage();
+
     return useQuery({
-        queryKey: ["post", slug],
+        queryKey: ["post", slug, language],
         queryFn: () => apiClient.getPost(slug),
         enabled: !!slug, // slug가 있을 때만 실행
         staleTime: 2 * 60 * 60 * 1000, // 2시간 (백엔드 HTTP 캐시)
@@ -273,7 +298,6 @@ export const useDashboardSummary = () => {
         queryFn: () => apiClient.getDashboardSummary(),
     });
 };
-
 
 // TODO: 함수 이름 개선
 // 포스트 통계 (/dashboard/posts/{postId}/stats) - 인증 필요
