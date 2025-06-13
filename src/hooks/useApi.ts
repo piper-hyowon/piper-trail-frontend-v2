@@ -86,8 +86,8 @@ export const usePostStats = (slug: string) => {
     return useQuery({
         queryKey: ["post-stats", slug, language],
         queryFn: () => apiClient.getPostStats(slug),
-        staleTime: 60 * 1000, // 1분
-        gcTime: 5 * 60 * 1000, // 5분
+        staleTime: 10 * 1000,
+        gcTime: 5 * 60 * 1000,
         enabled: !!slug,
     });
 };
