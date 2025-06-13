@@ -412,9 +412,7 @@ const PostListPage: React.FC = () => {
     const isTagRoute = location.pathname.startsWith('/tag/');
     const isSearchRoute = location.pathname.startsWith('/search');
     const pathSegments = location.pathname.split('/').filter(Boolean);
-    const currentCategory = isTagRoute
-        ? params.tagName
-        : (params.categoryName || pathSegments[0]);
+    let currentCategory: string = pathSegments[0];
 
     const searchParams = new URLSearchParams(location.search);
     const currentPage = parseInt(searchParams.get('page') || '0');
@@ -528,7 +526,7 @@ const PostListPage: React.FC = () => {
                 subtitleEn: postData.subtitleEn,
                 markdownContent: postData.content,
                 markdownContentEn: postData.contentEn,
-                category: currentCategory,
+                category: currentCategory || 'null',
                 tags: postData.tags || []
             });
 
@@ -587,8 +585,8 @@ const PostListPage: React.FC = () => {
     }, [navigate]);
 
     const handleCardClick = useCallback((post: any) => {
-        navigate(`/${post.category || currentCategory}/${post.slug}`);
-    }, [navigate, currentCategory]);
+        navigate(`/${post.category || 'uncategorized'}/${post.slug}`);
+    }, [navigate]);
 
     const handleCreatePostClick = useCallback(() => {
         setShowPostForm(true);

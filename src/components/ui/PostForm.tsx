@@ -4,7 +4,7 @@ import {useLanguage} from '../../context/LanguageContext';
 import {renderMarkdown} from "../../utils/markdoown.ts";
 
 interface PostFormProps {
-    category: string;
+    category: string | null;
     initialData?: {
         title: string;
         titleEn?: string;

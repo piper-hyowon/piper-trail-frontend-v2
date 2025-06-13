@@ -574,7 +574,7 @@ const PostDetailPage: React.FC = () => {
                         markdownContent: postData.content,
                         markdownContentEn: postData.contentEn,
                         tags: postData.tags || [],
-                        category: category ?? '',
+                        category: category === 'uncategorized' || !category ? 'null' : category,
                     },
                 });
 
