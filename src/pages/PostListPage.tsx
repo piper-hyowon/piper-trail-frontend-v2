@@ -1,5 +1,5 @@
 import React, {useState, useCallback, useEffect, useMemo} from 'react';
-import styled from 'styled-components';
+import styled, {keyframes} from 'styled-components';
 import {useParams, useLocation, useNavigate} from 'react-router-dom';
 import {Card, CardTitle, CardContent, CardFooter} from '../components/ui/Card';
 import TagList from '../components/ui/TagList';
@@ -7,7 +7,7 @@ import Pagination from '../components/ui/Pagination';
 import SortSelector from '../components/ui/SortSelector';
 import AuthModal from '../components/ui/AuthModal';
 import PostForm from "../components/ui/PostForm.tsx";
-import {IoAddCircleOutline} from "react-icons/io5";
+import {IoAddCircleOutline, IoEyeOutline, IoCalendarOutline, IoFolderOpenOutline} from "react-icons/io5";
 import {usePostsByCategory, usePostsByTag, useSearchPosts, useCreatePost} from '../hooks/useApi';
 import {LoginCredentials, useApi} from '../context/ApiContext';
 import {useLanguage} from '../context/LanguageContext';
@@ -23,24 +23,48 @@ const SORT_OPTIONS = [
     {value: 'title,desc', label: 'Title Z-A'},
 ];
 
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const slideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+`;
+
 const PostListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.lg};
-  max-width: 1000px;
+  gap: ${({theme}) => theme.spacing.xl};
+  max-width: 1200px;
   margin: 0 auto;
+  padding: ${({theme}) => theme.spacing.lg};
+  animation: ${fadeIn} 0.6s ease-out;
 `;
 
 const PostListHeader = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.lg};
 `;
 
 const TitleRow = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: ${({theme}) => theme.spacing.md};
 
   @media (max-width: 768px) {
@@ -56,51 +80,53 @@ const PostListTitleSection = styled.div`
 `;
 
 const PostListTitle = styled.h1`
-  color: ${({theme}) => theme.colors.primary};
+  background: ${({theme}) => theme.gradients.techGradient};
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 2.5rem;
+  font-weight: 800;
   margin: 0 0 ${({theme}) => theme.spacing.xs} 0;
-`;
-
-const CardSubtitle = styled.div`
-  color: ${({theme}) => theme.colors.text}80;
-  font-size: ${({theme}) => theme.fontSizes.small};
-  margin: -8px 0 12px 0;
-  font-style: italic;
+  animation: ${slideIn} 0.8s ease-out;
 `;
 
 const PostCount = styled.p`
   margin: 0;
-  color: ${({theme}) => theme.colors.text}80;
-  font-size: ${({theme}) => theme.fontSizes.small};
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.7;
+  font-size: ${({theme}) => theme.fontSizes.medium};
+  font-weight: 500;
 `;
 
 const CreatePostButton = styled.button`
-  background-color: ${({theme}) => theme.colors.success};
+  background: ${({theme}) => theme.gradients.purpleGradient};
   color: white;
-  font-weight: bold;
+  font-weight: 600;
   padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.lg}`};
   border: none;
-  border-radius: ${({theme}) => theme.borderRadius};
+  border-radius: 25px;
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
   cursor: pointer;
-  transition: ${({theme}) => theme.transitions.default};
+  transition: all ${({theme}) => theme.transitions.default};
   white-space: nowrap;
   height: fit-content;
+  box-shadow: 0 4px 15px rgba(46, 139, 87, 0.3);
 
   &:hover {
-    opacity: 0.9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 139, 87, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-  }
-
-  @media (max-width: 768px) {
-    align-self: flex-start;
-    padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.md}`};
-    font-size: ${({theme}) => theme.fontSizes.small};
+    transform: none;
   }
 `;
 
@@ -108,10 +134,10 @@ const FilterContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({theme}) => theme.spacing.md};
-  background: ${({theme}) => `${theme.colors.background}F0`};
-  padding: ${({theme}) => theme.spacing.md};
-  border-radius: ${({theme}) => theme.borderRadius};
-  border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+  background: ${({theme}) => `${theme.colors.secondaryBackground}50`};
+  padding: ${({theme}) => theme.spacing.lg};
+  border-radius: 16px;
+  border: 1px solid ${({theme}) => `${theme.colors.primary}10`};
 
   @media (min-width: 769px) {
     flex-direction: row;
@@ -130,7 +156,7 @@ const TagFilterSection = styled.div`
   h4 {
     margin: 0;
     color: ${({theme}) => theme.colors.primary};
-    font-size: ${({theme}) => theme.fontSizes.small};
+    font-size: ${({theme}) => theme.fontSizes.medium};
     font-weight: 600;
   }
 `;
@@ -143,6 +169,7 @@ const SortContainer = styled.div`
 
   @media (max-width: 768px) {
     min-width: auto;
+    width: 100%;
   }
 `;
 
@@ -153,9 +180,96 @@ const SortLabel = styled.label`
   margin: 0;
 `;
 
-const PostDate = styled.span`
-  color: ${({theme}) => theme.colors.text}80;
+const StyledCard = styled(Card)`
+  background: ${({theme}) => theme.colors.background};
+  border: 1px solid ${({theme}) => `${theme.colors.primary}10`};
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all ${({theme}) => theme.transitions.default};
+  cursor: pointer;
+  overflow: hidden;
+  animation: ${fadeIn} 0.6s ease-out;
+  animation-fill-mode: both;
+
+  &:nth-child(1) {
+    animation-delay: 0.1s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.3s;
+  }
+
+  &:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: ${({theme}) => `${theme.colors.primary}30`};
+  }
+`;
+
+const StyledCardTitle = styled(CardTitle)`
+  font-size: ${({theme}) => theme.fontSizes.large};
+  font-weight: 700;
+  color: ${({theme}) => theme.colors.text};
+  margin-bottom: ${({theme}) => theme.spacing.xs};
+  transition: color ${({theme}) => theme.transitions.default};
+
+  ${StyledCard}:hover & {
+    color: ${({theme}) => theme.colors.primary};
+  }
+`;
+
+const CardSubtitle = styled.div`
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.6;
   font-size: ${({theme}) => theme.fontSizes.small};
+  margin-bottom: ${({theme}) => theme.spacing.sm};
+  font-style: italic;
+`;
+
+const StyledCardContent = styled(CardContent)`
+  display: flex;
+  flex-direction: column;
+  gap: ${({theme}) => theme.spacing.sm};
+`;
+
+const StyledCardFooter = styled(CardFooter)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: ${({theme}) => theme.spacing.sm};
+  border-top: 1px solid ${({theme}) => `${theme.colors.primary}05`};
+  margin-top: auto;
+`;
+
+const CardMeta = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({theme}) => theme.spacing.md};
+  font-size: ${({theme}) => theme.fontSizes.small};
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.6;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: ${({theme}) => theme.spacing.xs};
+  }
+`;
+
+const PostDate = styled.span`
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.5;
+  font-size: ${({theme}) => theme.fontSizes.small};
+  display: flex;
+  align-items: center;
+  gap: ${({theme}) => theme.spacing.xs};
 `;
 
 const LoadingContainer = styled.div`
@@ -165,18 +279,45 @@ const LoadingContainer = styled.div`
   justify-content: center;
   padding: ${({theme}) => theme.spacing.xl};
   text-align: center;
-  max-width: 600px;
-  margin: 0 auto;
+
+  h2 {
+    background: ${({theme}) => theme.gradients.purpleGradient};
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 `;
 
 const ErrorContainer = styled.div`
-  background-color: ${({theme}) => `${theme.colors.error}10`};
-  border: 1px solid ${({theme}) => theme.colors.error};
-  border-radius: ${({theme}) => theme.borderRadius};
-  padding: ${({theme}) => theme.spacing.lg};
-  margin: ${({theme}) => theme.spacing.lg} 0;
+  background: ${({theme}) => `${theme.colors.error}10`};
+  border: 1px solid ${({theme}) => `${theme.colors.error}30`};
+  border-radius: 16px;
+  padding: ${({theme}) => theme.spacing.xl};
+  margin: ${({theme}) => theme.spacing.xl} auto;
   max-width: 600px;
-  margin: ${({theme}) => theme.spacing.lg} auto;
+  text-align: center;
+
+  h2 {
+    color: ${({theme}) => theme.colors.error};
+    margin-bottom: ${({theme}) => theme.spacing.md};
+  }
+
+  button {
+    background: ${({theme}) => theme.colors.error};
+    color: white;
+    border: none;
+    padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.lg}`};
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all ${({theme}) => theme.transitions.default};
+    margin-top: ${({theme}) => theme.spacing.md};
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+    }
+  }
 `;
 
 const PostsGrid = styled.div`
@@ -188,10 +329,23 @@ const PostsGrid = styled.div`
 const NoPostsMessage = styled.div`
   text-align: center;
   padding: ${({theme}) => theme.spacing.xl};
-  color: ${({theme}) => theme.colors.text}80;
-  background: ${({theme}) => `${theme.colors.background}F0`};
-  border-radius: ${({theme}) => theme.borderRadius};
-  border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+  background: ${({theme}) => theme.colors.background};
+  border-radius: 16px;
+  border: 2px dashed ${({theme}) => `${theme.colors.primary}20`};
+  color: ${({theme}) => theme.colors.text};
+
+  p {
+    font-size: ${({theme}) => theme.fontSizes.medium};
+    margin: 0;
+    opacity: 0.7;
+
+    &:first-child {
+      font-size: ${({theme}) => theme.fontSizes.large};
+      font-weight: 600;
+      margin-bottom: ${({theme}) => theme.spacing.sm};
+      opacity: 0.9;
+    }
+  }
 `;
 
 const FormModal = styled.div`
@@ -224,7 +378,7 @@ const ModalHeader = styled.div`
   align-items: center;
   margin-bottom: ${({theme}) => theme.spacing.md};
   padding-bottom: ${({theme}) => theme.spacing.md};
-  border-bottom: 1px solid ${({theme}) => theme.colors.text}20;
+  border-bottom: 1px solid ${({theme}) => `${theme.colors.text}20`};
 `;
 
 const ModalTitle = styled.h2`
@@ -237,10 +391,12 @@ const CloseButton = styled.button`
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: ${({theme}) => theme.colors.text}80;
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.5;
+  transition: opacity ${({theme}) => theme.transitions.default};
 
   &:hover {
-    color: ${({theme}) => theme.colors.text};
+    opacity: 1;
   }
 `;
 
@@ -541,7 +697,7 @@ const PostListPage: React.FC = () => {
                             onClick={handleCreatePostClick}
                             disabled={createPostMutation.isPending}
                         >
-                            <IoAddCircleOutline size={16}/>
+                            <IoAddCircleOutline size={18}/>
                             {createPostMutation.isPending ? t('post.list.creating' as any) : t('post.list.createButton' as any)}
                         </CreatePostButton>
                     )}
@@ -609,31 +765,38 @@ const PostListPage: React.FC = () => {
             <PostsGrid>
                 {posts.length > 0 ? (
                     posts.map((post) => (
-                        <Card key={post.id} onClick={() => handleCardClick(post)}>
-                            <CardTitle>{post.title}</CardTitle>
+                        <StyledCard key={post.id} onClick={() => handleCardClick(post)}>
+                            <StyledCardTitle>{post.title}</StyledCardTitle>
                             {post.subtitle && (
                                 <CardSubtitle>{post.subtitle}</CardSubtitle>
                             )}
-                            <CardContent>
+                            <StyledCardContent>
                                 {post.tags && post.tags.length > 0 && (
                                     <TagList
                                         tags={post.tags}
                                         onTagClick={handlePostTagClick}
                                     />
                                 )}
-                            </CardContent>
-                            <CardFooter>
-                                <div>
-                                    {post.category && <span>Category: {post.category}</span>}
-                                    <span style={{marginLeft: post.category ? '1rem' : '0'}}>
-                                        Views: {post.viewCount || 0}
+                            </StyledCardContent>
+                            <StyledCardFooter>
+                                <CardMeta>
+                                    {post.category && (
+                                        <span>
+                                            <IoFolderOpenOutline/>
+                                            {post.category}
+                                        </span>
+                                    )}
+                                    <span>
+                                        <IoEyeOutline/>
+                                        {post.viewCount || 0}
                                     </span>
-                                </div>
+                                </CardMeta>
                                 <PostDate>
+                                    <IoCalendarOutline/>
                                     {new Date(post.createdAt).toLocaleDateString()}
                                 </PostDate>
-                            </CardFooter>
-                        </Card>
+                            </StyledCardFooter>
+                        </StyledCard>
                     ))
                 ) : (
                     <NoPostsMessage>
@@ -649,7 +812,7 @@ const PostListPage: React.FC = () => {
                             }
                         </p>
                         {isSearchRoute && (
-                            <p style={{marginTop: '0.5rem', fontSize: '0.9rem', opacity: 0.8}}>
+                            <p style={{marginTop: '0.5rem'}}>
                                 {t('post.list.noResults.searchTip' as any)}
                             </p>
                         )}

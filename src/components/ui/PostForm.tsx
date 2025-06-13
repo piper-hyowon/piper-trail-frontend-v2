@@ -1,6 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 import {useLanguage} from '../../context/LanguageContext';
+import {renderMarkdown} from "../../utils/markdoown.ts";
 
 interface PostFormProps {
     category: string;
@@ -296,6 +297,43 @@ const PreviewPanel = styled.div`
   table tr:nth-child(even) {
     background-color: ${({theme}) => `${theme.colors.background}F5`};
   }
+
+  pre {
+    background-color: ${({theme}) => theme.colors.secondaryBackground};
+    padding: ${({theme}) => theme.spacing.md};
+    border-radius: ${({theme}) => theme.borderRadius};
+    overflow-x: auto;
+    margin: ${({theme}) => theme.spacing.md} 0;
+    border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+
+    code {
+      background-color: transparent;
+      padding: 0;
+      border: none;
+      color: ${({theme}) => theme.colors.text};
+    }
+  }
+
+  hr {
+    border: none;
+    border-top: 2px solid ${({theme}) => `${theme.colors.primary}20`};
+    margin: ${({theme}) => theme.spacing.xl} 0;
+    opacity: 0.5;
+  }
+
+  p {
+    margin-bottom: ${({theme}) => theme.spacing.md};
+  }
+
+  ul, ol {
+    margin-bottom: ${({theme}) => theme.spacing.md};
+    padding-left: ${({theme}) => theme.spacing.lg};
+  }
+
+  li {
+    margin-bottom: ${({theme}) => theme.spacing.xs};
+    line-height: 1.6;
+  }
 `;
 
 const TagsContainer = styled.div`
@@ -367,14 +405,6 @@ const CancelButton = styled.button`
   &:hover {
     background-color: ${({theme}) => `${theme.colors.text}10`};
   }
-`;
-
-const NewCategoryNotice = styled.div`
-  padding: 10px;
-  background-color: ${({theme}) => theme.colors.secondaryBackground};
-  border-radius: 4px;
-  margin-bottom: 15px;
-  border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
 `;
 
 const LanguageIndicator = styled.span`
@@ -536,54 +566,17 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
         }
     };
 
-    const renderMarkdown = (content: string) => {
-        let renderedContent = content;
-
+    const renderMarkdownWithImages = (content: string) => {
+        let contentWithImages = content;
         imageFiles.forEach(imageFile => {
             const escapedPlaceholder = imageFile.placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            renderedContent = renderedContent.replace(
+            contentWithImages = contentWithImages.replace(
                 new RegExp(escapedPlaceholder, 'g'),
                 imageFile.preview
             );
         });
 
-        const renderTable = (tableText: string) => {
-            const lines = tableText.trim().split('\n');
-            if (lines.length < 2) return tableText;
-
-            let html = '<table>';
-            lines.forEach((line, index) => {
-                if (index === 1 && line.match(/^\|[\s\-:|]+\|$/)) return; // 구분선 건너뛰기
-
-                const cells = line.split('|').slice(1, -1); // 앞뒤 | 제거
-                const tag = index === 0 ? 'th' : 'td';
-
-                html += '<tr>';
-                cells.forEach(cell => {
-                    html += `<${tag}>${cell.trim()}</${tag}>`;
-                });
-                html += '</tr>';
-            });
-            html += '</table>';
-            return html;
-        };
-
-        // 표 찾아서 변환
-        renderedContent = renderedContent.replace(
-            /(\|.+\|[\r\n]+\|[\s\-:|]+\|[\r\n]+(\|.+\|[\r\n]*)+)/gm,
-            (match) => renderTable(match)
-        );
-
-        return renderedContent
-            .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-            .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-            .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/`(.*?)`/g, '<code>$1</code>')
-            .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" />')
-            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
-            .replace(/\n/g, '<br />');
+        return renderMarkdown(contentWithImages);
     };
 
     const handleAddTag = () => {
@@ -748,7 +741,7 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
 
                             <PreviewPanel>
                                 <div dangerouslySetInnerHTML={{
-                                    __html: renderMarkdown(
+                                    __html: renderMarkdownWithImages(
                                         (formData[contentField as keyof typeof formData] as string) ||
                                         (isKorean ? '미리보기' : 'Preview')
                                     )

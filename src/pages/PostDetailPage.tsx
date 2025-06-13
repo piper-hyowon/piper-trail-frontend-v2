@@ -15,6 +15,7 @@ import AuthModal from "../components/ui/AuthModal";
 import ApiLink from "../components/ui/ApiLink";
 import {CommentSection} from "../components/ui/comments/CommentSection.tsx";
 import {useLanguage} from "../context/LanguageContext";
+import {renderMarkdown} from "../utils/markdoown.ts";
 
 const PostDetailContainer = styled.article`
   max-width: 1000px;
@@ -170,33 +171,30 @@ const PostContent = styled.div`
     text-align: justify;
   }
 
+  hr {
+    border: none;
+    border-top: 2px solid ${({theme}) => `${theme.colors.primary}20`};
+    margin: ${({theme}) => theme.spacing.xl} 0;
+    opacity: 0.5;
+  }
+
   code {
-    background-color: ${({theme}) => theme.colors.secondaryBackground};
-    color: ${({theme}) => theme.colors.primary};
-    padding: 3px 6px;
-    border-radius: 4px;
-    font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
-    font-size: 0.9em;
-    border: 1px solid ${({theme}) => `${theme.colors.primary}30`};
-    font-weight: 500;
+    background: ${({theme}) => `${theme.colors.primary}15`};
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'Monaco', 'Menlo', monospace;
   }
 
   pre {
-    background-color: ${({theme}) => theme.colors.secondaryBackground};
+    background: ${({theme}) => `${theme.colors.primary}10`};
     padding: ${({theme}) => theme.spacing.md};
     border-radius: ${({theme}) => theme.borderRadius};
     overflow-x: auto;
     margin: ${({theme}) => theme.spacing.md} 0;
-    border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
-    box-shadow: inset 0 2px 4px ${({theme}) => `${theme.colors.primary}10`};
-    border-left: 4px solid ${({theme}) => theme.colors.primary};
 
     code {
-      background-color: transparent;
+      background: transparent;
       padding: 0;
-      border: none;
-      color: ${({theme}) => theme.colors.text};
-      font-weight: normal;
     }
   }
 
@@ -803,7 +801,9 @@ const PostDetailPage: React.FC = () => {
             </PostHeader>
 
             <PostContent>
-                <div dangerouslySetInnerHTML={{__html: post.content}}/>
+                <div dangerouslySetInnerHTML={{
+                    __html: renderMarkdown(post.content || post.content)
+                }}/>
             </PostContent>
 
             <PostFooter>
