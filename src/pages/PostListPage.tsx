@@ -8,7 +8,7 @@ import SortSelector from '../components/ui/SortSelector';
 import AuthModal from '../components/ui/AuthModal';
 import PostForm from "../components/ui/PostForm.tsx";
 import {IoAddCircleOutline, IoEyeOutline, IoCalendarOutline, IoFolderOpenOutline} from "react-icons/io5";
-import {usePostsByCategory, usePostsByTag, useSearchPosts, useCreatePost} from '../hooks/useApi';
+import {usePostsByCategory, usePostsByTag, useSearchPosts, useCreatePost, useBulkPostStats} from '../hooks/useApi';
 import {LoginCredentials, useApi} from '../context/ApiContext';
 import {useLanguage} from '../context/LanguageContext';
 import type {CreatePostRequest} from "../types/api.ts";
@@ -471,6 +471,9 @@ const PostListPage: React.FC = () => {
     }
 
     const {data: postsData, isLoading, error} = postsQuery;
+    const posts = postsData?.content || [];
+    const slugs = posts.map(post => post.slug);
+    const {data: statsData} = useBulkPostStats(slugs);
 
     const availableTags = useMemo(() => {
         if (!postsData?.content) return [];
@@ -682,7 +685,6 @@ const PostListPage: React.FC = () => {
         );
     }
 
-    const posts = postsData?.content || [];
     const totalPages = postsData?.total ? Math.ceil(postsData.total / postsData.size) : 0;
 
     return (
@@ -791,7 +793,7 @@ const PostListPage: React.FC = () => {
                                     )}
                                     <span>
                                         <IoEyeOutline/>
-                                        {post.viewCount || 0}
+                                        {statsData?.[post.slug]?.viewCount ?? post.viewCount ?? 0}
                                     </span>
                                 </CardMeta>
                                 <PostDate>

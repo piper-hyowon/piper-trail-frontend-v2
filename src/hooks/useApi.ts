@@ -50,6 +50,19 @@ export const usePostsByCategory = (
     });
 };
 
+export const useBulkPostStats = (slugs: string[]) => {
+    const {language} = useLanguage();
+    useSyncApiLanguage();
+
+    return useQuery({
+        queryKey: ["post-stats", "bulk", slugs, language],
+        queryFn: () => apiClient.getBulkPostStats(slugs),
+        staleTime: 30 * 1000, // 30초
+        gcTime: 2 * 60 * 1000, // 2분
+        enabled: slugs.length > 0,
+    });
+};
+
 export const usePostsByTag = (
     tagName: string,
     params?: BasicPaginationParams
@@ -113,6 +126,8 @@ export const useCreatePost = () => {
         onSuccess: () => {
             // React Query 메모리 캐시만 무효화 (HTTP 캐시는 서버에서 자동 처리)
             queryClient.invalidateQueries({queryKey: ["posts"]});
+            queryClient.invalidateQueries({queryKey: ["categories"]});
+            queryClient.invalidateQueries({queryKey: ["tags"]});
         },
     });
 };

@@ -237,6 +237,10 @@ class ApiClient {
             if (sortDir) searchParams.append('sortDir', sortDir);
         }
 
+        if (Date.now() < new Date('2025-07-01').getTime()) {
+            searchParams.append('_cb', Date.now().toString());
+        }
+
         const queryString = searchParams.toString();
         const category = categoryName === null ? 'null' : categoryName;
         return this.request<PaginatedResponse<PostSummary>>(`/posts/category/${category}${queryString ? `?${queryString}` : ''}`);
@@ -261,6 +265,10 @@ class ApiClient {
             if (sortDir) searchParams.append('sortDir', sortDir);
         }
 
+        if (Date.now() < new Date('2025-07-01').getTime()) {
+            searchParams.append('_cb', Date.now().toString());
+        }
+
         const queryString = searchParams.toString();
         return this.request<PaginatedResponse<PostSummary>>(`/posts/tag/${tagName}${queryString ? `?${queryString}` : ''}`);
     }
@@ -278,6 +286,10 @@ class ApiClient {
             }
         });
 
+        if (Date.now() < new Date('2025-07-01').getTime()) {
+            params.append('_cb', Date.now().toString());
+        }
+
         return this.request<PaginatedResponse<PostSummary>>(`/posts/search?${params.toString()}`);
     }
 
@@ -288,6 +300,13 @@ class ApiClient {
 
     async getTags(): Promise<string[]> {
         return this.request<string[]>('/posts/tags');
+    }
+
+    async getBulkPostStats(slugs: string[]): Promise<Record<string, PostStat>> {
+        const params = new URLSearchParams();
+        slugs.forEach(slug => params.append('slugs', slug));
+
+        return this.request<Record<string, PostStat>>(`/posts/stats?${params.toString()}`);
     }
 
     // Comments API
