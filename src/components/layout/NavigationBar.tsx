@@ -23,6 +23,21 @@ import {
 } from "../../config/navigation.config.ts";
 import DeleteConfirmModal from "../ui/DeleteConfirmModal.tsx";
 import SearchBar from "../ui/SearchBar.tsx";
+import type {CreatePostRequest, PostDetail, UpdatePostRequest} from "../../types/api.ts";
+
+interface PostData {
+    id: string;
+    title: string;
+    titleEn?: string;
+    subtitle?: string;
+    subtitleEn?: string;
+    markdownContent?: string;
+    markdownContentEn?: string;
+    content?: string;
+    contentEn?: string;
+    tags?: string[];
+    category?: string;
+}
 
 const NavContainer = styled.nav`
   padding: ${props => props.theme?.spacing?.md || '16px'};
@@ -282,13 +297,13 @@ const NavigationBar: React.FC = () => {
     const [showUpdateForm, setShowUpdateForm] = useState<boolean>(false);
     const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
     const [currentCategory, setCurrentCategory] = useState<string>('');
-    const [currentPostData, setCurrentPostData] = useState<any>(null);
+    const [currentPostData, setCurrentPostData] = useState<PostData | null>(null);
     const [showSearch, setShowSearch] = useState(false);
 
     // 인증 모달 상태
     const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
     const [authMessage, setAuthMessage] = useState<string>('');
-    const [formData, setFormData] = useState<any>(null);
+    const [formData, setFormData] = useState<CreatePostRequest | FormData | null>(null);
     const [pendingAction, setPendingAction] = useState<'create' | 'update' | 'delete' | null>(null);
 
     const prevLocationRef = useRef(location.pathname + location.search);
@@ -340,7 +355,7 @@ const NavigationBar: React.FC = () => {
     };
 
     // 현재 페이지의 포스트 데이터 가져오기
-    const getCurrentPostData = useCallback(() => {
+    const getCurrentPostData = useCallback((): Promise<PostDetail | null> => {
         return new Promise((resolve) => {
             const handlePostData = (event: any) => {
                 resolve(event.detail);
@@ -358,18 +373,22 @@ const NavigationBar: React.FC = () => {
         });
     }, []);
 
-    const createPost = useCallback(async (postData: any) => {
+    const createPost = useCallback(async (postData: CreatePostRequest | FormData) => {
         try {
-            await createPostMutation.mutateAsync({
-                title: postData.title,
-                titleEn: postData.titleEn,
-                subtitle: postData.subtitle,
-                subtitleEn: postData.subtitleEn,
-                markdownContent: postData.content,
-                markdownContentEn: postData.contentEn,
-                category: currentCategory,
-                tags: postData.tags || []
-            });
+            if (postData instanceof FormData) {
+                await createPostMutation.mutateAsync(postData);
+            } else {
+                await createPostMutation.mutateAsync({
+                    title: postData.title,
+                    titleEn: postData.titleEn,
+                    subtitle: postData.subtitle,
+                    subtitleEn: postData.subtitleEn,
+                    markdownContent: postData.markdownContent,
+                    markdownContentEn: postData.markdownContentEn,
+                    category: currentCategory,
+                    tags: postData.tags || []
+                });
+            }
 
             setShowPostForm(false);
             setFormData(null);
@@ -384,24 +403,28 @@ const NavigationBar: React.FC = () => {
         }
     }, [createPostMutation, currentCategory, setApiStatus, setStatusCode, setApiError]);
 
-    const updatePost = useCallback(async (postData: any) => {
+    const updatePost = useCallback(async (postData: UpdatePostRequest | FormData) => {
         try {
             if (!currentPostData?.id) {
                 alert(t('layout.method.postDataError' as any));
+                return;
             }
+
+            // FormData인 경우와 일반 객체인 경우 처리
+            const updateData = postData instanceof FormData ? postData : {
+                title: postData.title,
+                titleEn: postData.titleEn,
+                subtitle: postData.subtitle,
+                subtitleEn: postData.subtitleEn,
+                markdownContent: postData.markdownContent,
+                markdownContentEn: postData.markdownContentEn,
+                tags: postData.tags || [],
+                category: currentCategory
+            };
 
             await updatePostMutation.mutateAsync({
                 postId: currentPostData.id.toString(),
-                post: {
-                    title: postData.title,
-                    titleEn: postData.titleEn,
-                    subtitle: postData.subtitle,
-                    subtitleEn: postData.subtitleEn,
-                    markdownContent: postData.content,
-                    markdownContentEn: postData.contentEn,
-                    tags: postData.tags || [],
-                    category: currentCategory
-                }
+                post: updateData
             });
 
             setShowUpdateForm(false);
@@ -416,7 +439,7 @@ const NavigationBar: React.FC = () => {
             setStatusCode(error.status || 500);
             setApiError('포스트 수정에 실패했습니다.');
         }
-    }, [updatePostMutation, currentPostData, setApiStatus, setStatusCode, setApiError]);
+    }, [updatePostMutation, currentPostData, currentCategory, setApiStatus, setStatusCode, setApiError]);
 
     const deletePost = useCallback(async () => {
         try {
@@ -424,7 +447,9 @@ const NavigationBar: React.FC = () => {
                 alert(t('layout.method.postDataError' as any));
             }
 
-            await deletePostMutation.mutateAsync(currentPostData.id.toString());
+            if ("id" in currentPostData) {
+                await deletePostMutation.mutateAsync(currentPostData.id.toString());
+            }
 
             setShowDeleteModal(false);
             setPendingAction(null);
@@ -439,7 +464,10 @@ const NavigationBar: React.FC = () => {
         }
     }, [deletePostMutation, currentPostData, currentCategory, navigateTo, setApiStatus, setStatusCode, setApiError]);
 
-    const handleFormSubmit = useCallback(async (formData: any, action: 'create' | 'update') => {
+    const handleFormSubmit = useCallback(async (
+        formData: CreatePostRequest | FormData,
+        action: 'create' | 'update'
+    ) => {
         try {
             if (!isAuthenticated) {
                 // 인증되지 않았으면 폼 데이터 저장하고 인증 모달 표시
@@ -855,9 +883,10 @@ const NavigationBar: React.FC = () => {
                                 titleEn: currentPostData.titleEn,
                                 subtitle: currentPostData.subtitle,
                                 subtitleEn: currentPostData.subtitleEn,
-                                content: currentPostData.markdownContent || currentPostData.content,
+                                content: currentPostData.markdownContent || currentPostData.content || '',
                                 contentEn: currentPostData.markdownContentEn || currentPostData.contentEn,
-                                tags: currentPostData.tags || []
+                                tags: currentPostData.tags || [],
+                                imageFiles: []
                             }}
                             onSubmit={handleUpdateFormSubmit}  // update용
                             onCancel={handleFormCancel}

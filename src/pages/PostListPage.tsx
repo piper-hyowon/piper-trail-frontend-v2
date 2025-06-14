@@ -11,6 +11,7 @@ import {IoAddCircleOutline, IoEyeOutline, IoCalendarOutline, IoFolderOpenOutline
 import {usePostsByCategory, usePostsByTag, useSearchPosts, useCreatePost} from '../hooks/useApi';
 import {LoginCredentials, useApi} from '../context/ApiContext';
 import {useLanguage} from '../context/LanguageContext';
+import type {CreatePostRequest} from "../types/api.ts";
 
 const PAGE_SIZE = 4;
 const DEFAULT_SORT = 'createdAt,desc';
@@ -427,7 +428,7 @@ const PostListPage: React.FC = () => {
     const [showPostForm, setShowPostForm] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMessage, setAuthMessage] = useState('');
-    const [formData, setFormData] = useState<any>(null);
+    const [formData, setFormData] = useState<CreatePostRequest | FormData | null>(null);
 
     const createPostMutation = useCreatePost();
 
@@ -517,23 +518,27 @@ const PostListPage: React.FC = () => {
         }
     };
 
-    const createPost = useCallback(async (postData: any) => {
+    const createPost = useCallback(async (postData: CreatePostRequest | FormData) => {
         try {
-            await createPostMutation.mutateAsync({
-                title: postData.title,
-                titleEn: postData.titleEn,
-                subtitle: postData.subtitle,
-                subtitleEn: postData.subtitleEn,
-                markdownContent: postData.content,
-                markdownContentEn: postData.contentEn,
-                category: currentCategory || 'null',
-                tags: postData.tags || []
-            });
+            if (postData instanceof FormData) {
+                await createPostMutation.mutateAsync(postData);
+            } else {
+                await createPostMutation.mutateAsync({
+                    title: postData.title,
+                    titleEn: postData.titleEn,
+                    subtitle: postData.subtitle,
+                    subtitleEn: postData.subtitleEn,
+                    markdownContent: postData.markdownContent,
+                    markdownContentEn: postData.markdownContentEn,
+                    category: currentCategory || 'null',
+                    tags: postData.tags || []
+                });
+            }
 
             setShowPostForm(false);
             setFormData(null);
             alert(t('post.form.success.created' as any));
-            window.open(window.location.href, '_self'); // TODO:
+            window.location.reload();
 
         } catch (error: any) {
             console.error('포스트 생성 실패:', error);
@@ -592,7 +597,7 @@ const PostListPage: React.FC = () => {
         setShowPostForm(true);
     }, []);
 
-    const handleFormSubmit = useCallback(async (formData: any) => {
+    const handleFormSubmit = useCallback(async (formData: CreatePostRequest | FormData) => {
         try {
             if (!isAuthenticated) {
                 // 인증되지 않았으면 폼 데이터 저장하고 인증 모달 표시

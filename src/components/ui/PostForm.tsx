@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 import {useLanguage} from '../../context/LanguageContext';
 import {renderMarkdown} from "../../utils/markdoown.ts";
+import type {CreatePostRequest, ImageMapping, UpdatePostRequest} from "../../types/api.ts";
 
 interface PostFormProps {
     category: string | null;
@@ -13,8 +14,9 @@ interface PostFormProps {
         content: string;
         contentEn?: string;
         tags: string[];
+        imageFiles: ImageFile[];
     };
-    onSubmit: (formData: any) => void;
+    onSubmit: (formData: CreatePostRequest | UpdatePostRequest | FormData) => void;
     onCancel: () => void;
 }
 
@@ -425,7 +427,8 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
         subtitleEn: '',
         contentEn: '',
         currentTag: '',
-        tags: [] as string[]
+        tags: [] as string[],
+        imageFiles: [] as ImageFile[],
     });
 
     const [errors, setErrors] = useState({
@@ -458,7 +461,9 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                 subtitleEn: initialData.subtitleEn || '',
                 content: initialData.content,
                 contentEn: initialData.contentEn || '',
-                tags: initialData.tags || []
+                tags: initialData.tags || [],
+                imageFiles: initialData.imageFiles || [],
+
             }));
         }
     }, [initialData]);
@@ -621,22 +626,47 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log(formData);
 
         if (validateForm()) {
-            onSubmit({
-                title: formData.title,
-                subtitle: formData.subtitle,
-                content: formData.content,
-                titleEn: formData.titleEn,
-                subtitleEn: formData.subtitleEn,
-                contentEn: formData.contentEn,
-                tags: formData.tags,
-                // imageFiles: imageFiles
-            });
+            if (imageFiles.length > 0) {
+                const formDataToSend = new FormData();
+
+                formDataToSend.append('title', formData.title);
+                formDataToSend.append('subtitle', formData.subtitle);
+                formDataToSend.append('markdownContent', formData.content);
+                formDataToSend.append('titleEn', formData.titleEn || '');
+                formDataToSend.append('subtitleEn', formData.subtitleEn || '');
+                formDataToSend.append('markdownContentEn', formData.contentEn || '');
+                formDataToSend.append('category', category || '');
+                formDataToSend.append('tags', JSON.stringify(formData.tags));
+
+                const imageMetadata: ImageMapping[] = imageFiles.map((img, index) => ({
+                    id: img.id,
+                    placeholder: img.placeholder,
+                    filename: img.file.name,
+                    index,
+                }));
+                formDataToSend.append('imageMetadata', JSON.stringify(imageMetadata));
+
+                imageFiles.forEach((imageFile) => {
+                    formDataToSend.append('images', imageFile.file);
+                });
+
+                onSubmit(formDataToSend as FormData);
+            } else {
+                onSubmit({
+                    title: formData.title,
+                    subtitle: formData.subtitle,
+                    markdownContent: formData.content,
+                    titleEn: formData.titleEn,
+                    subtitleEn: formData.subtitleEn,
+                    markdownContentEn: formData.contentEn,
+                    tags: formData.tags,
+                    category: category || ''
+                } as CreatePostRequest);
+            }
         }
     };
-
     const renderLanguageFields = (lang: 'ko' | 'en') => {
         const isKorean = lang === 'ko';
         const titleField = isKorean ? 'title' : 'titleEn';

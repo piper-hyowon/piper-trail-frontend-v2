@@ -8,9 +8,12 @@ export interface PaginatedResponse<T> {
 export interface PostSummary {
     id: string;
     title: string;
+    titleEn: string;
     subtitle: string;
+    subtitleEn: string;
     slug: string;
     preview: string;
+    previewEn: string;
     category: string;
     tags: string[];
     createdAt: Date;
@@ -25,6 +28,7 @@ export interface LinkInfo {
 
 export interface PostDetail extends PostSummary {
     content: string;
+    contentEn: string;
     _links: Map<string, LinkInfo>;
 }
 
@@ -44,6 +48,12 @@ export interface CreatePostRequest {
     subtitleEn?: string;
     tags: string[];
     category: string;
+}
+
+export interface ImageMapping {
+    id: string;
+    placeholder: string;
+    filename: string;
 }
 
 export interface UpdatePostRequest {

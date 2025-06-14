@@ -109,7 +109,7 @@ export const useCreatePost = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (post: CreatePostRequest) => apiClient.createPost(post),
+        mutationFn: (post: CreatePostRequest | FormData) => apiClient.createPost(post),
         onSuccess: () => {
             // React Query 메모리 캐시만 무효화 (HTTP 캐시는 서버에서 자동 처리)
             queryClient.invalidateQueries({queryKey: ["posts"]});
@@ -126,7 +126,7 @@ export const useUpdatePost = () => {
                          post,
                      }: {
             postId: string;
-            post: UpdatePostRequest;
+            post: UpdatePostRequest | FormData;
         }) => apiClient.updatePost(postId, post),
         onSuccess: (_, variables) => {
             // React Query 메모리 캐시만 무효화

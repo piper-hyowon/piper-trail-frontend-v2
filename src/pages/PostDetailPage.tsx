@@ -16,6 +16,7 @@ import ApiLink from "../components/ui/ApiLink";
 import {CommentSection} from "../components/ui/comments/CommentSection.tsx";
 import {useLanguage} from "../context/LanguageContext";
 import {renderMarkdown} from "../utils/markdoown.ts";
+import type {UpdatePostRequest} from "../types/api.ts";
 
 const PostDetailContainer = styled.article`
   max-width: 1000px;
@@ -463,7 +464,7 @@ const PostDetailPage: React.FC = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMessage, setAuthMessage] = useState("");
-    const [formData, setFormData] = useState<any>(null);
+    const [formData, setFormData] = useState<UpdatePostRequest | FormData | null>(null);
     const [pendingAction, setPendingAction] = useState<
         "update" | "delete" | null
     >(null);
@@ -558,24 +559,29 @@ const PostDetailPage: React.FC = () => {
     }, [post]);
 
     const updatePost = useCallback(
-        async (postData: any) => {
+        async (postData: UpdatePostRequest | FormData) => {
             try {
                 if (!post?.id) {
                     throw new Error(t("post.form.errors.noPostId" as any));
                 }
 
-                await updatePostMutation.mutateAsync({
-                    postId: post.id.toString(),
-                    post: {
+                // FormData인지 체크
+                const updateData = postData instanceof FormData
+                    ? postData
+                    : {
                         title: postData.title,
                         titleEn: postData.titleEn,
                         subtitle: postData.subtitle,
                         subtitleEn: postData.subtitleEn,
-                        markdownContent: postData.content,
-                        markdownContentEn: postData.contentEn,
+                        markdownContent: postData.markdownContent,
+                        markdownContentEn: postData.markdownContentEn,
                         tags: postData.tags || [],
                         category: category === 'uncategorized' || !category ? 'null' : category,
-                    },
+                    };
+
+                await updatePostMutation.mutateAsync({
+                    postId: post.id.toString(),
+                    post: updateData
                 });
 
                 setShowUpdateForm(false);
@@ -592,7 +598,7 @@ const PostDetailPage: React.FC = () => {
                 );
             }
         },
-        [updatePostMutation, post, t, formatMessage]
+        [updatePostMutation, post, category, t, formatMessage]
     );
 
     const deletePost = useCallback(async () => {
@@ -615,8 +621,8 @@ const PostDetailPage: React.FC = () => {
         }
     }, [deletePostMutation, post, navigate, t, formatMessage]);
 
-    const handleUpdateSubmit = useCallback(
-        async (formData: any) => {
+    const handleUpdateSubmit = useCallback(async (formData: UpdatePostRequest | FormData) => {
+
             try {
                 if (!isAuthenticated) {
                     setFormData(formData);
@@ -867,9 +873,13 @@ const PostDetailPage: React.FC = () => {
                             category={post.category || "uncategorized"}
                             initialData={{
                                 title: post.title,
+                                titleEn: post.titleEn,
                                 subtitle: post.subtitle,
-                                content: post.content || post.content,
+                                subtitleEn: post.subtitleEn,
+                                content: post.content,
+                                contentEn: post.contentEn || '',
                                 tags: post.tags || [],
+                                imageFiles: []
                             }}
                             onSubmit={handleUpdateSubmit}
                             onCancel={handleFormCancel}

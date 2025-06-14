@@ -69,9 +69,12 @@ class ApiClient {
         const url = `${this.baseURL}${this.addLanguageParam(endpoint)}`;
 
         const headers: Record<string, string> = {
-            'Content-Type': 'application/json',
             'Accept-Language': this.language,
         };
+
+        if (!(options.body instanceof FormData)) {
+            headers['Content-Type'] = 'application/json';
+        }
 
         // 기존 헤더가 있으면 병합
         if (options.headers) {
@@ -194,17 +197,19 @@ class ApiClient {
         return this.request<PostStat>(`/posts/${slug}/stats`);
     }
 
-    async createPost(post: CreatePostRequest): Promise<PostDetail> {
+    async createPost(post: CreatePostRequest | FormData): Promise<PostDetail> {
+        const body = post instanceof FormData ? post : JSON.stringify(post);
         return this.request<PostDetail>('/posts', {
             method: 'POST',
-            body: JSON.stringify(post),
+            body,
         });
     }
 
-    async updatePost(postId: string, post: UpdatePostRequest): Promise<PostDetail> {
+    async updatePost(postId: string, post: UpdatePostRequest | FormData): Promise<PostDetail> {
+        const body = post instanceof FormData ? post : JSON.stringify(post);
         return this.request<PostDetail>(`/posts/${postId}`, {
             method: 'PUT',
-            body: JSON.stringify(post),
+            body,
         });
     }
 
