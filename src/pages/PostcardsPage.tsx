@@ -1,5 +1,6 @@
 import React, {useEffect, useState, useMemo, useCallback} from 'react';
 import styled from 'styled-components';
+import ReactDOM from 'react-dom';
 import Mailbox3D from '../components/ui/stamps/Mailbox3D';
 import StampCard from '../components/ui/stamps/StampCard';
 import PostcardCard from '../components/ui/stamps/PostcardCard';
@@ -114,13 +115,36 @@ const PostcardOverlay = styled.div<{ $isVisible: boolean }>`
   bottom: 0;
   background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(10px);
-  z-index: 999;
+  z-index: 10000;
   display: ${({$isVisible}) => $isVisible ? 'flex' : 'none'};
   flex-direction: column;
-  padding: ${({theme}) => theme.spacing.lg};
-  overflow-y: auto;
+  padding: 0;
+  overflow-y: hidden;
 `;
 
+const PostcardListContent = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: ${({theme}) => theme.spacing.lg};
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${({theme}) => `${theme.colors.text}10`};
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${({theme}) => `${theme.colors.text}30`};
+    border-radius: 4px;
+
+    &:hover {
+      background: ${({theme}) => `${theme.colors.text}50`};
+    }
+  }
+`;
 const PostcardListHeader = styled.div`
   text-align: center;
   margin-bottom: ${({theme}) => theme.spacing.lg};
@@ -179,7 +203,7 @@ const Modal = styled.div<{ $isOpen: boolean }>`
   display: ${({$isOpen}) => $isOpen ? 'flex' : 'none'};
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: ${({theme}) => theme.zIndex.modal};
   backdrop-filter: blur(5px);
 `;
 
@@ -447,11 +471,15 @@ const PostcardsPage: React.FC = () => {
                 setMailboxClickCount(0);
             }, 5000);
         } else {
-            setShowPostcards(!showPostcards);
+            setShowPostcards(true);
             setMailboxClickCount(0);
             setShowClickHint(false);
         }
-    }, [stampEntries.length, mailboxClickCount, showPostcards]);
+    }, [stampEntries.length, mailboxClickCount]);
+
+    const handleShowPostcardsClick = useCallback(() => {
+        setShowPostcards(true);
+    }, []);
 
     const handleStampSelect = useCallback((stampId: string) => {
         setSelectedStampId(stampId);
@@ -628,78 +656,84 @@ const PostcardsPage: React.FC = () => {
                         }
                     </ActionButton>
                     {stampEntries.length > 0 && (
-                        <ActionButton $variant="secondary" onClick={handleMailboxClick}>
+                        <ActionButton $variant="secondary" onClick={handleShowPostcardsClick}>
                             {formatMessage('postcard.buttons.viewPostcards', {count: stampEntries.length})}
                         </ActionButton>
                     )}
                 </ActionButtons>
             </MailboxSection>
 
-            <PostcardOverlay $isVisible={showPostcards && stampEntries.length > 0}>
-                <PostcardListHeader>
-                    <PostcardListTitle>
-                        {formatMessage('postcard.list.title', {count: stampEntries.length})}
-                    </PostcardListTitle>
-                    <ClosePostcardsButton onClick={handlePostcardsClose}>
-                        {t('postcard.buttons.closeMailbox' as any)}
-                    </ClosePostcardsButton>
-                </PostcardListHeader>
-
-                <PostcardGrid>
-                    {renderedPostcardCards}
-                </PostcardGrid>
-            </PostcardOverlay>
-
+            {showPostcards && stampEntries.length > 0 && ReactDOM.createPortal(
+                <PostcardOverlay $isVisible={true}>  {/* $isVisible={true} 추가 */}
+                    <PostcardListHeader>
+                        <PostcardListTitle>
+                            {formatMessage('postcard.list.title', {count: stampEntries.length})}
+                        </PostcardListTitle>
+                        <ClosePostcardsButton onClick={handlePostcardsClose}>
+                            {t('postcard.buttons.closeMailbox' as any)}
+                        </ClosePostcardsButton>
+                    </PostcardListHeader>
+                    <PostcardListContent>
+                        <PostcardGrid>
+                            {renderedPostcardCards}
+                        </PostcardGrid>
+                    </PostcardListContent>
+                </PostcardOverlay>,
+                document.getElementById('modal-root')!
+            )}
             {/* 엽서 작성 모달 */}
-            <Modal $isOpen={showModal}>
-                <ModalContent>
-                    <ModalHeader>
-                        <ModalTitle>{t('postcard.modal.title' as any)}</ModalTitle>
-                        <CloseButton onClick={handleModalClose}>×</CloseButton>
-                    </ModalHeader>
+            {showModal && ReactDOM.createPortal(
+                <Modal $isOpen={showModal}>
+                    <ModalContent>
+                        <ModalHeader>
+                            <ModalTitle>{t('postcard.modal.title' as any)}</ModalTitle>
+                            <CloseButton onClick={handleModalClose}>×</CloseButton>
+                        </ModalHeader>
 
-                    <FormGroup>
-                        <FormLabel $required>{t('postcard.modal.selectStamp' as any)}</FormLabel>
-                        <StampGrid>
-                            {renderedStampCards}
-                        </StampGrid>
-                    </FormGroup>
+                        <FormGroup>
+                            <FormLabel $required>{t('postcard.modal.selectStamp' as any)}</FormLabel>
+                            <StampGrid>
+                                {renderedStampCards}
+                            </StampGrid>
+                        </FormGroup>
 
-                    <FormGroup>
-                        <FormLabel>{t('postcard.modal.nickname' as any)}</FormLabel>
-                        <FormInput
-                            type="text"
-                            placeholder={t('postcard.modal.nicknamePlaceholder' as any)}
-                            value={nickname}
-                            onChange={(e) => setNickname(e.target.value)}
-                            maxLength={20}
-                        />
-                    </FormGroup>
+                        <FormGroup>
+                            <FormLabel>{t('postcard.modal.nickname' as any)}</FormLabel>
+                            <FormInput
+                                type="text"
+                                placeholder={t('postcard.modal.nicknamePlaceholder' as any)}
+                                value={nickname}
+                                onChange={(e) => setNickname(e.target.value)}
+                                maxLength={20}
+                            />
+                        </FormGroup>
 
-                    <FormGroup>
-                        <FormLabel>{t('postcard.modal.message' as any)}</FormLabel>
-                        <FormTextarea
-                            placeholder={t('postcard.modal.messagePlaceholder' as any)}
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            maxLength={200}
-                        />
-                    </FormGroup>
+                        <FormGroup>
+                            <FormLabel>{t('postcard.modal.message' as any)}</FormLabel>
+                            <FormTextarea
+                                placeholder={t('postcard.modal.messagePlaceholder' as any)}
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                maxLength={200}
+                            />
+                        </FormGroup>
 
-                    <SubmitButton
-                        $disabled={!selectedStampId || createPostcardMutation.isPending}
-                        onClick={handleStampSubmit}
-                        disabled={!selectedStampId || createPostcardMutation.isPending}
-                    >
-                        {createPostcardMutation.isPending
-                            ? t('postcard.modal.submitSending' as any)
-                            : selectedStampId
-                                ? t('postcard.modal.submitSelected' as any)
-                                : t('postcard.modal.submitSelectStamp' as any)
-                        }
-                    </SubmitButton>
-                </ModalContent>
-            </Modal>
+                        <SubmitButton
+                            $disabled={!selectedStampId || createPostcardMutation.isPending}
+                            onClick={handleStampSubmit}
+                            disabled={!selectedStampId || createPostcardMutation.isPending}
+                        >
+                            {createPostcardMutation.isPending
+                                ? t('postcard.modal.submitSending' as any)
+                                : selectedStampId
+                                    ? t('postcard.modal.submitSelected' as any)
+                                    : t('postcard.modal.submitSelectStamp' as any)
+                            }
+                        </SubmitButton>
+                    </ModalContent>
+                </Modal>,
+                document.getElementById('modal-root')!
+            )}
         </StampsContainer>
     );
 };
