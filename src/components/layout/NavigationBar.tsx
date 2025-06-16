@@ -117,14 +117,43 @@ const LanguageToggle = styled.button`
   }
 `;
 
-const ThemeToggleButton = styled.button`
-  background: none;
-  color: ${({theme}) => theme.colors.text};
-  padding: ${({theme}) => theme.spacing.xs};
-  font-size: 18px;
+const ThemeToggleSwitch = styled.button<{ $isDark: boolean }>`
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background: ${({theme, $isDark}) =>
+          $isDark ? theme.colors.primary : `${theme.colors.text}20`};
+  border: none;
+  border-radius: 13px;
+  cursor: pointer;
+  transition: ${({theme}) => theme.transitions.default};
+  padding: 2px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: ${({$isDark}) => $isDark ? '24px' : '2px'};
+    width: 22px;
+    height: 22px;
+    background: white;
+    border-radius: 50%;
+    transition: ${({theme}) => theme.transitions.default};
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
 
   &:hover {
-    background-color: ${({theme}) => `${theme.colors.secondary}30`};
+    opacity: 0.8;
+  }
+
+  &::before {
+    content: ${({$isDark}) => $isDark ? '"🌙"' : '"☀️"'};
+    position: absolute;
+    left: ${({$isDark}) => $isDark ? '5px' : '28px'};
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    z-index: 1;
   }
 `;
 
@@ -777,9 +806,13 @@ const NavigationBar: React.FC = () => {
                             <LanguageToggle onClick={toggleLanguage}>
                                 {language === 'en' ? '한국어' : 'English'}
                             </LanguageToggle>
-                            <ThemeToggleButton onClick={toggleTheme}>
-                                {themeMode === 'light' ? '🌙' : '☀️'}
-                            </ThemeToggleButton>
+
+                            <ThemeToggleSwitch
+                                $isDark={themeMode === 'dark'}
+                                onClick={toggleTheme}
+                                aria-label={`Switch to ${themeMode === 'light' ? 'dark' : 'light'} mode`}
+                            />
+
 
                             <AuthStatusContainer $authenticated={isAuthenticated}>
                                 {isAuthenticated ? '🔒' : '🔓'}
