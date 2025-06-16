@@ -40,9 +40,8 @@ interface PostData {
 }
 
 const NavContainer = styled.nav`
-  padding: ${props => props.theme?.spacing?.md || '16px'};
+  padding: ${props => props.theme?.spacing?.sm || '8px'};
   background: ${({theme}) => theme.gradients.skyToTransparent};
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 `;
 
 const NavContent = styled.div`
@@ -54,15 +53,15 @@ const NavHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${({theme}) => theme.spacing.md};
+  margin-bottom: ${({theme}) => theme.spacing.sm};
 `;
 
 const Logo = styled.div`
   display: flex;
   align-items: flex-end;
-  gap: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.xs};
   cursor: pointer;
-  padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.sm}`};
+  padding: ${({theme}) => `${theme.spacing.xs}`};
   border-radius: ${({theme}) => theme.borderRadius};
   transition: ${({theme}) => theme.transitions.default};
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
@@ -75,11 +74,11 @@ const Logo = styled.div`
 const LogoTextContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom: ${({theme}) => theme.spacing.xs};
+  margin-bottom: 0;
 `;
 
 const LogoText = styled.span`
-  font-size: 30px;
+  font-size: 24px;
   font-weight: bold;
   color: ${({theme}) => theme.colors.primary};
 `;
@@ -93,13 +92,13 @@ const LogoSmallTitle = styled.span`
 const RightControls = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.xs};
   align-items: flex-end;
 `;
 
 const TopRightControls = styled.div`
   display: flex;
-  gap: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.sm};
   align-items: center;
 `;
 
@@ -107,10 +106,11 @@ const LanguageToggle = styled.button`
   background: none;
   border: 1px solid ${({theme}) => theme.colors.primary}40;
   border-radius: ${({theme}) => theme.borderRadius};
-  padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.sm}`};
+  padding: ${({theme}) => theme.spacing.xs};
   color: ${({theme}) => theme.colors.primary};
   cursor: pointer;
   transition: ${({theme}) => theme.transitions.default};
+  font-size: ${({theme}) => theme.fontSizes.small};
 
   &:hover {
     background-color: ${({theme}) => `${theme.colors.secondary}20`};
@@ -120,7 +120,8 @@ const LanguageToggle = styled.button`
 const ThemeToggleButton = styled.button`
   background: none;
   color: ${({theme}) => theme.colors.text};
-  padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.sm}`};
+  padding: ${({theme}) => theme.spacing.xs};
+  font-size: 18px;
 
   &:hover {
     background-color: ${({theme}) => `${theme.colors.secondary}30`};
@@ -131,7 +132,7 @@ const AuthStatusContainer = styled.div<{ $authenticated: boolean }>`
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
-  padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.sm}`};
+  padding: ${({theme}) => theme.spacing.xs};
   border-radius: ${({theme}) => theme.borderRadius};
   background-color: ${({theme, $authenticated}) =>
           $authenticated ? `${theme.colors.success}10` : `${theme.colors.primary}10`};
@@ -176,20 +177,20 @@ const LogoutButton = styled(AuthButton)`
 
 const ApiControls = styled.div`
   display: flex;
-  gap: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.xs};
   align-items: center;
 `;
 
 const HeadersContainer = styled.div`
-  margin-top: ${({theme}) => theme.spacing.md};
+  margin-top: ${({theme}) => theme.spacing.sm};
 `;
 
 const MethodAlert = styled.div`
   background-color: ${({theme}) => theme.colors.primary}20;
   color: ${({theme}) => theme.colors.primary};
-  padding: ${({theme}) => theme.spacing.sm};
+  padding: ${({theme}) => theme.spacing.xs};
   border-radius: ${({theme}) => theme.borderRadius};
-  margin-top: ${({theme}) => theme.spacing.sm};
+  margin-top: ${({theme}) => theme.spacing.xs};
   font-size: ${({theme}) => theme.fontSizes.small};
   animation: fadeIn 0.3s;
 
@@ -206,9 +207,9 @@ const MethodAlert = styled.div`
 const ErrorAlert = styled.div`
   background-color: ${({theme}) => theme.colors.error}20;
   color: ${({theme}) => theme.colors.error};
-  padding: ${({theme}) => theme.spacing.sm};
+  padding: ${({theme}) => theme.spacing.xs};
   border-radius: ${({theme}) => theme.borderRadius};
-  margin-top: ${({theme}) => theme.spacing.sm};
+  margin-top: ${({theme}) => theme.spacing.xs};
   font-size: ${({theme}) => theme.fontSizes.small};
   animation: fadeIn 0.3s;
 
@@ -274,7 +275,7 @@ const CloseButton = styled.button`
 
 const SearchContainer = styled.div<{ $visible: boolean }>`
   opacity: ${({$visible}) => $visible ? 1 : 0};
-  max-height: ${({$visible}) => $visible ? '60px' : '0'};
+  max-height: ${({$visible}) => $visible ? '40px' : '0'};
   overflow: hidden;
   transition: all 0.3s ease;
 `;

@@ -53,7 +53,7 @@ const AboutContainer = styled.div`
   font-family: 'AboutCustomFont', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   max-width: 1200px;
   margin: 0 auto;
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   min-height: 100vh;
   background: ${({theme}) => theme.gradients.contentBackground};
   position: relative;
@@ -70,6 +70,10 @@ const AboutContainer = styled.div`
     radial-gradient(circle at 40% 80%, ${({theme}) => `${theme.colors.emerald}20`} 0%, transparent 50%);
     pointer-events: none;
   }
+
+  @media (max-width: 768px) {
+    padding: ${({theme}) => theme.spacing.sm};
+  }
 `;
 
 const ContentWrapper = styled.div`
@@ -79,8 +83,8 @@ const ContentWrapper = styled.div`
 
 const AboutHeader = styled.header`
   text-align: center;
-  margin-bottom: ${({theme}) => theme.spacing.xl};
-  padding: ${({theme}) => theme.spacing.xl};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.lg};
   background: ${({theme}) => `${theme.colors.background}E6`};
   backdrop-filter: blur(20px);
   border-radius: 24px;
@@ -104,14 +108,19 @@ const AboutHeader = styled.header`
     transparent);
     animation: ${shimmer} 3s infinite;
   }
+
+  @media (max-width: 768px) {
+    padding: ${({theme}) => theme.spacing.md};
+    margin-bottom: ${({theme}) => theme.spacing.md};
+  }
 `;
 
 const ProfileImage = styled.div`
-  width: 180px;
-  height: 180px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   background: ${({theme}) => theme.gradients.seaGradient};
-  margin: 0 auto ${({theme}) => theme.spacing.lg};
+  margin: 0 auto ${({theme}) => theme.spacing.md};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -142,28 +151,37 @@ const ProfileImage = styled.div`
     transparent);
     animation: ${shimmer} 4s infinite;
   }
+
+  @media (max-width: 768px) {
+    width: 100px;
+    height: 100px;
+  }
 `;
 
 const Name = styled.h1`
   color: ${({theme}) => theme.colors.text};
-  margin-bottom: ${({theme}) => theme.spacing.lg};
-  font-size: 2.5rem;
+  margin-bottom: ${({theme}) => theme.spacing.md};
+  font-size: 2rem;
   font-weight: 700;
   text-shadow: 0 2px 10px ${({theme}) => `${theme.colors.primary}30`};
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const InterestsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.lg};
-  margin-top: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.md};
+  margin-top: ${({theme}) => theme.spacing.sm};
 `;
 
 const InterestGroup = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.xs};
 `;
 
 const InterestLabel = styled.span`
@@ -173,11 +191,11 @@ const InterestLabel = styled.span`
 `;
 
 const PrimaryInterestLabel = styled(InterestLabel)`
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 `;
 
 const SecondaryInterestLabel = styled(InterestLabel)`
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: ${({theme}) => theme.colors.secondary};
   font-weight: 500;
 `;
@@ -194,7 +212,7 @@ const InterestTag = styled.span`
   color: ${({theme}) => theme.colors.text};
   padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
   border-radius: 20px;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
   border: 1px solid ${({theme}) => `${theme.colors.primary}30`};
   transition: all 0.2s ease;
@@ -213,7 +231,7 @@ const SecondaryInterestTags = styled(InterestTags)``;
 const SecondaryInterestTag = styled(InterestTag)`
   background: ${({theme}) => `${theme.colors.secondary}15`};
   border: 1px solid ${({theme}) => `${theme.colors.secondary}25`};
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 
   &:hover {
     background: ${({theme}) => `${theme.colors.secondary}25`};
@@ -221,8 +239,8 @@ const SecondaryInterestTag = styled(InterestTag)`
 `;
 
 const TechSection = styled.section`
-  margin-bottom: ${({theme}) => theme.spacing.xl};
-  padding: ${({theme}) => theme.spacing.xl};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.lg};
   background: ${({theme}) => `${theme.colors.background}E6`};
   backdrop-filter: blur(20px);
   border-radius: 20px;
@@ -251,11 +269,16 @@ const TechSection = styled.section`
     opacity: 0.1;
     animation: ${shimmer} 4s infinite;
   }
+
+  @media (max-width: 768px) {
+    padding: ${({theme}) => theme.spacing.md};
+    margin-bottom: ${({theme}) => theme.spacing.md};
+  }
 `;
 
 const LinksSection = styled.section`
-  margin-bottom: ${({theme}) => theme.spacing.xl};
-  padding: ${({theme}) => theme.spacing.xl};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.lg};
   background: ${({theme}) => `${theme.colors.background}E6`};
   backdrop-filter: blur(20px);
   border-radius: 20px;
@@ -284,14 +307,19 @@ const LinksSection = styled.section`
     opacity: 0.1;
     animation: ${shimmer} 5s infinite;
   }
+
+  @media (max-width: 768px) {
+    padding: ${({theme}) => theme.spacing.md};
+    margin-bottom: ${({theme}) => theme.spacing.md};
+  }
 `;
 
 const SectionTitle = styled.h3`
   color: ${({theme}) => theme.colors.text};
-  margin-bottom: ${({theme}) => theme.spacing.lg};
-  padding-bottom: ${({theme}) => theme.spacing.sm};
+  margin-bottom: ${({theme}) => theme.spacing.md};
+  padding-bottom: ${({theme}) => theme.spacing.xs};
   border-bottom: 2px solid ${({theme}) => `${theme.colors.purple}30`};
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 600;
   text-shadow: 0 2px 5px ${({theme}) => `${theme.colors.purple}20`};
   position: relative;
@@ -319,12 +347,16 @@ const LinksSectionTitle = styled(SectionTitle)`
 const SkillGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: ${({theme}) => theme.spacing.lg};
-  margin-top: ${({theme}) => theme.spacing.lg};
+  gap: ${({theme}) => theme.spacing.md};
+  margin-top: ${({theme}) => theme.spacing.md};
+
+  @media (max-width: 768px) {
+    gap: ${({theme}) => theme.spacing.sm};
+  }
 `;
 
 const BackendSkillCategory = styled.div`
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   background: ${({theme}) => `${theme.colors.background}B3`};
   backdrop-filter: blur(10px);
   border-radius: 16px;
@@ -334,7 +366,7 @@ const BackendSkillCategory = styled.div`
   overflow: hidden;
 
   &:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-5px) scale(1.02);
     box-shadow: 0 15px 30px ${({theme}) => `${theme.colors.indigo}25`};
     background: ${({theme}) => `${theme.colors.background}CC`};
   }
@@ -353,6 +385,10 @@ const BackendSkillCategory = styled.div`
 
   &:hover::before {
     opacity: 1;
+  }
+
+  @media (max-width: 768px) {
+    padding: ${({theme}) => theme.spacing.sm};
   }
 `;
 
@@ -394,8 +430,8 @@ const OthersSkillCategory = styled(BackendSkillCategory)`
 
 const SkillTitle = styled.h4`
   color: ${({theme}) => theme.colors.text};
-  margin-bottom: ${({theme}) => theme.spacing.md};
-  font-size: 1.2rem;
+  margin-bottom: ${({theme}) => theme.spacing.sm};
+  font-size: 1.1rem;
   font-weight: 600;
   text-shadow: 0 1px 3px ${({theme}) => `${theme.colors.primary}30`};
 `;
@@ -407,11 +443,12 @@ const SkillList = styled.ul`
 `;
 
 const SkillItem = styled.li`
-  padding: ${({theme}) => theme.spacing.sm} 0;
+  padding: ${({theme}) => theme.spacing.xs} 0;
   color: ${({theme}) => `${theme.colors.text}E6`};
   display: flex;
   align-items: center;
   font-weight: 400;
+  font-size: 0.95rem;
   transition: all 0.2s ease;
 
   &:hover {
@@ -436,15 +473,15 @@ const SkillItem = styled.li`
 const ContactInfo = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: ${({theme}) => theme.spacing.lg};
-  margin-top: ${({theme}) => theme.spacing.lg};
+  gap: ${({theme}) => theme.spacing.md};
+  margin-top: ${({theme}) => theme.spacing.md};
 `;
 
 const ContactItem = styled.div`
   display: flex;
   align-items: center;
-  gap: ${({theme}) => theme.spacing.md};
-  padding: ${({theme}) => theme.spacing.lg};
+  gap: ${({theme}) => theme.spacing.sm};
+  padding: ${({theme}) => theme.spacing.md};
   background: ${({theme}) => `${theme.colors.background}B3`};
   backdrop-filter: blur(10px);
   border-radius: 16px;
@@ -457,12 +494,16 @@ const ContactItem = styled.div`
     box-shadow: 0 15px 30px ${({theme}) => `${theme.colors.emerald}25`};
     background: ${({theme}) => `${theme.colors.background}CC`};
   }
+
+  @media (max-width: 768px) {
+    padding: ${({theme}) => theme.spacing.sm};
+  }
 `;
 
 const ContactIcon = styled.div`
-  font-size: 2rem;
-  width: 60px;
-  height: 60px;
+  font-size: 1.5rem;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -471,17 +512,24 @@ const ContactIcon = styled.div`
   backdrop-filter: blur(10px);
   color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
 `;
 
 const ContactText = styled.div`
   color: ${({theme}) => `${theme.colors.text}E6`};
   flex: 1;
+  font-size: 0.95rem;
 
   strong {
     color: ${({theme}) => theme.colors.text};
     font-weight: 600;
     display: block;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
     text-shadow: 0 1px 3px ${({theme}) => `${theme.colors.emerald}30`};
   }
 
@@ -494,15 +542,19 @@ const ContactText = styled.div`
       color: ${({theme}) => theme.colors.emerald};
     }
   }
+
+  @media (max-width: 768px) {
+    font-size: 0.9rem;
+  }
 `;
 
 const CopyButton = styled.button`
   background: ${({theme}) => theme.gradients.socialGradient};
   color: white;
   border: none;
-  border-radius: 10px;
-  padding: 10px 16px;
-  font-size: 0.9rem;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -536,6 +588,11 @@ const CopyButton = styled.button`
 
   &:hover::before {
     left: 100%;
+  }
+
+  @media (max-width: 768px) {
+    padding: 6px 12px;
+    font-size: 0.8rem;
   }
 `;
 
@@ -591,7 +648,7 @@ const AboutPage: React.FC = () => {
                 <ContentWrapper>
                     <AboutHeader>
                         <ProfileImage>
-                            <img width={180} src={'/images/profile.PNG'} alt="Profile Image"/>
+                            <img width={120} src={'/images/profile.PNG'} alt="Profile Image"/>
                         </ProfileImage>
                         <Name>Backend Developer</Name>
 

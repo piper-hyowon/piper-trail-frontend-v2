@@ -69,19 +69,19 @@ interface Project {
 const ProjectsContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
 `;
 
 const FilterContainer = styled.div`
   display: flex;
-  gap: ${({theme}) => theme.spacing.sm};
-  margin-bottom: ${({theme}) => theme.spacing.xl};
+  gap: ${({theme}) => theme.spacing.xs};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
   flex-wrap: wrap;
   justify-content: center;
 `;
 
 const FilterButton = styled.button<{ $active: boolean }>`
-  padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.md}`};
+  padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
   border: 2px solid ${({theme, $active}) =>
           $active ? theme.colors.primary : `${theme.colors.primary}30`};
   background: ${({theme, $active}) =>
@@ -91,6 +91,7 @@ const FilterButton = styled.button<{ $active: boolean }>`
   border-radius: ${({theme}) => theme.borderRadius};
   cursor: pointer;
   font-weight: bold;
+  font-size: ${({theme}) => theme.fontSizes.small};
   transition: ${({theme}) => theme.transitions.default};
 
   &:hover {
@@ -103,22 +104,22 @@ const FilterButton = styled.button<{ $active: boolean }>`
 const ProjectsGrid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.lg};
+  gap: ${({theme}) => theme.spacing.md};
 `;
 
 const ProjectCard = styled.div`
   background: ${({theme}) => theme.colors.background};
   border-radius: ${({theme}) => theme.borderRadius};
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   box-shadow: 0 4px 12px ${({theme}) => `${theme.colors.primary}20`};
   border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
   transition: ${({theme}) => theme.transitions.default};
   position: relative;
   overflow: visible;
   display: grid;
-  grid-template-columns: 200px 1fr 200px;
-  grid-template-rows: auto auto auto auto auto;
-  gap: ${({theme}) => theme.spacing.lg};
+  grid-template-columns: 150px 1fr 180px;
+  grid-template-rows: auto auto auto auto auto auto; // 6개로 증가
+  gap: ${({theme}) => theme.spacing.md};
   align-items: start;
 
   &:hover {
@@ -132,20 +133,21 @@ const ProjectCard = styled.div`
     top: 0;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 3px;
     background: ${({theme}) => theme.gradients.seaGradient};
   }
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto auto auto auto auto;
-    gap: ${({theme}) => theme.spacing.md};
+    grid-template-rows: auto auto auto auto auto auto auto auto;  // 8개로 증가
+    gap: ${({theme}) => theme.spacing.sm};
+    padding: ${({theme}) => theme.spacing.sm};
   }
 `;
 
 const ProjectImage = styled.div<{ $imageUrl?: string }>`
-  width: 200px;
-  height: 150px;
+  width: 150px;
+  height: 120px;
   background: ${({$imageUrl, theme}) =>
           $imageUrl
                   ? `url(${$imageUrl}) center/cover`
@@ -155,7 +157,7 @@ const ProjectImage = styled.div<{ $imageUrl?: string }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: white;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   grid-column: 1;
@@ -163,7 +165,7 @@ const ProjectImage = styled.div<{ $imageUrl?: string }>`
 
   @media (max-width: 768px) {
     width: 100%;
-    height: 120px;
+    height: 100px;
     grid-column: 1;
     grid-row: 1;
   }
@@ -185,15 +187,15 @@ const ProjectMainInfo = styled.div`
 
 const ProjectTitle = styled.h3`
   color: ${({theme}) => theme.colors.primary};
-  margin: 0 0 ${({theme}) => theme.spacing.sm} 0;
-  font-size: ${({theme}) => theme.fontSizes.xlarge};
+  margin: 0 0 ${({theme}) => theme.spacing.xs} 0;
+  font-size: ${({theme}) => theme.fontSizes.large};
 `;
 
 const ProjectDescription = styled.p`
   color: ${({theme}) => `${theme.colors.text}90`};
-  line-height: 1.6;
+  line-height: 1.5;
   margin: 0;
-  font-size: ${({theme}) => theme.fontSizes.medium};
+  font-size: ${({theme}) => theme.fontSizes.small};
 `;
 
 const ProjectMetaInfo = styled.div`
@@ -201,7 +203,7 @@ const ProjectMetaInfo = styled.div`
   grid-row: 1;
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.xs};
   align-items: flex-end;
   min-height: 0;
 
@@ -289,30 +291,30 @@ const ProjectMeta = styled.div`
 
 const RoleExpandedContainer = styled.div<{ $isExpanded: boolean }>`
   grid-column: 1 / -1;
-  grid-row: 2;
-  margin-top: ${({theme}) => theme.spacing.xl};
-  padding: ${({theme}) => theme.spacing.md};
+  grid-row: 3;
+  margin-top: ${({theme}) => theme.spacing.md};
+  padding: ${({theme}) => theme.spacing.sm};
   background: ${({theme}) => `${theme.colors.primary}05`};
   border-radius: ${({theme}) => theme.borderRadius};
   border-left: 3px solid ${({theme}) => theme.colors.primary};
 
-
   ul {
     color: ${({theme}) => `${theme.colors.text}95`};
-    padding-left: ${({theme}) => theme.spacing.md};
+    padding-left: ${({theme}) => theme.spacing.sm};
     columns: 2;
-    column-gap: ${({theme}) => theme.spacing.lg};
+    column-gap: ${({theme}) => theme.spacing.md};
 
     li {
       margin-bottom: ${({theme}) => theme.spacing.xs};
-      line-height: 1.6;
+      line-height: 1.4;
       break-inside: avoid;
       font-size: ${({theme}) => theme.fontSizes.small};
     }
   }
 
   @media (max-width: 768px) {
-    grid-row: 4;
+    grid-row: 5;
+    margin-top: ${({theme}) => theme.spacing.sm};
 
     ul {
       columns: 1;
@@ -356,12 +358,12 @@ const ExpandableRole = styled.div`
 
 const TechStackSection = styled.div`
   grid-column: 1 / -1;
-  grid-row: 3;
-  margin-top: ${({theme}) => theme.spacing.sm};
+  grid-row: 4;
+  margin-top: ${({theme}) => theme.spacing.xs};
 
   @media (max-width: 768px) {
     grid-column: 1;
-    grid-row: 5;
+    grid-row: 6;
     margin-top: 0;
   }
 `;
@@ -378,7 +380,7 @@ const TechLabel = styled.span`
   font-weight: bold;
   color: ${({theme}) => theme.colors.primary};
   font-size: ${({theme}) => theme.fontSizes.small};
-  min-width: 120px;
+  min-width: 100px;
 `;
 
 const TechTags = styled.div`
@@ -398,17 +400,18 @@ const TechTag = styled.span`
 
 const HighlightsSection = styled.div`
   grid-column: 1 / -1;
-  grid-row: 4;
+  grid-row: 5;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: ${({theme}) => theme.spacing.lg};
-  margin-top: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.md};
+  margin-top: ${({theme}) => theme.spacing.xs};
 
   @media (max-width: 768px) {
     grid-column: 1;
-    grid-row: 6;
+    grid-row: 7;
     grid-template-columns: 1fr;
     margin-top: 0;
+    gap: ${({theme}) => theme.spacing.sm};
   }
 `;
 
@@ -417,38 +420,39 @@ const HighlightCategory = styled.div``;
 const HighlightTitle = styled.h4`
   margin: 0 0 ${({theme}) => theme.spacing.xs} 0;
   color: ${({theme}) => theme.colors.primary};
-  font-size: ${({theme}) => theme.fontSizes.medium};
+  font-size: ${({theme}) => theme.fontSizes.small};
+  font-weight: 600;
 `;
 
 const HighlightList = styled.ul`
   margin: 0;
-  padding-left: ${({theme}) => theme.spacing.md};
+  padding-left: ${({theme}) => theme.spacing.sm};
   color: ${({theme}) => `${theme.colors.text}80`};
 `;
 
 const HighlightItem = styled.li`
-  margin-bottom: ${({theme}) => theme.spacing.xs};
-  line-height: 1.4;
+  margin-bottom: 2px;
+  line-height: 1.3;
   font-size: ${({theme}) => theme.fontSizes.small};
 `;
 
 const ProjectLinks = styled.div`
   grid-column: 1 / -1;
-  grid-row: 5;
+  grid-row: 6;
   display: flex;
-  gap: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.xs};
   flex-wrap: wrap;
-  margin-top: ${({theme}) => theme.spacing.sm};
+  margin-top: ${({theme}) => theme.spacing.xs};
 
   @media (max-width: 768px) {
     grid-column: 1;
-    grid-row: 7;
+    grid-row: 8;
     margin-top: 0;
   }
 `;
 
 const ProjectLink = styled.a`
-  padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.md}`};
+  padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.sm}`};
   background: ${({theme}) => theme.colors.primary};
   color: ${({theme}) => theme.colors.background};
   text-decoration: none;
@@ -469,7 +473,7 @@ const ProjectLink = styled.a`
 
 const EmptyState = styled.div`
   text-align: center;
-  padding: ${({theme}) => theme.spacing.xl};
+  padding: ${({theme}) => theme.spacing.lg};
   color: ${({theme}) => `${theme.colors.text}60`};
   font-style: italic;
   background: ${({theme}) => theme.gradients.contentBackground};
@@ -696,6 +700,16 @@ const projects: Project[] = [
     },
 ];
 
+const RoleSummaryContainer = styled.div`
+  grid-column: 1 / -1;
+  grid-row: 2;
+
+  @media (max-width: 768px) {
+    grid-column: 1;
+    grid-row: 4;
+  }
+`;
+
 const RoleSection: React.FC<{
     project: Project;
     language: 'ko' | 'en';
@@ -709,7 +723,7 @@ const RoleSection: React.FC<{
 
     return (
         <>
-            <div style={{gridColumn: '1 / -1', gridRow: '2'}}>
+            <RoleSummaryContainer>
                 <ExpandableRole onClick={() => hasDetails && setIsExpanded(!isExpanded)}>
                     <div className="role-summary">
                         <strong>Role:</strong> {summary}
@@ -720,7 +734,7 @@ const RoleSection: React.FC<{
                         )}
                     </div>
                 </ExpandableRole>
-            </div>
+            </RoleSummaryContainer>
 
             {isExpanded && hasDetails && (
                 <RoleExpandedContainer $isExpanded={isExpanded}>
@@ -776,26 +790,27 @@ const ProjectsPage: React.FC = () => {
     };
 
     const renderTechStack = (techStack: Project['techStack']) => {
-        const categoryOrder = ['backend', 'frontend', 'database', 'deployment', 'blockchain', 'architecture'];
+            const categoryOrder = ['backend', 'frontend', 'database', 'deployment', 'blockchain', 'architecture'];
 
-        return categoryOrder.map(category => {
-            const techs = techStack[category as keyof typeof techStack];
-            if (!techs || techs.length === 0) return null;
+            return categoryOrder.map(category => {
+                const techs = techStack[category as keyof typeof techStack];
+                if (!techs || techs.length === 0) return null;
 
-            const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
+                const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1);
 
-            return (
-                <TechRow key={category}>
-                    <TechLabel>{categoryLabel}:</TechLabel>
-                    <TechTags>
-                        {(techs as string[]).map((tech, index) => (
-                            <TechTag key={index}>{tech}</TechTag>
-                        ))}
-                    </TechTags>
-                </TechRow>
-            );
-        }).filter(Boolean);
-    };
+                return (
+                    <TechRow key={category}>
+                        <TechLabel>{categoryLabel}:</TechLabel>
+                        <TechTags>
+                            {(techs as string[]).map((tech, index) => (
+                                <TechTag key={index}>{tech}</TechTag>
+                            ))}
+                        </TechTags>
+                    </TechRow>
+                );
+            }).filter(Boolean);
+        }
+    ;
 
     return (
         <ProjectsContainer>

@@ -24,7 +24,6 @@ const NavigationWrapper = styled.div`
   right: 0;
   z-index: 200;
   background: ${({theme}) => theme.gradients.contentBackground};
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const MainContentWrapper = styled.div<{ $navHeight: number; $footerHeight: number; $statusHeight: number }>`
