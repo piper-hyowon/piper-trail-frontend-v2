@@ -12,8 +12,9 @@ import {usePostsByCategory, usePostsByTag, useSearchPosts, useCreatePost, useBul
 import {LoginCredentials, useApi} from '../context/ApiContext';
 import {useLanguage} from '../context/LanguageContext';
 import type {CreatePostRequest} from "../types/api.ts";
+import ReactDOM from 'react-dom';
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 2;
 const DEFAULT_SORT = 'createdAt,desc';
 
 const SORT_OPTIONS = [
@@ -49,17 +50,17 @@ const slideIn = keyframes`
 const PostListContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.xl};
+  gap: ${({theme}) => theme.spacing.lg};
   max-width: 1200px;
   margin: 0 auto;
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   animation: ${fadeIn} 0.6s ease-out;
 `;
 
 const PostListHeader = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.lg};
+  gap: ${({theme}) => theme.spacing.md};
 `;
 
 const TitleRow = styled.div`
@@ -85,7 +86,7 @@ const PostListTitle = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
   margin: 0 0 ${({theme}) => theme.spacing.xs} 0;
   animation: ${slideIn} 0.8s ease-out;
@@ -103,13 +104,14 @@ const CreatePostButton = styled.button`
   background: ${({theme}) => theme.gradients.purpleGradient};
   color: white;
   font-weight: 600;
-  padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.lg}`};
+  padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.md};
   border: none;
-  border-radius: 25px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
   cursor: pointer;
+  font-size: ${({theme}) => theme.fontSizes.small};
   transition: all ${({theme}) => theme.transitions.default};
   white-space: nowrap;
   height: fit-content;
@@ -129,15 +131,23 @@ const CreatePostButton = styled.button`
     cursor: not-allowed;
     transform: none;
   }
+
+  @media (max-width: 480px) {
+    padding: ${({theme}) => theme.spacing.xs};
+
+    span:not(:first-child) {
+      display: none;
+    }
+  }
 `;
 
 const FilterContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.sm};
   background: ${({theme}) => `${theme.colors.secondaryBackground}50`};
-  padding: ${({theme}) => theme.spacing.lg};
-  border-radius: 16px;
+  padding: ${({theme}) => theme.spacing.md};
+  border-radius: 12px;
   border: 1px solid ${({theme}) => `${theme.colors.primary}10`};
 
   @media (min-width: 769px) {
@@ -190,6 +200,7 @@ const StyledCard = styled(Card)`
   overflow: hidden;
   animation: ${fadeIn} 0.6s ease-out;
   animation-fill-mode: both;
+  padding: ${({theme}) => theme.spacing.md};
 
   &:nth-child(1) {
     animation-delay: 0.1s;
@@ -208,8 +219,8 @@ const StyledCard = styled(Card)`
   }
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     border-color: ${({theme}) => `${theme.colors.primary}30`};
   }
 `;
@@ -324,7 +335,16 @@ const ErrorContainer = styled.div`
 const PostsGrid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.lg};
+  gap: ${({theme}) => theme.spacing.md};
+
+  @media (min-width: 768px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const NoPostsMessage = styled.div`
@@ -359,18 +379,40 @@ const FormModal = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: ${({theme}) => theme.zIndex.modal};
+  padding: 20px; // 패딩 추가로 가장자리 여백 확보
+  box-sizing: border-box; // 패딩 포함한 크기 계산
+
 `;
 
 const ModalContent = styled.div`
   background-color: ${({theme}) => theme.colors.background};
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   border-radius: ${({theme}) => theme.borderRadius};
-  max-width: 1000px;
+  max-width: 800px; // 1000px → 800px로 줄임
   width: 90%;
-  max-height: 90vh;
+  max-height: 85vh; // 90vh → 85vh로 줄임
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+
+  /* 스크롤바 스타일 추가 */
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${({theme}) => theme.colors.primary}30;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    width: 95%;  // 100% → 95%로 변경
+    height: auto;  // 100% → auto로 변경
+    max-height: 95vh;  // 100vh → 95vh로 변경
+    margin: 10px;  // 여백 추가
+    border-radius: ${({theme}) => theme.borderRadius};  // 모바일에서도 둥근 모서리 유지
+  }
 `;
 
 const ModalHeader = styled.div`
@@ -835,19 +877,22 @@ const PostListPage: React.FC = () => {
 
             {/* 포스트 작성 모달 (검색 라우트가 아닐 때만) */}
             {showPostForm && !isSearchRoute && (
-                <FormModal>
-                    <ModalContent>
-                        <ModalHeader>
-                            <ModalTitle>{formatMessage('post.form.titles.create', {category: getCategoryName(currentCategory || '')})}</ModalTitle>
-                            <CloseButton onClick={handleFormCancel}>×</CloseButton>
-                        </ModalHeader>
-                        <PostForm
-                            category={currentCategory}
-                            onSubmit={handleFormSubmit}
-                            onCancel={handleFormCancel}
-                        />
-                    </ModalContent>
-                </FormModal>
+                ReactDOM.createPortal(
+                    <FormModal>
+                        <ModalContent>
+                            <ModalHeader>
+                                <ModalTitle>{formatMessage('post.form.titles.create', {category: getCategoryName(currentCategory || '')})}</ModalTitle>
+                                <CloseButton onClick={handleFormCancel}>×</CloseButton>
+                            </ModalHeader>
+                            <PostForm
+                                category={currentCategory}
+                                onSubmit={handleFormSubmit}
+                                onCancel={handleFormCancel}
+                            />
+                        </ModalContent>
+                    </FormModal>,
+                    document.getElementById('modal-root')!
+                )
             )}
 
             {/* 인증 모달 */}

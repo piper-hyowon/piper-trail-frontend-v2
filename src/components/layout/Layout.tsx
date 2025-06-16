@@ -22,7 +22,7 @@ const NavigationWrapper = styled.div`
   top: 0;
   left: 0;
   right: 0;
-  z-index: 200;
+  z-index: ${({theme}) => theme.zIndex.navigation};
   background: ${({theme}) => theme.gradients.contentBackground};
 `;
 
@@ -34,6 +34,16 @@ const MainContentWrapper = styled.div<{ $navHeight: number; $footerHeight: numbe
   right: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  z-index: 1;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${({theme}) => theme.colors.primary}30;
+    border-radius: 4px;
+  }
 `;
 
 const StatusWrapper = styled.div<{ $footerHeight: number }>`
@@ -130,6 +140,19 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
             <FooterWrapper ref={footerRef}>
                 <FooterLinks/>
             </FooterWrapper>
+
+            <div
+                id="modal-root"
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 99999,
+                    pointerEvents: 'none'
+                }}
+            />
         </LayoutContainer>
     );
 };

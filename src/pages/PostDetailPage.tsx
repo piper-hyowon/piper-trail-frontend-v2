@@ -17,20 +17,16 @@ import {CommentSection} from "../components/ui/comments/CommentSection.tsx";
 import {useLanguage} from "../context/LanguageContext";
 import {renderMarkdown} from "../utils/markdoown.ts";
 import type {UpdatePostRequest} from "../types/api.ts";
+import ReactDOM from 'react-dom';
 
 const PostDetailContainer = styled.article`
   max-width: 1000px;
   margin: 0 auto;
-  padding: ${({theme}) => theme.spacing.md} ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.sm} ${({theme}) => theme.spacing.md};
 
-  /* 모바일 반응형 */
   @media (max-width: 768px) {
-    padding: ${({theme}) => theme.spacing.sm};
+    padding: ${({theme}) => theme.spacing.xs};
     max-width: 100%;
-  }
-
-  @media (min-width: 1200px) {
-    max-width: 1100px;
   }
 `;
 
@@ -41,7 +37,8 @@ const BackButton = styled(Link)`
   color: ${({theme}) => theme.colors.primary};
   text-decoration: none;
   font-weight: 500;
-  margin-bottom: ${({theme}) => theme.spacing.lg};
+  font-size: ${({theme}) => theme.fontSizes.small};
+  margin-bottom: ${({theme}) => theme.spacing.md};
   padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
   border-radius: ${({theme}) => theme.borderRadius};
   background: ${({theme}) => `${theme.colors.primary}10`};
@@ -60,27 +57,27 @@ const BackButton = styled(Link)`
 `;
 
 const PostHeader = styled.header`
-  margin-bottom: ${({theme}) => theme.spacing.xl};
-  padding: ${({theme}) => theme.spacing.lg};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   background: ${({theme}) => theme.colors.background};
   border-radius: ${({theme}) => theme.borderRadius};
-  border-left: 4px solid ${({theme}) => theme.colors.primary};
+  border-left: 3px solid ${({theme}) => theme.colors.primary};
 `;
 
 const PostTitle = styled.h1`
   color: ${({theme}) => theme.colors.primary};
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
   line-height: 1.2;
-  margin-bottom: ${({theme}) => theme.spacing.md};
+  margin-bottom: ${({theme}) => theme.spacing.sm};
   word-break: keep-all;
 `;
 
 const PostSubtitle = styled.h2`
   color: ${({theme}) => theme.colors.text}80;
-  font-size: clamp(1.2rem, 3vw, 1.6rem);
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
   font-weight: 400;
   line-height: 1.4;
-  margin: -${({theme}) => theme.spacing.sm} 0 ${({theme}) => theme.spacing.md} 0;
+  margin: -${({theme}) => theme.spacing.xs} 0 ${({theme}) => theme.spacing.sm} 0;
   font-style: italic;
   word-break: keep-all;
 `;
@@ -133,11 +130,11 @@ const TagSection = styled.div`
 `;
 
 const PostContent = styled.div`
-  line-height: 1.8;
-  font-size: 1.1rem;
+  line-height: 1.7;
+  font-size: 1rem;
   color: ${({theme}) => theme.colors.text};
-  margin-bottom: ${({theme}) => theme.spacing.xl};
-  padding: ${({theme}) => theme.spacing.lg};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   background: ${({theme}) => theme.colors.background};
   border-radius: ${({theme}) => theme.borderRadius};
   box-shadow: 0 2px 8px ${({theme}) => `${theme.colors.primary}10`};
@@ -149,26 +146,26 @@ const PostContent = styled.div`
   h5,
   h6 {
     color: ${({theme}) => theme.colors.primary};
-    margin-top: ${({theme}) => theme.spacing.xl};
-    margin-bottom: ${({theme}) => theme.spacing.md};
+    margin-top: ${({theme}) => theme.spacing.lg};
+    margin-bottom: ${({theme}) => theme.spacing.sm};
     padding-bottom: ${({theme}) => theme.spacing.xs};
-    border-bottom: 2px solid ${({theme}) => `${theme.colors.primary}20`};
+    border-bottom: 1px solid ${({theme}) => `${theme.colors.primary}20`};
   }
 
   h1 {
-    font-size: 2rem;
-  }
-
-  h2 {
     font-size: 1.7rem;
   }
 
-  h3 {
+  h2 {
     font-size: 1.4rem;
   }
 
+  h3 {
+    font-size: 1.2rem;
+  }
+
   p {
-    margin-bottom: ${({theme}) => theme.spacing.md};
+    margin-bottom: ${({theme}) => theme.spacing.sm};
     text-align: justify;
   }
 
@@ -188,10 +185,10 @@ const PostContent = styled.div`
 
   pre {
     background: ${({theme}) => `${theme.colors.primary}10`};
-    padding: ${({theme}) => theme.spacing.md};
+    padding: ${({theme}) => theme.spacing.sm};
     border-radius: ${({theme}) => theme.borderRadius};
     overflow-x: auto;
-    margin: ${({theme}) => theme.spacing.md} 0;
+    margin: ${({theme}) => theme.spacing.sm} 0;
 
     code {
       background: transparent;
@@ -200,9 +197,9 @@ const PostContent = styled.div`
   }
 
   blockquote {
-    border-left: 4px solid ${({theme}) => theme.colors.primary};
-    padding: ${({theme}) => theme.spacing.md};
-    margin: ${({theme}) => theme.spacing.md} 0;
+    border-left: 3px solid ${({theme}) => theme.colors.primary};
+    padding: ${({theme}) => theme.spacing.sm};
+    margin: ${({theme}) => theme.spacing.sm} 0;
     background: ${({theme}) => `${theme.colors.primary}05`};
     border-radius: 0 ${({theme}) => theme.borderRadius} ${({theme}) => theme.borderRadius} 0;
     font-style: italic;
@@ -211,8 +208,8 @@ const PostContent = styled.div`
 
   ul,
   ol {
-    margin-bottom: ${({theme}) => theme.spacing.md};
-    padding-left: ${({theme}) => theme.spacing.lg};
+    margin-bottom: ${({theme}) => theme.spacing.sm};
+    padding-left: ${({theme}) => theme.spacing.md};
   }
 
   li {
@@ -236,6 +233,12 @@ const PostContent = styled.div`
     background: ${({theme}) => theme.colors.secondaryBackground};
     border-radius: ${({theme}) => theme.borderRadius};
     overflow: hidden;
+
+    @media (max-width: 768px) {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
   }
 
   th,
@@ -250,14 +253,33 @@ const PostContent = styled.div`
     font-weight: bold;
     color: ${({theme}) => theme.colors.primary};
   }
+
+  font-size: 1rem;
+
+
+  @media (max-width: 768px) {
+    font-size: 0.95rem;
+
+    h1 {
+      font-size: 1.5rem;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+    }
+
+    h3 {
+      font-size: 1.1rem;
+    }
+  }
 `;
 
 const PostFooter = styled.footer`
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   background: ${({theme}) => theme.colors.background};
   border-radius: ${({theme}) => theme.borderRadius};
-  border-top: 3px solid ${({theme}) => theme.colors.primary};
-  margin-bottom: ${({theme}) => theme.spacing.xl};
+  border-top: 2px solid ${({theme}) => theme.colors.primary};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
 `;
 
 const FooterContent = styled.div`
@@ -322,8 +344,8 @@ const ActionButton = styled.button<{ $variant?: "edit" | "delete" }>`
 `;
 
 const ResourceLinksSection = styled.section`
-  margin-top: ${({theme}) => theme.spacing.xl};
-  padding: ${({theme}) => theme.spacing.lg};
+  margin-top: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   background: ${({theme}) => theme.colors.background};
   border-radius: ${({theme}) => theme.borderRadius};
   border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
@@ -384,18 +406,35 @@ const FormModal = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 10000;
 `;
 
 const ModalContent = styled.div`
   background-color: ${({theme}) => theme.colors.background};
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   border-radius: ${({theme}) => theme.borderRadius};
-  max-width: 600px;
+  max-width: 800px;
   width: 90%;
-  max-height: 90vh;
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${({theme}) => theme.colors.primary}30;
+    border-radius: 4px;
+  }
+
+  @media (max-width: 768px) {
+    width: 95%;
+    height: auto;
+    max-height: 95vh;
+    margin: 10px;
+    border-radius: ${({theme}) => theme.borderRadius};
+  }
 `;
 
 const ModalHeader = styled.div`
@@ -863,29 +902,32 @@ const PostDetailPage: React.FC = () => {
 
             {/* Update Post Modal */}
             {showUpdateForm && (
-                <FormModal>
-                    <ModalContent>
-                        <ModalHeader>
-                            <ModalTitle>{t("post.form.titles.edit" as any)}</ModalTitle>
-                            <CloseButton onClick={handleFormCancel}>×</CloseButton>
-                        </ModalHeader>
-                        <PostForm
-                            category={post.category || "uncategorized"}
-                            initialData={{
-                                title: post.title,
-                                titleEn: post.titleEn,
-                                subtitle: post.subtitle,
-                                subtitleEn: post.subtitleEn,
-                                content: post.content,
-                                contentEn: post.contentEn || '',
-                                tags: post.tags || [],
-                                imageFiles: []
-                            }}
-                            onSubmit={handleUpdateSubmit}
-                            onCancel={handleFormCancel}
-                        />
-                    </ModalContent>
-                </FormModal>
+                ReactDOM.createPortal(
+                    <FormModal>
+                        <ModalContent>
+                            <ModalHeader>
+                                <ModalTitle>{t("post.form.titles.edit" as any)}</ModalTitle>
+                                <CloseButton onClick={handleFormCancel}>×</CloseButton>
+                            </ModalHeader>
+                            <PostForm
+                                category={post.category || "uncategorized"}
+                                initialData={{
+                                    title: post.title,
+                                    titleEn: post.titleEn,
+                                    subtitle: post.subtitle,
+                                    subtitleEn: post.subtitleEn,
+                                    content: post.content,
+                                    contentEn: post.contentEn || '',
+                                    tags: post.tags || [],
+                                    imageFiles: []
+                                }}
+                                onSubmit={handleUpdateSubmit}
+                                onCancel={handleFormCancel}
+                            />
+                        </ModalContent>
+                    </FormModal>
+                    , document.getElementById('modal-root')!
+                )
             )}
 
             {/* Delete Confirm Modal */}

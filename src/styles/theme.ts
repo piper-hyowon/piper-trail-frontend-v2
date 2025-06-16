@@ -1,6 +1,14 @@
 export type ThemeMode = 'light' | 'dark';
 
 export interface Theme {
+    zIndex: {
+        footer: number;
+        statusBar: number;
+        navigation: number;
+        modal: number;
+        modalOverlay: number;
+        tooltip: number;
+    };
     gradients: {
         skyToTransparent: string;
         transparentToSea: string;
@@ -61,6 +69,14 @@ export interface Theme {
 
 export const theme: Record<ThemeMode, Theme> = {
     light: {
+        zIndex: {
+            footer: 100,
+            statusBar: 150,
+            navigation: 200,
+            modal: 9999,
+            modalOverlay: 9998,
+            tooltip: 10000,
+        },
         seaColors: ['#40E0D0', 'rgba(126,206,213,0.46)', '#00CED1'],
         skyColors: ['#BBDEFB', '#FFCCBC', '#FFE0B2'],
         gradients: {
@@ -119,6 +135,14 @@ export const theme: Record<ThemeMode, Theme> = {
         },
     },
     dark: {
+        zIndex: {
+            footer: 100,
+            statusBar: 150,
+            navigation: 200,
+            modal: 9999,
+            modalOverlay: 9998,
+            tooltip: 10000,
+        },
         seaColors: ['#154459', '#206a7a', '#2a7f91'],
         skyColors: ['#0A1931', 'rgba(24,90,219,0.44)', '#5BC0BE'],
         gradients: {

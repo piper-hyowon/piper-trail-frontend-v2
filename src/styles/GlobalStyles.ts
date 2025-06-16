@@ -154,4 +154,27 @@ export const GlobalStyles = createGlobalStyle`
   .mono {
     font-family: 'Roboto Mono', monospace;
   }
+
+  #modal-root {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 10000 !important;
+    pointer-events: none !important;
+  }
+
+  #modal-root > * {
+    pointer-events: auto !important;
+  }
+
+  #modal-root {
+    z-index: 10000 !important;
+  }
+
+  [class*="NavigationWrapper"] {
+    z-index: 200 !important;
+  }
 `;
+

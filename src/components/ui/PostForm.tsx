@@ -31,6 +31,8 @@ const FormContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({theme}) => theme.spacing.md};
+  max-height: calc(80vh - 120px);
+  padding-right: ${({ theme }) => theme.spacing.xs}; 
 `;
 
 const FormField = styled.div`
@@ -61,6 +63,8 @@ const FormInput = styled.input`
 const TextareaContainer = styled.div`
   position: relative;
   height: 100%;
+  max-height: 300px;  // 최대 높이 제한
+  overflow-y: auto;
 `;
 
 const FormTextarea = styled.textarea`

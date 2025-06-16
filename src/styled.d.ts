@@ -2,6 +2,14 @@ import 'styled-components';
 
 declare module 'styled-components' {
     export interface DefaultTheme {
+        zIndex: {
+            footer: number;
+            statusBar: number;
+            navigation: number;
+            modal: number;
+            modalOverlay: number;
+            tooltip: number;
+        };
         gradients: {
             skyToTransparent: string;
             transparentToSea: string;
