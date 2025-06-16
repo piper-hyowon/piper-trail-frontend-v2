@@ -30,6 +30,65 @@ export const GlobalStyles = createGlobalStyle`
     letter-spacing: 0.01em;
   }
 
+  /* 드래그 방지 */
+  img {
+    -webkit-user-drag: none; /* Webkit/Chrome/Safari */
+    pointer-events: auto; /* 클릭은 가능하도록 */
+  }
+
+  /* 프로필, 로고, 장식용 이미지는 선택도 방지 */
+  .logo-image,
+  .profile-image,
+  .decorative-image,
+  .no-drag {
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* 모바일 드래그/선택 방지 */
+  @media (max-width: 768px) {
+    img {
+      -webkit-touch-callout: none;
+    }
+  }
+
+  article img,
+  .post-content img,
+  .content-image {
+    -webkit-user-drag: auto;
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+    user-select: auto;
+  }
+
+  /* 텍스트는 항상 선택 가능 */
+  p, span, div, h1, h2, h3, h4, h5, h6, li, td, th {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+
+  /* 코드 블록 가능 */
+  code, pre, .code-block {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+  }
+
+  /* 버튼과 인터랙티브 요소 선택 방지 */
+  button, a, label, select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
   a {
     color: ${({theme}) => theme.colors.primary};
     text-decoration: none;
