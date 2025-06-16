@@ -107,7 +107,7 @@ const SceneContent: React.FC<{
             />
 
             <Sea/>
-            <Dolphin position={[-60, -15, -100]} scale={0.05} isDay={isDay}
+            <Dolphin position={[-60, -15, -100]} scale={0.08} isDay={isDay}
                      onClick={handleDolphinClick}/>
 
             {finalIslands.map((island) => (
