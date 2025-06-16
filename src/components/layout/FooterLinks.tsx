@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import {useNavigate, useLocation} from 'react-router-dom';
 
 const FooterContainer = styled.footer`
-  padding: ${({theme}) => theme.spacing.md};
+  padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
   background: ${({theme}) => theme.gradients.seaGradient};
   border-top: 1px solid rgba(64, 224, 208, 0.3);
   position: relative;
@@ -13,61 +13,62 @@ const FooterContainer = styled.footer`
 const FooterContent = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-
   background: rgba(255, 255, 255, 0.9);
-  padding: ${({theme}) => theme.spacing.md};
+  padding: ${({theme}) => theme.spacing.xs};
   border-radius: ${({theme}) => theme.borderRadius};
   backdrop-filter: blur(10px);
 `;
 
-const FooterTitle = styled.div`
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: ${({theme}) => theme.spacing.sm};
-  color: ${({theme}) => theme.colors.primary};
-
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-`;
 const FooterNav = styled.div`
   display: flex;
-  gap: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.xs};
   flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
 `;
 
 const FooterLink = styled.div<{ $active: boolean }>`
-  padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.md}`};
+  padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.sm}`};
   background-color: ${({theme, $active}) =>
           $active ? theme.colors.primary : 'rgba(255, 255, 255, 0.8)'
   };
-
   color: ${({$active, theme}) =>
           $active ? '#ffffff' : theme.colors.text
   };
-
   border-radius: ${({theme}) => theme.borderRadius};
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
-
-  box-shadow: 0 2px 4px rgba(64, 224, 208, 0.2);
+  font-size: ${({theme}) => theme.fontSizes.small};
+  box-shadow: 0 1px 2px rgba(64, 224, 208, 0.2);
   border: 1px solid ${({theme, $active}) =>
           $active ? theme.colors.primary : 'rgba(64, 224, 208, 0.3)'
   };
-
   transition: ${({theme}) => theme.transitions.default};
 
   &:hover {
     background-color: ${({theme, $active}) =>
             $active ? theme.colors.primary : theme.colors.secondary
     };
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(64, 224, 208, 0.3);
+  }
 
-    color: ${({$active}) => $active ? '#ffffff' : '#ffffff'};
+  @media (max-width: 768px) {
+    padding: ${({theme}) => theme.spacing.xs};
 
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(64, 224, 208, 0.3);
+    span:last-child {
+      display: none;
+    }
+
+    span:first-child {
+      font-size: 18px;
+    }
   }
 `;
+
 const FooterLinks: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -85,7 +86,6 @@ const FooterLinks: React.FC = () => {
     return (
         <FooterContainer>
             <FooterContent>
-                <FooterTitle>Navigation</FooterTitle>
                 <FooterNav>
                     {links.map(link => (
                         <FooterLink
@@ -93,7 +93,8 @@ const FooterLinks: React.FC = () => {
                             $active={path === link.path}
                             onClick={() => navigate(link.path)}
                         >
-                            <span role="img" aria-label={link.label}>{link.icon}</span> {link.label}
+                            <span role="img" aria-label={link.label}>{link.icon}</span>
+                            <span>{link.label}</span>
                         </FooterLink>
                     ))}
                 </FooterNav>

@@ -9,25 +9,21 @@ interface StatusBarProps {
 }
 
 const StatusBarContainer = styled.div<{ $statusType: string }>`
-  padding: ${({theme}) => theme.spacing.md};
-  margin-top: auto;
+  padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
   background: ${({theme}) => theme.gradients.transparentToSea};
-  border: 2px solid ${({$statusType, theme}) =>
-          $statusType === 'success' ? `${theme.colors.success}60` :
-                  $statusType === 'warning' ? `${theme.colors.warning}60` :
-                          `${theme.colors.error}60`
+  border-top: 1px solid ${({$statusType, theme}) =>
+          $statusType === 'success' ? `${theme.colors.success}40` :
+                  $statusType === 'warning' ? `${theme.colors.warning}40` :
+                          `${theme.colors.error}40`
   };
   color: ${({$statusType, theme}) =>
           $statusType === 'success' ? theme.colors.success :
                   $statusType === 'warning' ? theme.colors.warning :
                           theme.colors.error
   };
-  border-radius: ${({theme}) => theme.borderRadius};
   font-family: 'Roboto Mono', monospace;
-  font-size: 14px;
-
+  font-size: 12px;
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-
 `;
 
 const StatusContent = styled.div`
@@ -36,29 +32,57 @@ const StatusContent = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-
+  gap: ${({theme}) => theme.spacing.sm};
   background: rgba(255, 255, 255, 0.7);
-  padding: ${({theme}) => theme.spacing.sm};
+  padding: ${({theme}) => theme.spacing.xs};
   border-radius: ${({theme}) => theme.borderRadius};
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
 `;
 
-const ApiUrlDisplay = styled.div`
-  font-family: 'Roboto Mono', monospace;
-  font-size: 12px;
+const StatusInfo = styled.div`
+  display: flex;
+  gap: ${({theme}) => theme.spacing.sm};
+  align-items: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    gap: ${({theme}) => theme.spacing.xs};
+  }
+`;
+
+const StatusCode = styled.span`
+  font-weight: bold;
+`;
+
+const ApiUrl = styled.span`
   opacity: 0.8;
-  margin-top: 5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 500px;
+
+  @media (max-width: 768px) {
+    max-width: 250px;
+  }
+`;
+
+const Timing = styled.span`
+  font-size: 11px;
+  opacity: 0.7;
 `;
 
 const StatusBar: React.FC<StatusBarProps> = ({statusCode: propStatusCode, statusText: propStatusText, timing}) => {
-    // API 컨텍스트에서 상태 가져오기
     const {apiUrl, method, statusCode: contextStatusCode} = useApi();
 
-    // 컨텍스트에 상태가 없으면 StatusBar 자체를 숨기거나 기본 상태 표시
     if (!contextStatusCode && !propStatusCode) {
-        return null; // 또는 기본 상태 표시
+        return null;
     }
 
-    // props가 제공되지 않으면 컨텍스트 값 사용
     const statusCode = propStatusCode || contextStatusCode || 200;
     const statusText = propStatusText || getStatusTextFromCode(statusCode);
 
@@ -69,42 +93,34 @@ const StatusBar: React.FC<StatusBarProps> = ({statusCode: propStatusCode, status
     };
 
     const statusType = getStatusType(statusCode);
+
     return (
         <StatusBarContainer $statusType={statusType}>
             <StatusContent>
-                <div>
-                    <div>HTTP/1.1 {statusCode} {statusText}</div>
-                    <ApiUrlDisplay>[{method}] {apiUrl}</ApiUrlDisplay>
-                </div>
-                {timing && <div>{timing}ms</div>}
+                <StatusInfo>
+                    <StatusCode>{statusCode} {statusText}</StatusCode>
+                    <ApiUrl>[{method}] {apiUrl}</ApiUrl>
+                </StatusInfo>
+                {timing && <Timing>{timing}ms</Timing>}
             </StatusContent>
         </StatusBarContainer>
     );
 };
 
 function getStatusTextFromCode(code: number): string {
-    switch (code) {
-        case 200:
-            return 'OK';
-        case 201:
-            return 'Created';
-        case 204:
-            return 'No Content';
-        case 400:
-            return 'Bad Request';
-        case 401:
-            return 'Unauthorized';
-        case 403:
-            return 'Forbidden';
-        case 404:
-            return 'Not Found';
-        case 405:
-            return 'Method Not Allowed';
-        case 500:
-            return 'Internal Server Error';
-        default:
-            return 'Unknown Status';
-    }
+    const statusTexts: Record<number, string> = {
+        200: 'OK',
+        201: 'Created',
+        204: 'No Content',
+        400: 'Bad Request',
+        401: 'Unauthorized',
+        403: 'Forbidden',
+        404: 'Not Found',
+        405: 'Method Not Allowed',
+        500: 'Internal Server Error'
+    };
+
+    return statusTexts[code] || 'Unknown Status';
 }
 
 export default StatusBar;
