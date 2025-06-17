@@ -27,7 +27,7 @@ interface ThreeJsVisualizationProps {
 }
 
 const CAMERA_CONFIG = {
-    position: [123, 24, 154] as [number, number, number],
+    position: [150, 24, 154] as [number, number, number],
     fov: 75,
 };
 
@@ -36,7 +36,7 @@ const ORBIT_CONTROLS_CONFIG = {
     maxPolarAngle: Math.PI / 2,
     minPolarAngle: Math.PI / 6,
     minDistance: 1,
-    maxDistance: 230,
+    maxDistance: 290,
     enablePan: false,
 };
 

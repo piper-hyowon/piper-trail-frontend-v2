@@ -54,6 +54,13 @@ const NavHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-bottom: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.md};
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: ${({theme}) => theme.spacing.sm};
+  }
 `;
 
 const Logo = styled.div`
@@ -69,6 +76,14 @@ const Logo = styled.div`
   &:hover {
     background-color: ${({theme}) => `${theme.colors.secondary}30`};
   }
+
+  @media (max-width: 768px) {
+    justify-content: center;
+
+    img {
+      width: 100px;
+    }
+  }
 `;
 
 const LogoTextContainer = styled.div`
@@ -81,6 +96,10 @@ const LogoText = styled.span`
   font-size: 24px;
   font-weight: bold;
   color: ${({theme}) => theme.colors.primary};
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 `;
 
 const LogoSmallTitle = styled.span`
@@ -94,12 +113,25 @@ const RightControls = styled.div`
   flex-direction: column;
   gap: ${({theme}) => theme.spacing.xs};
   align-items: flex-end;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    align-items: stretch;
+  }
 `;
 
 const TopRightControls = styled.div`
   display: flex;
   gap: ${({theme}) => theme.spacing.sm};
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+
+  @media (max-width: 768px) {
+    gap: ${({theme}) => theme.spacing.xs};
+    justify-content: space-between;
+    width: 100%;
+  }
 `;
 
 const LanguageToggle = styled.button`
@@ -170,6 +202,12 @@ const AuthStatusContainer = styled.div<{ $authenticated: boolean }>`
   font-size: ${({theme}) => theme.fontSizes.small};
   border: 1px solid ${({theme, $authenticated}) =>
           $authenticated ? `${theme.colors.success}30` : `${theme.colors.primary}30`};
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    font-size: ${({theme}) => '0.75rem'};
+    padding: ${({theme}) => `${'4px'} ${theme.spacing.xs}`};
+  }
 `;
 
 const AuthButtonGroup = styled.div`
@@ -208,6 +246,11 @@ const ApiControls = styled.div`
   display: flex;
   gap: ${({theme}) => theme.spacing.xs};
   align-items: center;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: ${({theme}) => theme.spacing.xs};
+  }
 `;
 
 const HeadersContainer = styled.div`
@@ -262,7 +305,7 @@ const FormModal = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: ${({ theme }) => theme.zIndex.modal};
+  z-index: ${({theme}) => theme.zIndex.modal};
 `;
 
 const ModalContent = styled.div`
@@ -307,6 +350,33 @@ const SearchContainer = styled.div<{ $visible: boolean }>`
   max-height: ${({$visible}) => $visible ? '40px' : '0'};
   overflow: hidden;
   transition: all 0.3s ease;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    margin-top: ${({theme, $visible}) => $visible ? theme.spacing.xs : '0'};
+  }
+`;
+
+const MobileControlGroup = styled.div`
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    gap: ${({theme}) => theme.spacing.xs};
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+`;
+
+const DesktopControlGroup = styled.div`
+  display: flex;
+  gap: ${({theme}) => theme.spacing.sm};
+  align-items: center;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const NavigationBar: React.FC = () => {
@@ -803,37 +873,70 @@ const NavigationBar: React.FC = () => {
 
                     <RightControls>
                         <TopRightControls>
-                            <LanguageToggle onClick={toggleLanguage}>
-                                {language === 'en' ? '한국어' : 'English'}
-                            </LanguageToggle>
+                            <DesktopControlGroup>
+                                <LanguageToggle onClick={toggleLanguage}>
+                                    {language === 'en' ? '한국어' : 'English'}
+                                </LanguageToggle>
 
-                            <ThemeToggleSwitch
-                                $isDark={themeMode === 'dark'}
-                                onClick={toggleTheme}
-                                aria-label={`Switch to ${themeMode === 'light' ? 'dark' : 'light'} mode`}
-                            />
+                                <ThemeToggleSwitch
+                                    $isDark={themeMode === 'dark'}
+                                    onClick={toggleTheme}
+                                    aria-label={`Switch to ${themeMode === 'light' ? 'dark' : 'light'} mode`}
+                                />
 
+                                <AuthStatusContainer $authenticated={isAuthenticated}>
+                                    {isAuthenticated ? '🔒' : '🔓'}
+                                    {isAuthenticated ? t('layout.auth.authenticated' as any) : t('layout.auth.notAuthenticated' as any)}
+                                </AuthStatusContainer>
 
-                            <AuthStatusContainer $authenticated={isAuthenticated}>
-                                {isAuthenticated ? '🔒' : '🔓'}
-                                {isAuthenticated ? t('layout.auth.authenticated' as any) : t('layout.auth.notAuthenticated' as any)}
-                            </AuthStatusContainer>
+                                <AuthButtonGroup>
+                                    {!isAuthenticated ? (
+                                        <Tooltip content={t('layout.auth.adminLogin' as any)}>
+                                            <AuthButton onClick={handleAuthButtonClick}>
+                                                <IoPersonOutline size={16}/>
+                                            </AuthButton>
+                                        </Tooltip>
+                                    ) : (
+                                        <Tooltip content={t('layout.auth.logout' as any)}>
+                                            <LogoutButton onClick={handleLogout}>
+                                                <IoLogOutOutline size={16}/>
+                                            </LogoutButton>
+                                        </Tooltip>
+                                    )}
+                                </AuthButtonGroup>
+                            </DesktopControlGroup>
 
-                            <AuthButtonGroup>
-                                {!isAuthenticated ? (
-                                    <Tooltip content={t('layout.auth.adminLogin' as any)}>
+                            <MobileControlGroup>
+                                <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                                    <LanguageToggle onClick={toggleLanguage}>
+                                        {language === 'en' ? '한국어' : 'English'}
+                                    </LanguageToggle>
+                                    <ThemeToggleSwitch
+                                        $isDark={themeMode === 'dark'}
+                                        onClick={toggleTheme}
+                                        aria-label={`Switch to ${themeMode === 'light' ? 'dark' : 'light'} mode`}
+                                    />
+                                </div>
+
+                                <AuthButtonGroup>
+                                    {!isAuthenticated ? (
                                         <AuthButton onClick={handleAuthButtonClick}>
                                             <IoPersonOutline size={16}/>
                                         </AuthButton>
-                                    </Tooltip>
-                                ) : (
-                                    <Tooltip content={t('layout.auth.logout' as any)}>
+                                    ) : (
                                         <LogoutButton onClick={handleLogout}>
                                             <IoLogOutOutline size={16}/>
                                         </LogoutButton>
-                                    </Tooltip>
-                                )}
-                            </AuthButtonGroup>
+                                    )}
+                                </AuthButtonGroup>
+                            </MobileControlGroup>
+
+                            <MobileControlGroup>
+                                <AuthStatusContainer $authenticated={isAuthenticated}>
+                                    {isAuthenticated ? '🔒' : '🔓'}
+                                    {isAuthenticated ? t('layout.auth.authenticated' as any) : t('layout.auth.notAuthenticated' as any)}
+                                </AuthStatusContainer>
+                            </MobileControlGroup>
                         </TopRightControls>
 
                         <SearchContainer $visible={showSearch}>
