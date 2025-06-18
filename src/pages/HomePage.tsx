@@ -9,12 +9,14 @@ const HomeContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({theme}) => theme.spacing.lg};
+  height: 100%;
 `;
 
 const CategoriesGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: ${({theme}) => theme.spacing.md};
+  padding: ${({theme}) => theme.spacing.lg};
 `;
 
 const CategoryDescription = styled.p`
@@ -29,12 +31,9 @@ const ApiLinkText = styled.div`
 `;
 
 const ThreeJsContainer = styled.div`
-  height: 700px;
-  width: 100vw;
-  margin: calc(-${({theme}) => theme.spacing.lg}) 0 calc(-${({theme}) => theme.spacing.lg}) 50%;
-  transform: translateX(-50%);
-  border-radius: 12px;
-  overflow: hidden;
+  flex: 1;
+  width: 100%;
+  min-height: 700px;
   position: relative;
 `;
 

@@ -65,7 +65,7 @@ const DolphinPageFont = createGlobalStyle`
 `;
 
 const DolphinContainer = styled.div`
-  min-height: 50vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -73,11 +73,7 @@ const DolphinContainer = styled.div`
   background: ${({theme}) => theme.gradients.transparentToSea};
   position: relative;
   overflow: hidden;
-
-  height: 700px;
-  width: 100vw;
-  margin: calc(-${({theme}) => theme.spacing.lg}) 0 calc(-${({theme}) => theme.spacing.lg}) 50%;
-  transform: translateX(-50%);
+  width: 100%;
 
   /* DXcutecute 폰트 적용 */
   font-family: 'DXcutecute', 'Comic Sans MS', cursive;

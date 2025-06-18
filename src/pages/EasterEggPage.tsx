@@ -3,16 +3,13 @@ import styled from 'styled-components';
 import {Navigate, useLocation} from 'react-router-dom';
 
 const EasterEggContainer = styled.div`
-  background: ${({theme}) => theme.skyColors[0]};
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
   min-height: 60vh;
-  width: 100vw;
-  margin: calc(-${({theme}) => theme.spacing.lg}) 0 calc(-${({theme}) => theme.spacing.lg}) 50%;
-  transform: translateX(-50%);
+  width: 100%;
   font-family: 'DXcutecute', 'Comic Sans MS', cursive;
 `;
 

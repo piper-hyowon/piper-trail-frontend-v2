@@ -1,5 +1,6 @@
 import React, {ReactNode, useEffect, useState, useRef} from 'react';
 import styled from 'styled-components';
+import {useLocation} from 'react-router-dom';
 import NavigationBar from './NavigationBar';
 import StatusBar from './StatusBar';
 import FooterLinks from './FooterLinks';
@@ -26,7 +27,12 @@ const NavigationWrapper = styled.div`
   background: ${({theme}) => theme.gradients.contentBackground};
 `;
 
-const MainContentWrapper = styled.div<{ $navHeight: number; $footerHeight: number; $statusHeight: number }>`
+const MainContentWrapper = styled.div<{
+    $navHeight: number;
+    $footerHeight: number;
+    $statusHeight: number;
+    $isFullWidth: boolean
+}>`
   position: fixed;
   top: ${({$navHeight}) => $navHeight}px;
   bottom: ${({$footerHeight, $statusHeight}) => $footerHeight + $statusHeight}px;
@@ -35,6 +41,7 @@ const MainContentWrapper = styled.div<{ $navHeight: number; $footerHeight: numbe
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 1;
+  background: ${({theme, $isFullWidth}) => $isFullWidth ? theme.skyColors[0] : theme.gradients.contentBackground};
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -54,15 +61,16 @@ const StatusWrapper = styled.div<{ $footerHeight: number }>`
   z-index: 150;
 `;
 
-const MainContent = styled.main`
-  padding: ${({theme}) => theme.spacing.lg};
-  max-width: 1200px;
+const MainContent = styled.main<{ $isFullWidth: boolean }>`
+  padding: ${({theme, $isFullWidth}) => $isFullWidth ? 0 : theme.spacing.lg};
+  max-width: ${({$isFullWidth}) => $isFullWidth ? '100%' : '1200px'};
   margin: 0 auto;
   width: 100%;
   color: ${({theme}) => theme.colors.text};
+  height: 100%;
 
   @media (max-width: 768px) {
-    padding: ${({theme}) => theme.spacing.md};
+    padding: ${({theme, $isFullWidth}) => $isFullWidth ? 0 : theme.spacing.md};
   }
 `;
 
@@ -74,14 +82,28 @@ const FooterWrapper = styled.div`
   z-index: 100;
 `;
 
+const FULL_WIDTH_ROUTES = [
+    '/',
+    '/dolphin',
+    '/iloveyou',
+    '/hello',
+    '/coffee',
+    '/cats',
+    '/secret'
+];
+
 const Layout: React.FC<LayoutProps> = ({children}) => {
     const {statusCode} = useApi();
+    const location = useLocation();
     const [navHeight, setNavHeight] = useState(150);
     const [footerHeight, setFooterHeight] = useState(100);
-    const [statusHeight, setStatusHeight] = useState(80); // StatusBar 기본 높이
+    const [statusHeight, setStatusHeight] = useState(80);
     const navRef = useRef<HTMLDivElement | null>(null);
     const footerRef = useRef<HTMLDivElement | null>(null);
     const statusRef = useRef<HTMLDivElement | null>(null);
+
+    // 현재 경로가 전체 너비를 사용해야 하는지 확인
+    const isFullWidth = FULL_WIDTH_ROUTES.includes(location.pathname);
 
     useEffect(() => {
         const updateHeights = () => {
@@ -127,8 +149,9 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
                 <NavigationBar/>
             </NavigationWrapper>
 
-            <MainContentWrapper $navHeight={navHeight} $footerHeight={footerHeight} $statusHeight={statusHeight}>
-                <MainContent>
+            <MainContentWrapper $navHeight={navHeight} $footerHeight={footerHeight} $statusHeight={statusHeight}
+                                $isFullWidth={isFullWidth}>
+                <MainContent $isFullWidth={isFullWidth}>
                     {children}
                 </MainContent>
             </MainContentWrapper>

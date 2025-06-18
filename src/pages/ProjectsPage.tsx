@@ -27,11 +27,11 @@ interface Project {
 
     techStack: {
         backend?: string[];
+        blockchain?: string[];
         frontend?: string[];
         database?: string[];
         deployment?: string[];
         architecture?: string[];
-        blockchain?: string[];
     };
 
     type: ('personal' | 'team')[];
@@ -618,10 +618,10 @@ const projects: Project[] = [
         },
         techStack: {
             backend: ["NestJS", "TypeScript", "TypeORM", "WebSocket"],
+            blockchain: ["Solidity", "Polygon", "Hardhat", "OpenZeppelin"],
             frontend: ["React", "TypeScript", "Web3Auth", "Vite"],
             database: ["PostgreSQL", "Redis"],
             deployment: ["DigitalOcean Droplet", "AWS S3", "GitHub Actions"],
-            blockchain: ["Solidity", "Polygon", "Hardhat", "OpenZeppelin"]
         },
         type: ["team"],
         status: "completed",
@@ -632,22 +632,24 @@ const projects: Project[] = [
         highlights: {
             technical: {
                 ko: [
+                    "스마트 컨트랙트 가스비 최적화 (동적 배열 사전 할당, 스토리지 접근 최소화)",
                     "ERC-20/ERC-721 스마트 컨트랙트 설계 및 구현",
+                    "상태 기반 NFT 교환 시스템 (동시 수락 방지, 블록체인 최종 검증)",
                     "Web3Auth를 활용한 지갑 없는 소셜 로그인 시스템",
                     "WebSocket 기반 실시간 미니게임 구현",
                     "권한 관리 시스템으로 게임 공정성 보장",
                     "블록체인 트랜잭션 모니터링 및 수집 스케줄러 구현",
-                    "5초 간격 스케줄러로 실시간 NFT 발행 현황 업데이트",
-                    "ReentrancyGuard 활용 안전한 NFT 교환 시스템"
+                    "5초 간격 블록체인 동기화 스케줄러 (RPC 비용 절감, API 응답 속도 향상)",
                 ],
                 en: [
+                    "Smart contract gas optimization (dynamic array pre-allocation, storage access minimization)",
                     "ERC-20/ERC-721 smart contract design and implementation",
+                    "State-based NFT exchange system (preventing concurrent acceptance, blockchain final verification)",
                     "Wallet-free social login system using Web3Auth",
-                    "Real-time mini-game implementation with WebSocket",
+                    "WebSocket-based real-time mini-game implementation",
                     "Permission management system ensuring game fairness",
                     "Blockchain transaction monitoring and collection scheduler implementation",
-                    "Real-time NFT minting status updates with 5-second scheduler",
-                    "Secure NFT exchange system using ReentrancyGuard",
+                    "5-second synchronization scheduler (RPC cost reduction, faster API response)"
                 ]
             },
             service: {

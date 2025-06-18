@@ -42,6 +42,10 @@ interface PostData {
 const NavContainer = styled.nav`
   padding: ${props => props.theme?.spacing?.sm || '8px'};
   background: ${({theme}) => theme.gradients.skyToTransparent};
+
+  @media (max-width: 768px) {
+    padding: ${props => props.theme?.spacing?.xs || '4px'};
+  }
 `;
 
 const NavContent = styled.div`
@@ -55,11 +59,12 @@ const NavHeader = styled.div`
   align-items: center;
   margin-bottom: ${({theme}) => theme.spacing.sm};
   gap: ${({theme}) => theme.spacing.md};
-
+  
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: stretch;
-    gap: ${({theme}) => theme.spacing.sm};
+    gap: ${({theme}) => theme.spacing.xs};
+    margin-bottom: ${({theme}) => theme.spacing.xs};
   }
 `;
 
@@ -81,7 +86,7 @@ const Logo = styled.div`
     justify-content: center;
 
     img {
-      width: 100px;
+      width: 80px;
     }
   }
 `;
@@ -98,7 +103,7 @@ const LogoText = styled.span`
   color: ${({theme}) => theme.colors.primary};
 
   @media (max-width: 768px) {
-    font-size: 20px;
+    font-size: 18px;
   }
 `;
 
@@ -106,6 +111,7 @@ const LogoSmallTitle = styled.span`
   font-size: ${({theme}) => theme.fontSizes.small};
   color: ${({theme}) => theme.colors.primary}80;
   margin-top: ${({theme}) => theme.spacing.xs};
+  display: none;
 `;
 
 const RightControls = styled.div`
@@ -353,6 +359,7 @@ const SearchContainer = styled.div<{ $visible: boolean }>`
 
   @media (max-width: 768px) {
     width: 100%;
+    max-height: ${({$visible}) => $visible ? '35px' : '0'};
     margin-top: ${({theme, $visible}) => $visible ? theme.spacing.xs : '0'};
   }
 `;
