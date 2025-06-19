@@ -7,12 +7,12 @@ interface CameraControlsProps {
 
 const CameraControls: React.FC<CameraControlsProps> = ({onMove, isDay}) => {
     const buttonStyle = {
-        backgroundColor: isDay ? 'rgba(34,197,170,0.2)' : 'rgba(59, 130, 246, 0.2)', // green-500 or blue-500 with 20% opacity
+        backgroundColor: isDay ? 'rgba(34,197,170,0.2)' : 'rgba(59, 130, 246, 0.2)',
         transition: 'all 0.2s ease'
     }
 
     const resetButtonStyle = {
-        backgroundColor: isDay ? 'rgba(34,197,154,0.4)' : 'rgba(59, 130, 246, 0.4)', // green-500 or blue-500 with 40% opacity
+        backgroundColor: isDay ? 'rgba(34,197,154,0.4)' : 'rgba(59, 130, 246, 0.4)',
         transition: 'all 0.2s ease'
     }
 
@@ -29,28 +29,49 @@ const CameraControls: React.FC<CameraControlsProps> = ({onMove, isDay}) => {
             ? `rgba(34, 197, 94, ${isReset ? 0.4 : 0.2})`
             : `rgba(59, 130, 246, ${isReset ? 0.4 : 0.2})`
     }
+
     return (
         <div
             style={{
                 position: 'fixed',
-                bottom: '24px',
-                right: '24px',
-                zIndex: 9999,
+                bottom: '70px',
+                right: '20px',
+                zIndex: 10,
                 pointerEvents: 'auto'
             }}
         >
-            <div className="bg-black/30 backdrop-blur-sm rounded-2xl p-4">
-                <table className="border-separate border-spacing-1">
+            <div
+                style={{
+                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                    backdropFilter: 'blur(4px)',
+                    borderRadius: '16px',
+                    padding: '12px'
+                }}
+            >
+                <table style={{borderSpacing: '4px'}}>
                     <tbody>
                     <tr>
                         <td></td>
                         <td>
                             <button
                                 onClick={() => onMove('up')}
-                                style={buttonStyle}
+                                style={{
+                                    ...buttonStyle,
+                                    width: '44px',
+                                    height: '44px',
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'white',
+                                    fontSize: '20px',
+                                    fontWeight: 'bold',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    outline: 'none'
+                                }}
                                 onMouseEnter={handleMouseEnter}
                                 onMouseLeave={handleMouseLeave}
-                                className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold active:scale-95"
                             >
                                 ↑
                             </button>
@@ -61,10 +82,23 @@ const CameraControls: React.FC<CameraControlsProps> = ({onMove, isDay}) => {
                         <td>
                             <button
                                 onClick={() => onMove('left')}
-                                style={buttonStyle}
+                                style={{
+                                    ...buttonStyle,
+                                    width: '44px',
+                                    height: '44px',
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'white',
+                                    fontSize: '20px',
+                                    fontWeight: 'bold',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    outline: 'none'
+                                }}
                                 onMouseEnter={handleMouseEnter}
                                 onMouseLeave={handleMouseLeave}
-                                className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold active:scale-95"
                             >
                                 ←
                             </button>
@@ -72,10 +106,23 @@ const CameraControls: React.FC<CameraControlsProps> = ({onMove, isDay}) => {
                         <td>
                             <button
                                 onClick={() => onMove('reset')}
-                                style={resetButtonStyle}
+                                style={{
+                                    ...resetButtonStyle,
+                                    width: '44px',
+                                    height: '44px',
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'white',
+                                    fontSize: '18px',
+                                    fontWeight: 'bold',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    outline: 'none'
+                                }}
                                 onMouseEnter={handleMouseEnter}
                                 onMouseLeave={handleMouseLeave}
-                                className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-lg font-bold active:scale-95"
                                 title="원점으로"
                             >
                                 ⊙
@@ -84,10 +131,23 @@ const CameraControls: React.FC<CameraControlsProps> = ({onMove, isDay}) => {
                         <td>
                             <button
                                 onClick={() => onMove('right')}
-                                style={buttonStyle}
+                                style={{
+                                    ...buttonStyle,
+                                    width: '44px',
+                                    height: '44px',
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'white',
+                                    fontSize: '20px',
+                                    fontWeight: 'bold',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    outline: 'none'
+                                }}
                                 onMouseEnter={handleMouseEnter}
                                 onMouseLeave={handleMouseLeave}
-                                className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold active:scale-95"
                             >
                                 →
                             </button>
@@ -98,10 +158,23 @@ const CameraControls: React.FC<CameraControlsProps> = ({onMove, isDay}) => {
                         <td>
                             <button
                                 onClick={() => onMove('down')}
-                                style={buttonStyle}
+                                style={{
+                                    ...buttonStyle,
+                                    width: '44px',
+                                    height: '44px',
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'white',
+                                    fontSize: '20px',
+                                    fontWeight: 'bold',
+                                    border: 'none',
+                                    cursor: 'pointer',
+                                    outline: 'none'
+                                }}
                                 onMouseEnter={handleMouseEnter}
                                 onMouseLeave={handleMouseLeave}
-                                className="w-12 h-12 rounded-lg flex items-center justify-center text-white text-xl font-bold active:scale-95"
                             >
                                 ↓
                             </button>

@@ -4,6 +4,9 @@ export const layoutTranslations = {
             blogTitle: 'Footprints out of the well',
             adminAccess: 'Admin access only',
             login: 'Login',
+            headers: {
+                tooltip: 'Change API response format (JSON/HTML)'
+            },
             auth: {
                 authenticated: 'Authenticated',
                 notAuthenticated: 'Not authenticated',
@@ -57,6 +60,9 @@ export const layoutTranslations = {
             blogTitle: '우물 밖으로의 발자국을 기록하는 공간',
             adminAccess: '관리자 전용',
             login: '로그인',
+            headers: {
+                tooltip: 'API 응답 형식을 변경해보세요 (JSON/HTML)'
+            },
             auth: {
                 authenticated: '인증됨',
                 notAuthenticated: '인증되지 않음',

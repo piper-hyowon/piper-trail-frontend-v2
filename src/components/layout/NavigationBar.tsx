@@ -44,7 +44,7 @@ const NavContainer = styled.nav`
   background: ${({theme}) => theme.gradients.skyToTransparent};
 
   @media (max-width: 768px) {
-    padding: ${props => props.theme?.spacing?.xs || '4px'};
+    padding: 4px 8px;
   }
 `;
 
@@ -59,12 +59,12 @@ const NavHeader = styled.div`
   align-items: center;
   margin-bottom: ${({theme}) => theme.spacing.sm};
   gap: ${({theme}) => theme.spacing.md};
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: stretch;
-    gap: ${({theme}) => theme.spacing.xs};
-    margin-bottom: ${({theme}) => theme.spacing.xs};
+    gap: 4px;
+    margin-bottom: 4px;
   }
 `;
 
@@ -83,11 +83,8 @@ const Logo = styled.div`
   }
 
   @media (max-width: 768px) {
-    justify-content: center;
-
-    img {
-      width: 80px;
-    }
+    justify-content: left;
+    padding: 2px;
   }
 `;
 
@@ -103,7 +100,7 @@ const LogoText = styled.span`
   color: ${({theme}) => theme.colors.primary};
 
   @media (max-width: 768px) {
-    font-size: 18px;
+    font-size: 20px;
   }
 `;
 
@@ -111,7 +108,13 @@ const LogoSmallTitle = styled.span`
   font-size: ${({theme}) => theme.fontSizes.small};
   color: ${({theme}) => theme.colors.primary}80;
   margin-top: ${({theme}) => theme.spacing.xs};
-  display: none;
+  display: block;
+
+  @media (max-width: 768px) {
+    //display: none; 
+    font-size: 10px;
+
+  }
 `;
 
 const RightControls = styled.div`
@@ -123,6 +126,7 @@ const RightControls = styled.div`
   @media (max-width: 768px) {
     width: 100%;
     align-items: stretch;
+    gap: 4px;
   }
 `;
 
@@ -134,7 +138,7 @@ const TopRightControls = styled.div`
   justify-content: flex-end;
 
   @media (max-width: 768px) {
-    gap: ${({theme}) => theme.spacing.xs};
+    gap: 4px;
     justify-content: space-between;
     width: 100%;
   }
@@ -153,6 +157,11 @@ const LanguageToggle = styled.button`
   &:hover {
     background-color: ${({theme}) => `${theme.colors.secondary}20`};
   }
+
+  @media (max-width: 768px) {
+    padding: 2px 6px;
+    font-size: 0.75rem;
+  }
 `;
 
 const ThemeToggleSwitch = styled.button<{ $isDark: boolean }>`
@@ -167,6 +176,12 @@ const ThemeToggleSwitch = styled.button<{ $isDark: boolean }>`
   transition: ${({theme}) => theme.transitions.default};
   padding: 2px;
 
+  @media (max-width: 768px) {
+    width: 40px;
+    height: 20px;
+    border-radius: 10px;
+  }
+
   &::after {
     content: '';
     position: absolute;
@@ -178,6 +193,13 @@ const ThemeToggleSwitch = styled.button<{ $isDark: boolean }>`
     border-radius: 50%;
     transition: ${({theme}) => theme.transitions.default};
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+    @media (max-width: 768px) {
+      width: 16px;
+      height: 16px;
+      top: 2px;
+      left: ${({$isDark}) => $isDark ? '22px' : '2px'};
+    }
   }
 
   &:hover {
@@ -211,8 +233,10 @@ const AuthStatusContainer = styled.div<{ $authenticated: boolean }>`
   white-space: nowrap;
 
   @media (max-width: 768px) {
-    font-size: ${({theme}) => '0.75rem'};
-    padding: ${({theme}) => `${'4px'} ${theme.spacing.xs}`};
+    display: none;
+    font-size: 0.7rem;
+    padding: 2px 4px;
+    gap: 2px;
   }
 `;
 
@@ -238,6 +262,16 @@ const AuthButton = styled.button`
   &:hover {
     opacity: 0.9;
   }
+
+  @media (max-width: 768px) {
+    padding: 4px 8px;
+    gap: 2px;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
 `;
 
 const LogoutButton = styled(AuthButton)`
@@ -255,7 +289,7 @@ const ApiControls = styled.div`
 
   @media (max-width: 768px) {
     flex-wrap: wrap;
-    gap: ${({theme}) => theme.spacing.xs};
+    gap: 4px;
   }
 `;
 
@@ -359,8 +393,8 @@ const SearchContainer = styled.div<{ $visible: boolean }>`
 
   @media (max-width: 768px) {
     width: 100%;
-    max-height: ${({$visible}) => $visible ? '35px' : '0'};
-    margin-top: ${({theme, $visible}) => $visible ? theme.spacing.xs : '0'};
+    max-height: ${({$visible}) => $visible ? '30px' : '0'};
+    margin-top: ${({theme, $visible}) => $visible ? '4px' : '0'};
   }
 `;
 
@@ -871,13 +905,17 @@ const NavigationBar: React.FC = () => {
             <NavContent>
                 <NavHeader>
                     <Logo onClick={handleLogoClick}>
-                        <img width={140} src={LogoChacter} alt="Frog Character"/>
+                        <img
+                            width={140}
+                            src={LogoChacter}
+                            alt="Frog Character"
+                            style={{width: window.innerWidth <= 768 ? '60px' : '140px'}}
+                        />
                         <LogoTextContainer>
                             <LogoText>piper-trail.com</LogoText>
                             <LogoSmallTitle>{t('layout.blogTitle')}</LogoSmallTitle>
                         </LogoTextContainer>
                     </Logo>
-
                     <RightControls>
                         <TopRightControls>
                             <DesktopControlGroup>
@@ -914,7 +952,7 @@ const NavigationBar: React.FC = () => {
                             </DesktopControlGroup>
 
                             <MobileControlGroup>
-                                <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                                <div style={{display: 'flex', gap: '4px', alignItems: 'center'}}>
                                     <LanguageToggle onClick={toggleLanguage}>
                                         {language === 'en' ? '한국어' : 'English'}
                                     </LanguageToggle>
@@ -969,6 +1007,8 @@ const NavigationBar: React.FC = () => {
                     <HeadersButton
                         isOpen={showHeadersPanel}
                         onClick={toggleHeadersPanel}
+                        currentPath={location.pathname}
+                        tooltipText={t('layout.headers.tooltip' as any)}
                     />
                 </ApiControls>
 

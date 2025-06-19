@@ -12,18 +12,18 @@ import {
     createDefaultIsland,
     IslandConfig,
 } from '../../config/island.config';
-import CameraControls from '../three/CameraControls.tsx'
 import ResourceIsland from "./ResourceIsland.tsx";
 import Dolphin from "./object/Dolphin.tsx";
 import {CanvasLoadingScreen} from "./LoadingScreen.tsx";
 import {Sea} from "./Sea.tsx";
 import {SkyScene} from "./SkyScene.tsx";
-import * as THREE from 'three';
 import {useEasterEgg} from "../../context/EasterEggDolphinContext.tsx";
 
 interface ThreeJsVisualizationProps {
     categories: string[];
     onIslandClick: (category: string) => void;
+    onCameraMove?: (direction: string) => void;
+    orbitControlsRef?: React.MutableRefObject<any>;
 }
 
 const CAMERA_CONFIG = {
@@ -134,66 +134,20 @@ const SceneContent: React.FC<{
 
 const ThreeJsVisualization: React.FC<ThreeJsVisualizationProps> = ({
                                                                        categories,
-                                                                       onIslandClick
+                                                                       onIslandClick,
+                                                                       orbitControlsRef: externalRef
                                                                    }) => {
     const {themeMode} = useTheme();
     const isDay = themeMode === 'light';
 
     const [isLoading, setIsLoading] = useState(true);
-    const orbitControlsRef = useRef<any>(null);
+    const internalRef = useRef<any>(null);
+    const orbitControlsRef = externalRef || internalRef;
+
     const isMobile = useMemo(
         () => typeof window !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent),
         []
     );
-
-    const handleCameraMove = (direction: string) => {
-        if (!orbitControlsRef.current) return;
-
-        const controls = orbitControlsRef.current;
-        const camera = controls.object;
-        const moveDistance = 10;
-        const seaLimit = 100;
-
-        // 카메라의 현재 방향 벡터
-        const forward = new THREE.Vector3();
-        camera.getWorldDirection(forward);
-        forward.y = 0; // Y축 제거 (수평 이동만)
-        forward.normalize();
-
-        const right = new THREE.Vector3();
-        right.crossVectors(forward, new THREE.Vector3(0, 1, 0));
-
-        let movement = new THREE.Vector3();
-
-        switch (direction) {
-            case 'up':
-                movement = forward.clone().multiplyScalar(-moveDistance);
-                break;
-            case 'down':
-                movement = forward.clone().multiplyScalar(moveDistance);
-                break;
-            case 'left':
-                movement = right.clone().multiplyScalar(-moveDistance);
-                break;
-            case 'right':
-                movement = right.clone().multiplyScalar(moveDistance);
-                break;
-            case 'reset':
-                camera.position.set(...CAMERA_CONFIG.position);
-                controls.target.set(0, 0, 0);
-                controls.update();
-                return;
-        }
-
-        const newTarget = controls.target.clone().add(movement);
-
-        // 경계 체크
-        newTarget.x = Math.max(-seaLimit, Math.min(seaLimit, newTarget.x));
-        newTarget.z = Math.max(-seaLimit, Math.min(seaLimit, newTarget.z));
-
-        controls.target.copy(newTarget);
-        controls.update();
-    };
 
     useEffect(() => {
         const timer = setTimeout(() => setIsLoading(false), 1000);
@@ -201,49 +155,42 @@ const ThreeJsVisualization: React.FC<ThreeJsVisualizationProps> = ({
     }, []);
 
     return (
-        <div style={{position: 'relative', width: '100%', height: '100%'}}>
-            <Canvas
-                dpr={isMobile ? 1 : [1, 1.5]}
-                gl={{
-                    powerPreference: 'high-performance',
-                    antialias: true,
-                    alpha: false,
-                }}
-                shadows
-                style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    zIndex: 1
-                }}
-            >
-                <Suspense fallback={<CanvasLoadingScreen/>}>
-                    <SceneContent
-                        isDay={isDay}
-                        categories={categories}
-                        onIslandClick={onIslandClick}
-                        orbitControlsRef={orbitControlsRef}
-                    />
-                    <OrbitControls
-                        ref={orbitControlsRef}
-                        enableDamping
-                        dampingFactor={ORBIT_CONTROLS_CONFIG.dampingFactor}
-                        maxPolarAngle={ORBIT_CONTROLS_CONFIG.maxPolarAngle}
-                        minPolarAngle={ORBIT_CONTROLS_CONFIG.minPolarAngle}
-                        minDistance={ORBIT_CONTROLS_CONFIG.minDistance}
-                        maxDistance={ORBIT_CONTROLS_CONFIG.maxDistance}
-                        enablePan={ORBIT_CONTROLS_CONFIG.enablePan}
-                    />
-                </Suspense>
-            </Canvas>
-            <CameraControls
-                onMove={handleCameraMove}
-                isDay={isDay}
-            />
-        </div>
+        <Canvas
+            dpr={isMobile ? 1 : [1, 1.5]}
+            gl={{
+                powerPreference: 'high-performance',
+                antialias: true,
+                alpha: false,
+            }}
+            shadows
+            style={{
+                width: '100%',
+                height: '100%',
+                display: 'block'
+            }}
+        >
+            <Suspense fallback={<CanvasLoadingScreen/>}>
+                <SceneContent
+                    isDay={isDay}
+                    categories={categories}
+                    onIslandClick={onIslandClick}
+                    orbitControlsRef={orbitControlsRef}
+                />
+                <OrbitControls
+                    ref={orbitControlsRef}
+                    enableDamping
+                    dampingFactor={ORBIT_CONTROLS_CONFIG.dampingFactor}
+                    maxPolarAngle={ORBIT_CONTROLS_CONFIG.maxPolarAngle}
+                    minPolarAngle={ORBIT_CONTROLS_CONFIG.minPolarAngle}
+                    minDistance={ORBIT_CONTROLS_CONFIG.minDistance}
+                    maxDistance={ORBIT_CONTROLS_CONFIG.maxDistance}
+                    enablePan={ORBIT_CONTROLS_CONFIG.enablePan}
+                />
+            </Suspense>
+        </Canvas>
     );
 };
 
+// Export camera config for external use
+export {CAMERA_CONFIG};
 export default ThreeJsVisualization;
