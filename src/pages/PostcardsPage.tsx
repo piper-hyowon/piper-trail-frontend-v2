@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useMemo, useCallback} from 'react';
-import styled from 'styled-components';
+import styled, {keyframes} from 'styled-components';
 import ReactDOM from 'react-dom';
 import Mailbox3D from '../components/ui/stamps/Mailbox3D';
 import StampCard from '../components/ui/stamps/StampCard';
@@ -13,6 +13,17 @@ interface Stamp {
     name: string;
     color: string;
     description: string;
+}
+
+interface Particle {
+    id: number;
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    color: string;
+    rotation: number;
+    rotationSpeed: number;
 }
 
 const convertToStampType = (stampId: string): StampType => {
@@ -35,6 +46,82 @@ const convertPostcardResponse = (postcard: any) => ({
     nickname: postcard.nickname
 });
 
+const confettiFall = keyframes`
+  0% {
+    transform: translate(var(--x), -100px) rotate(var(--rotation));
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--x) + var(--drift)), calc(100vh + 100px)) rotate(calc(var(--rotation) + 360deg));
+    opacity: 0;
+  }
+`;
+
+const ConfettiContainer = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20000;
+`;
+
+const ConfettiParticle = styled.div<{
+    $delay: number;
+    $duration: number;
+    $drift: number;
+    $x: number;
+    $rotation: number;
+    $color: string
+}>`
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: ${({$color}) => $color};
+  animation: ${confettiFall} ${({$duration}) => $duration}s linear ${({$delay}) => $delay}s;
+  animation-fill-mode: forwards;
+  --x: ${({$x}) => $x}px;
+  --drift: ${({$drift}) => $drift}px;
+  --rotation: ${({$rotation}) => $rotation}deg;
+
+  &::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: inherit;
+    transform: rotate(45deg);
+  }
+`;
+
+const SuccessMessage = styled.div<{ $show: boolean }>`
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(${({$show}) => $show ? 1 : 0.8});
+  background: white;
+  padding: ${({theme}) => theme.spacing.xl};
+  border-radius: ${({theme}) => theme.borderRadius};
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  opacity: ${({$show}) => $show ? 1 : 0};
+  transition: all 0.3s ease;
+  z-index: 15000;
+`;
+
+const SuccessIcon = styled.div`
+  font-size: 60px;
+  margin-bottom: ${({theme}) => theme.spacing.md};
+`;
+
+const SuccessText = styled.h3`
+  color: ${({theme}) => theme.colors.primary};
+  margin: 0;
+  font-size: ${({theme}) => theme.fontSizes.xlarge};
+`;
+
+// 기존 스타일 컴포넌트들...
 const StampsContainer = styled.div`
   max-width: 1000px;
   margin: 0 auto;
@@ -145,6 +232,7 @@ const PostcardListContent = styled.div`
     }
   }
 `;
+
 const PostcardListHeader = styled.div`
   text-align: center;
   margin-bottom: ${({theme}) => theme.spacing.lg};
@@ -385,6 +473,11 @@ const PostcardsPage: React.FC = () => {
     const [mailboxClickCount, setMailboxClickCount] = useState(0);
     const [showClickHint, setShowClickHint] = useState(false);
 
+    // 종이조각 효과(엽서 작성시)
+    const [showConfetti, setShowConfetti] = useState(false);
+    const [confettiParticles, setConfettiParticles] = useState<Particle[]>([]);
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
     const {data: postcardsResponse, isLoading, error, refetch} = usePostcards(0, 50);
     const createPostcardMutation = useCreatePostcard();
 
@@ -396,6 +489,33 @@ const PostcardsPage: React.FC = () => {
             message = message.replace(`{${param}}`, String(value));
         });
         return message;
+    };
+
+    const createConfetti = () => {
+        const colors = ['#FFD700', '#FF69B4', '#87CEEB', '#98FB98', '#DDA0DD', '#F0E68C', '#FF6347'];
+        const particles: Particle[] = [];
+
+        for (let i = 0; i < 150; i++) {
+            particles.push({
+                id: i,
+                x: Math.random() * window.innerWidth,
+                y: -20,
+                vx: (Math.random() - 0.5) * 4,
+                vy: Math.random() * 3 + 2,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                rotation: Math.random() * 360,
+                rotationSpeed: (Math.random() - 0.5) * 10
+            });
+        }
+
+        setConfettiParticles(particles);
+        setShowConfetti(true);
+
+        // 6초 후 제거
+        setTimeout(() => {
+            setShowConfetti(false);
+            setConfettiParticles([]);
+        }, 6000);
     };
 
     useEffect(() => {
@@ -542,7 +662,13 @@ const PostcardsPage: React.FC = () => {
             setMessage('');
             setShowModal(false);
 
-            alert(t('postcard.messages.success' as any));
+            setShowSuccessMessage(true);
+            createConfetti();
+
+            // 3초 후 성공 메시지 숨기기
+            setTimeout(() => {
+                setShowSuccessMessage(false);
+            }, 3000);
 
             // 목록 새로고침
             refetch();
@@ -663,8 +789,35 @@ const PostcardsPage: React.FC = () => {
                 </ActionButtons>
             </MailboxSection>
 
+            {/* 종이 가루 효과 */}
+            {showConfetti && ReactDOM.createPortal(
+                <ConfettiContainer>
+                    {confettiParticles.map((particle) => (
+                        <ConfettiParticle
+                            key={particle.id}
+                            $x={particle.x}
+                            $delay={Math.random() * 0.5}
+                            $duration={3 + Math.random() * 2}
+                            $drift={(Math.random() - 0.5) * 200}
+                            $rotation={particle.rotation}
+                            $color={particle.color}
+                        />
+                    ))}
+                </ConfettiContainer>,
+                document.body
+            )}
+
+            {/* 성공 메시지 */}
+            {showSuccessMessage && ReactDOM.createPortal(
+                <SuccessMessage $show={showSuccessMessage}>
+                    <SuccessIcon>🎉</SuccessIcon>
+                    <SuccessText>{t('postcard.messages.success' as any)}</SuccessText>
+                </SuccessMessage>,
+                document.body
+            )}
+
             {showPostcards && stampEntries.length > 0 && ReactDOM.createPortal(
-                <PostcardOverlay $isVisible={true}>  {/* $isVisible={true} 추가 */}
+                <PostcardOverlay $isVisible={true}>
                     <PostcardListHeader>
                         <PostcardListTitle>
                             {formatMessage('postcard.list.title', {count: stampEntries.length})}
@@ -681,6 +834,7 @@ const PostcardsPage: React.FC = () => {
                 </PostcardOverlay>,
                 document.getElementById('modal-root')!
             )}
+
             {/* 엽서 작성 모달 */}
             {showModal && ReactDOM.createPortal(
                 <Modal $isOpen={showModal}>

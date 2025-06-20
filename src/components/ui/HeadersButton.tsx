@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import styled, {keyframes} from 'styled-components';
 
 interface HeadersButtonProps {
@@ -60,7 +60,7 @@ const ChevronIcon = styled.span<{ $isOpen: boolean }>`
   transform: ${({$isOpen}) => $isOpen ? 'rotate(180deg)' : 'rotate(0)'};
 `;
 
-const TooltipBubble = styled.div<{ $isVisible: boolean }>`
+const TooltipBubble = styled.div<{ $isVisible: boolean; $shouldRender: boolean }>`
   position: absolute;
   bottom: calc(100% + 10px);
   left: 50%;
@@ -76,6 +76,7 @@ const TooltipBubble = styled.div<{ $isVisible: boolean }>`
   opacity: ${({$isVisible}) => $isVisible ? 1 : 0};
   pointer-events: none;
   z-index: 1000;
+  display: ${({$shouldRender}) => $shouldRender ? 'block' : 'none'};
 
   /* 화면 너비에 따라 위치 조정 */
   @media (max-width: 1200px) {
@@ -115,38 +116,73 @@ const TooltipBubble = styled.div<{ $isVisible: boolean }>`
 
 const HeadersButton: React.FC<HeadersButtonProps> = ({isOpen, onClick, currentPath = '/', tooltipText}) => {
     const [showTooltip, setShowTooltip] = useState(false);
-    const [hasShownTooltip, setHasShownTooltip] = useState(false);
+    const [shouldRenderTooltip, setShouldRenderTooltip] = useState(false);
+    const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const showTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const clearAllTimeouts = () => {
+        if (hideTimeoutRef.current) {
+            clearTimeout(hideTimeoutRef.current!);
+            hideTimeoutRef.current = null;
+        }
+        if (showTimeoutRef.current) {
+            clearTimeout(showTimeoutRef.current!);
+            showTimeoutRef.current = null;
+        }
+        if (animationTimeoutRef.current) {
+            clearTimeout(animationTimeoutRef.current!);
+            animationTimeoutRef.current = null;
+        }
+    };
 
     useEffect(() => {
-        // 홈페이지('/')에서만 툴팁 표시
-        if (currentPath === '/' && !hasShownTooltip) {
-            const showTimer = setTimeout(() => {
+        // 홈페이지('/')로 이동할 때마다 툴팁 표시
+        if (currentPath === '/') {
+            clearAllTimeouts();
+
+            setShouldRenderTooltip(true);
+
+            showTimeoutRef.current = setTimeout(() => {
                 setShowTooltip(true);
-                setHasShownTooltip(true);
+
+                // 3초 후 툴팁 숨기기
+                hideTimeoutRef.current = setTimeout(() => {
+                    setShowTooltip(false);
+
+                    animationTimeoutRef.current = setTimeout(() => {
+                        setShouldRenderTooltip(false);
+                    }, 300);
+                }, 3000);
             }, 500);
-
-            // 3초 후 툴팁 숨기기
-            const hideTimer = setTimeout(() => {
-                setShowTooltip(false);
-            }, 3500);
-
-            return () => {
-                clearTimeout(showTimer);
-                clearTimeout(hideTimer);
-            };
         }
-    }, [currentPath, hasShownTooltip]);
 
-    // 페이지 이동 시 툴팁 상태 리셋
+        return () => {
+            clearAllTimeouts();
+        };
+    }, [currentPath]);
+
+    // 페이지 이동 시 즉시 툴팁 숨기기
     useEffect(() => {
         if (currentPath !== '/') {
-            setHasShownTooltip(false);
+            clearAllTimeouts();
+            setShowTooltip(false);
+            setShouldRenderTooltip(false);
         }
     }, [currentPath]);
 
+    useEffect(() => {
+        return () => {
+            clearAllTimeouts();
+        };
+    }, []);
+
     return (
         <ButtonWrapper>
-            <TooltipBubble $isVisible={showTooltip}>
+            <TooltipBubble
+                $isVisible={showTooltip}
+                $shouldRender={shouldRenderTooltip}
+            >
                 {tooltipText || 'Change API response format (JSON/HTML)'}
             </TooltipBubble>
             <StyledButton $isOpen={isOpen} onClick={onClick}>
