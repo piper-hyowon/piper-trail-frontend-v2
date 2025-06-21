@@ -117,11 +117,11 @@ export const theme: Record<ThemeMode, Theme> = {
         },
         borderRadius: '12px',
         fontSizes: {
-            small: '15px',
-            medium: '17px',
-            large: '19px',
-            xlarge: '23px',
-            xxlarge: '29px',
+            small: '13px',
+            medium: '15px',
+            large: '17px',
+            xlarge: '21px',
+            xxlarge: '27px',
         },
         spacing: {
             xs: '4px',
@@ -183,11 +183,11 @@ export const theme: Record<ThemeMode, Theme> = {
         },
         borderRadius: '12px',
         fontSizes: {
-            small: '15px',
-            medium: '17px',
-            large: '19px',
-            xlarge: '23px',
-            xxlarge: '29px',
+            small: '13px',
+            medium: '15px',
+            large: '17px',
+            xlarge: '21px',
+            xxlarge: '27px',
         },
         spacing: {
             xs: '4px',

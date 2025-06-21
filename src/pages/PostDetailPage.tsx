@@ -20,13 +20,12 @@ import type {UpdatePostRequest} from "../types/api.ts";
 import ReactDOM from 'react-dom';
 
 const PostDetailContainer = styled.article`
-  max-width: 1000px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: ${({theme}) => theme.spacing.sm} ${({theme}) => theme.spacing.md};
+  padding: ${({theme}) => theme.spacing.md};
 
   @media (max-width: 768px) {
-    padding: ${({theme}) => theme.spacing.xs};
-    max-width: 100%;
+    padding: ${({theme}) => theme.spacing.sm};
   }
 `;
 
@@ -38,58 +37,54 @@ const BackButton = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   font-size: ${({theme}) => theme.fontSizes.small};
-  margin-bottom: ${({theme}) => theme.spacing.md};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
   padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
   border-radius: ${({theme}) => theme.borderRadius};
-  background: ${({theme}) => `${theme.colors.primary}10`};
-  border: 1px solid ${({theme}) => `${theme.colors.primary}30`};
   transition: ${({theme}) => theme.transitions.default};
 
   &:hover {
-    background: ${({theme}) => `${theme.colors.primary}20`};
+    color: ${({theme}) => theme.colors.secondary};
     transform: translateX(-2px);
   }
 
   &::before {
     content: "←";
-    font-size: 1.1em;
+    font-size: 1.2em;
   }
 `;
 
 const PostHeader = styled.header`
-  margin-bottom: ${({theme}) => theme.spacing.lg};
-  padding: ${({theme}) => theme.spacing.md};
-  background: ${({theme}) => theme.colors.background};
-  border-radius: ${({theme}) => theme.borderRadius};
-  border-left: 3px solid ${({theme}) => theme.colors.primary};
+  margin-bottom: ${({theme}) => theme.spacing.xl};
+  text-align: center;
 `;
 
 const PostTitle = styled.h1`
-  color: ${({theme}) => theme.colors.primary};
-  font-size: clamp(1.5rem, 3.5vw, 2rem);
-  line-height: 1.2;
+  color: ${({theme}) => theme.colors.text};
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  line-height: 1.3;
   margin-bottom: ${({theme}) => theme.spacing.sm};
+  font-weight: 800;
   word-break: keep-all;
 `;
 
 const PostSubtitle = styled.h2`
-  color: ${({theme}) => theme.colors.text}80;
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.7;
   font-size: clamp(1rem, 2.5vw, 1.3rem);
   font-weight: 400;
-  line-height: 1.4;
-  margin: -${({theme}) => theme.spacing.xs} 0 ${({theme}) => theme.spacing.sm} 0;
+  line-height: 1.5;
+  margin-bottom: ${({theme}) => theme.spacing.md};
   font-style: italic;
-  word-break: keep-all;
 `;
 
 const PostMeta = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: ${({theme}) => theme.spacing.md};
-  align-items: center;
-  margin-bottom: ${({theme}) => theme.spacing.lg};
-  padding: ${({theme}) => theme.spacing.sm} 0;
-  border-bottom: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+  gap: ${({theme}) => theme.spacing.sm};
+  justify-content: center;
+  margin: ${({theme}) => theme.spacing.lg} 0;
+  padding-bottom: ${({theme}) => theme.spacing.lg};
+  border-bottom: 1px solid ${({theme}) => theme.colors.primary}20;
 `;
 
 const PostMetaItem = styled.div`
@@ -97,169 +92,212 @@ const PostMetaItem = styled.div`
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
   font-size: ${({theme}) => theme.fontSizes.small};
-  color: ${({theme}) => `${theme.colors.text}80`};
-  background: ${({theme}) => theme.colors.background};
-  padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
-  border-radius: 20px;
-  border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.7;
 `;
 
 const MetaIcon = styled.span`
   font-size: 1em;
-  opacity: 0.8;
 `;
 
 const CategoryLink = styled(Link)`
   color: ${({theme}) => theme.colors.primary};
   text-decoration: none;
   font-weight: 600;
-  padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
-  background: ${({theme}) => `${theme.colors.primary}15`};
-  border-radius: 16px;
-  border: 1px solid ${({theme}) => `${theme.colors.primary}30`};
   transition: ${({theme}) => theme.transitions.default};
 
   &:hover {
-    background: ${({theme}) => `${theme.colors.primary}25`};
-    transform: translateY(-1px);
+    color: ${({theme}) => theme.colors.secondary};
   }
 `;
 
 const TagSection = styled.div`
+  display: flex;
+  justify-content: center;
   margin-top: ${({theme}) => theme.spacing.md};
 `;
 
 const PostContent = styled.div`
   line-height: 1.7;
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: ${({theme}) => theme.colors.text};
-  margin-bottom: ${({theme}) => theme.spacing.lg};
-  padding: ${({theme}) => theme.spacing.md};
-  background: ${({theme}) => theme.colors.background};
-  border-radius: ${({theme}) => theme.borderRadius};
-  box-shadow: 0 2px 8px ${({theme}) => `${theme.colors.primary}10`};
+  margin-bottom: ${({theme}) => theme.spacing.xl};
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    color: ${({theme}) => theme.colors.primary};
-    margin-top: ${({theme}) => theme.spacing.lg};
-    margin-bottom: ${({theme}) => theme.spacing.sm};
-    padding-bottom: ${({theme}) => theme.spacing.xs};
-    border-bottom: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+  h1, h2, h3, h4, h5, h6 {
+    color: ${({theme}) => theme.colors.text};
+    margin-top: ${({theme}) => theme.spacing.xl};
+    margin-bottom: ${({theme}) => theme.spacing.md};
+    font-weight: 700;
+    line-height: 1.3;
   }
 
   h1 {
-    font-size: 1.7rem;
+    font-size: 1.8rem;
   }
 
   h2 {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
   }
 
   h3 {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
   }
 
+  h4 {
+    font-size: 1.1rem;
+  }
+
+
   p {
-    margin-bottom: ${({theme}) => theme.spacing.sm};
-    text-align: justify;
+    margin-bottom: ${({theme}) => theme.spacing.md};
+    line-height: 1.7;
   }
 
   hr {
     border: none;
-    border-top: 2px solid ${({theme}) => `${theme.colors.primary}20`};
+    height: 1px;
+    background: ${({theme}) => theme.colors.primary}20;
     margin: ${({theme}) => theme.spacing.xl} 0;
-    opacity: 0.5;
   }
 
   code {
-    background: ${({theme}) => `${theme.colors.primary}15`};
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    background: ${({theme}) => theme.colors.primary}10;
+    color: ${({theme}) => theme.colors.primary};
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-size: 0.9em;
+    font-weight: 500;
   }
 
+
   pre {
-    background: ${({theme}) => `${theme.colors.primary}10`};
-    padding: ${({theme}) => theme.spacing.sm};
-    border-radius: ${({theme}) => theme.borderRadius};
+    background: ${({theme}) => theme.colors.text === '#1A1A1A' ? '#f6f8fa' : '#1e1e1e'};
+    color: ${({theme}) => theme.colors.text === '#1A1A1A' ? '#24292e' : '#d4d4d4'};
+    padding: ${({theme}) => theme.spacing.lg};
+    border-radius: 8px;
     overflow-x: auto;
-    margin: ${({theme}) => theme.spacing.sm} 0;
+    margin: ${({theme}) => theme.spacing.lg} 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    border: 1px solid ${({theme}) => theme.colors.primary}10;
+
+
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${({theme}) => theme.colors.primary}30;
+      border-radius: 4px;
+    }
 
     code {
       background: transparent;
+      color: inherit;
       padding: 0;
+      font-size: inherit;
+      font-weight: 400;
     }
   }
 
+  ${({theme}) => theme.colors.text !== '#1A1A1A' && `
+    pre {
+      .keyword { color: #4FC3F7; }
+      .string { color: #80DEEA; }
+      .comment { color: #66BB6A; }
+      .function { color: #BA68C8; }
+      .number { color: #4DB6AC; }
+    }
+  `}
   blockquote {
-    border-left: 3px solid ${({theme}) => theme.colors.primary};
-    padding: ${({theme}) => theme.spacing.sm};
-    margin: ${({theme}) => theme.spacing.sm} 0;
-    background: ${({theme}) => `${theme.colors.primary}05`};
-    border-radius: 0 ${({theme}) => theme.borderRadius} ${({theme}) => theme.borderRadius} 0;
+    border-left: 4px solid ${({theme}) => theme.colors.primary};
+    padding: ${({theme}) => theme.spacing.md};
+    margin: ${({theme}) => theme.spacing.lg} 0;
+    background: ${({theme}) => theme.colors.primary}05;
+    border-radius: 0 8px 8px 0;
     font-style: italic;
-    color: ${({theme}) => `${theme.colors.text}90`};
+
+    p:last-child {
+      margin-bottom: 0;
+    }
   }
 
-  ul,
-  ol {
-    margin-bottom: ${({theme}) => theme.spacing.sm};
-    padding-left: ${({theme}) => theme.spacing.md};
-  }
+  ul, ol {
+    margin-bottom: ${({theme}) => theme.spacing.md};
+    padding-left: ${({theme}) => theme.spacing.lg};
 
-  li {
-    margin-bottom: ${({theme}) => theme.spacing.xs};
-    line-height: 1.6;
+    li {
+      margin-bottom: ${({theme}) => theme.spacing.xs};
+      line-height: 1.7;
+    }
   }
 
   img {
     max-width: 100%;
+    max-height: 500px;
+    width: auto;
     height: auto;
-    border-radius: ${({theme}) => theme.borderRadius};
-    box-shadow: 0 4px 12px ${({theme}) => `${theme.colors.primary}20`};
-    margin: ${({theme}) => theme.spacing.md} auto;
+    border-radius: 8px;
+    margin: ${({theme}) => theme.spacing.lg} auto;
     display: block;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    object-fit: contain;
+    cursor: zoom-in;
+    transition: ${({theme}) => theme.transitions.default};
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+      transform: scale(1.02);
+    }
+
+    &[width] {
+      max-width: min(100%, 700px);
+    }
+
+    @media (max-width: 768px) {
+      max-height: 400px;
+    }
   }
 
   table {
     width: 100%;
     border-collapse: collapse;
-    margin: ${({theme}) => theme.spacing.md} 0;
-    background: ${({theme}) => theme.colors.secondaryBackground};
-    border-radius: ${({theme}) => theme.borderRadius};
+    margin: ${({theme}) => theme.spacing.lg} 0;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
     overflow: hidden;
+
+    th, td {
+      padding: ${({theme}) => theme.spacing.sm} ${({theme}) => theme.spacing.md};
+      text-align: left;
+      border-bottom: 1px solid ${({theme}) => theme.colors.primary}10;
+    }
+
+    th {
+      background: ${({theme}) => theme.colors.primary}10;
+      font-weight: 600;
+      color: ${({theme}) => theme.colors.text};
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
 
     @media (max-width: 768px) {
       display: block;
       overflow-x: auto;
-      white-space: nowrap;
     }
   }
 
-  th,
-  td {
-    padding: ${({theme}) => theme.spacing.sm};
-    text-align: left;
-    border-bottom: 1px solid ${({theme}) => `${theme.colors.primary}20`};
-  }
-
-  th {
-    background: ${({theme}) => `${theme.colors.primary}15`};
-    font-weight: bold;
-    color: ${({theme}) => theme.colors.primary};
-  }
-
-  font-size: 1rem;
-
-
   @media (max-width: 768px) {
     font-size: 0.95rem;
-
     h1 {
       font-size: 1.5rem;
     }
@@ -269,92 +307,71 @@ const PostContent = styled.div`
     }
 
     h3 {
-      font-size: 1.1rem;
+      font-size: 1.2rem;
+    }
+
+    pre {
+      padding: ${({theme}) => theme.spacing.md};
+      font-size: 0.85rem;
     }
   }
 `;
 
-const PostFooter = styled.footer`
-  padding: ${({theme}) => theme.spacing.md};
-  background: ${({theme}) => theme.colors.background};
-  border-radius: ${({theme}) => theme.borderRadius};
-  border-top: 2px solid ${({theme}) => theme.colors.primary};
-  margin-bottom: ${({theme}) => theme.spacing.lg};
-`;
-
-const FooterContent = styled.div`
+const ActionBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: ${({theme}) => theme.spacing.lg} 0;
+  border-top: 1px solid ${({theme}) => theme.colors.primary}20;
+  border-bottom: 1px solid ${({theme}) => theme.colors.primary}20;
+  margin: ${({theme}) => theme.spacing.xl} 0;
   flex-wrap: wrap;
   gap: ${({theme}) => theme.spacing.md};
 `;
 
-const ShareSection = styled.div`
+const ActionGroup = styled.div`
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.sm};
 `;
 
-const ActionSection = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({theme}) => theme.spacing.sm};
-`;
-
-const ShareText = styled.span`
-  color: ${({theme}) => `${theme.colors.text}80`};
-  font-size: ${({theme}) => theme.fontSizes.small};
-`;
-
-const ShareButton = styled.button`
-  background: ${({theme}) => theme.colors.primary};
-  color: white;
-  border: none;
-  padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
-  border-radius: ${({theme}) => theme.borderRadius};
+const IconButton = styled.button<{ $variant?: "primary" | "danger" }>`
+  background: transparent;
+  color: ${({theme, $variant}) =>
+          $variant === "danger" ? theme.colors.error : theme.colors.primary};
+  border: 1px solid ${({theme, $variant}) =>
+          $variant === "danger" ? theme.colors.error : theme.colors.primary};
+  padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.md};
+  border-radius: 20px;
   cursor: pointer;
   font-size: ${({theme}) => theme.fontSizes.small};
-  transition: ${({theme}) => theme.transitions.default};
-
-  &:hover {
-    background: ${({theme}) => theme.colors.secondary};
-    transform: translateY(-1px);
-  }
-`;
-
-const ActionButton = styled.button<{ $variant?: "edit" | "delete" }>`
-  background: ${({theme, $variant}) =>
-          $variant === "delete" ? theme.colors.error : theme.colors.primary};
-  color: white;
-  border: none;
-  padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
-  border-radius: ${({theme}) => theme.borderRadius};
-  cursor: pointer;
-  font-size: ${({theme}) => theme.fontSizes.small};
+  font-weight: 500;
   transition: ${({theme}) => theme.transitions.default};
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
 
   &:hover {
-    opacity: 0.9;
+    background: ${({theme, $variant}) =>
+            $variant === "danger" ? `${theme.colors.error}10` : `${theme.colors.primary}10`};
     transform: translateY(-1px);
+    box-shadow: 0 2px 8px ${({theme, $variant}) =>
+            $variant === "danger" ? `${theme.colors.error}20` : `${theme.colors.primary}20`};
   }
 `;
 
 const ResourceLinksSection = styled.section`
-  margin-top: ${({theme}) => theme.spacing.lg};
-  padding: ${({theme}) => theme.spacing.md};
+  margin-top: ${({theme}) => theme.spacing.xl};
+  padding: ${({theme}) => theme.spacing.lg};
   background: ${({theme}) => theme.colors.background};
-  border-radius: ${({theme}) => theme.borderRadius};
-  border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+  border-radius: 12px;
+  border: 1px solid ${({theme}) => theme.colors.primary}10;
 `;
 
 const ResourceLinksTitle = styled.h3`
   color: ${({theme}) => theme.colors.primary};
   margin-bottom: ${({theme}) => theme.spacing.md};
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: 600;
 `;
 
@@ -369,8 +386,9 @@ const LoadingContainer = styled.div`
   justify-content: center;
   align-items: center;
   min-height: 400px;
-  font-size: 1.2rem;
-  color: ${({theme}) => `${theme.colors.text}80`};
+  font-size: 1.1rem;
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.6;
 `;
 
 const ErrorContainer = styled.div`
@@ -381,9 +399,6 @@ const ErrorContainer = styled.div`
   min-height: 400px;
   text-align: center;
   padding: ${({theme}) => theme.spacing.xl};
-  background: ${({theme}) => `${theme.colors.error}10`};
-  border-radius: ${({theme}) => theme.borderRadius};
-  border: 1px solid ${({theme}) => `${theme.colors.error}30`};
 `;
 
 const ErrorTitle = styled.h1`
@@ -392,7 +407,8 @@ const ErrorTitle = styled.h1`
 `;
 
 const ErrorMessage = styled.p`
-  color: ${({theme}) => `${theme.colors.text}80`};
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.7;
   margin-bottom: ${({theme}) => theme.spacing.lg};
 `;
 
@@ -407,17 +423,18 @@ const FormModal = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 10000;
+  padding: 20px;
 `;
 
 const ModalContent = styled.div`
   background-color: ${({theme}) => theme.colors.background};
-  padding: ${({theme}) => theme.spacing.md};
-  border-radius: ${({theme}) => theme.borderRadius};
+  padding: ${({theme}) => theme.spacing.lg};
+  border-radius: 12px;
   max-width: 800px;
   width: 90%;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -427,23 +444,15 @@ const ModalContent = styled.div`
     background: ${({theme}) => theme.colors.primary}30;
     border-radius: 4px;
   }
-
-  @media (max-width: 768px) {
-    width: 95%;
-    height: auto;
-    max-height: 95vh;
-    margin: 10px;
-    border-radius: ${({theme}) => theme.borderRadius};
-  }
 `;
 
 const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${({theme}) => theme.spacing.md};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
   padding-bottom: ${({theme}) => theme.spacing.md};
-  border-bottom: 1px solid ${({theme}) => theme.colors.text}20;
+  border-bottom: 1px solid ${({theme}) => theme.colors.primary}20;
 `;
 
 const ModalTitle = styled.h2`
@@ -456,10 +465,12 @@ const CloseButton = styled.button`
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: ${({theme}) => theme.colors.text}80;
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.5;
+  transition: opacity ${({theme}) => theme.transitions.default};
 
   &:hover {
-    color: ${({theme}) => theme.colors.text};
+    opacity: 1;
   }
 `;
 
@@ -496,7 +507,7 @@ const PostDetailPage: React.FC = () => {
     }
 
     const {data: post, isLoading, error} = usePost(postSlug!);
-    const {data: stat, isLoading: isStatLoading, error: statError} = usePostStats(postSlug!);
+    const {data: stat} = usePostStats(postSlug!);
 
     // 모달 상태 관리
     const [showUpdateForm, setShowUpdateForm] = useState(false);
@@ -504,9 +515,7 @@ const PostDetailPage: React.FC = () => {
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMessage, setAuthMessage] = useState("");
     const [formData, setFormData] = useState<UpdatePostRequest | FormData | null>(null);
-    const [pendingAction, setPendingAction] = useState<
-        "update" | "delete" | null
-    >(null);
+    const [pendingAction, setPendingAction] = useState<"update" | "delete" | null>(null);
 
     const updatePostMutation = useUpdatePost();
     const deletePostMutation = useDeletePost();
@@ -549,7 +558,6 @@ const PostDetailPage: React.FC = () => {
                                 );
                             }
                         } else if (href.includes("/posts/")) {
-                            // 현재 포스트 새로고침 (self 링크)
                             window.location.reload();
                         } else {
                             navigate(href);
@@ -571,7 +579,6 @@ const PostDetailPage: React.FC = () => {
         [fetchApiData, navigate, handleUpdateClick, handleDeleteClick]
     );
 
-    // NavigationBar와의 통신을 위한 이벤트 리스너
     React.useEffect(() => {
         const handleRequestPostData = () => {
             if (post) {
@@ -604,7 +611,6 @@ const PostDetailPage: React.FC = () => {
                     throw new Error(t("post.form.errors.noPostId" as any));
                 }
 
-                // FormData인지 체크
                 const updateData = postData instanceof FormData
                     ? postData
                     : {
@@ -661,29 +667,26 @@ const PostDetailPage: React.FC = () => {
     }, [deletePostMutation, post, navigate, t, formatMessage]);
 
     const handleUpdateSubmit = useCallback(async (formData: UpdatePostRequest | FormData) => {
-
-            try {
-                if (!isAuthenticated) {
-                    setFormData(formData);
-                    setPendingAction("update");
-                    setShowUpdateForm(false);
-                    setAuthMessage(
-                        formatMessage("post.auth.required", {
-                            action: t("post.auth.actions.edit" as any),
-                            category: post?.category || "",
-                        })
-                    );
-                    setShowAuthModal(true);
-                    return;
-                }
-
-                await updatePost(formData);
-            } catch (error) {
-                console.error(t("post.form.errors.formSubmission" as any), error);
+        try {
+            if (!isAuthenticated) {
+                setFormData(formData);
+                setPendingAction("update");
+                setShowUpdateForm(false);
+                setAuthMessage(
+                    formatMessage("post.auth.required", {
+                        action: t("post.auth.actions.edit" as any),
+                        category: post?.category || "",
+                    })
+                );
+                setShowAuthModal(true);
+                return;
             }
-        },
-        [isAuthenticated, post, updatePost, formatMessage, t]
-    );
+
+            await updatePost(formData);
+        } catch (error) {
+            console.error(t("post.form.errors.formSubmission" as any), error);
+        }
+    }, [isAuthenticated, post, updatePost, formatMessage, t]);
 
     const handleDeleteConfirm = useCallback(async () => {
         try {
@@ -823,16 +826,22 @@ const PostDetailPage: React.FC = () => {
                 {post.subtitle && (
                     <PostSubtitle>{post.subtitle}</PostSubtitle>
                 )}
+
                 <PostMeta>
                     <PostMetaItem>
                         <MetaIcon>📅</MetaIcon>
                         {post.createdAt ? formatDate(post.createdAt) : "No date"}
                     </PostMetaItem>
 
-                    <CategoryLink to={`/${post.category || "uncategorized"}`}>
-                        <MetaIcon>📁</MetaIcon>
-                        {getCategoryDisplayName(post.category)}
-                    </CategoryLink>
+                    <PostMetaItem>•</PostMetaItem>
+
+                    <PostMetaItem>
+                        <CategoryLink to={`/${post.category || "uncategorized"}`}>
+                            {getCategoryDisplayName(post.category)}
+                        </CategoryLink>
+                    </PostMetaItem>
+
+                    <PostMetaItem>•</PostMetaItem>
 
                     <PostMetaItem>
                         <MetaIcon>👀</MetaIcon>
@@ -855,31 +864,23 @@ const PostDetailPage: React.FC = () => {
                 }}/>
             </PostContent>
 
-            <PostFooter>
-                <FooterContent>
-                    <BackButton to={`/${post.category || "uncategorized"}`}>
-                        {formatMessage("post.detail.backToList", {
-                            category: getCategoryDisplayName(post.category),
-                        })}
-                    </BackButton>
+            <ActionBar>
+                <BackButton to={`/${post.category || "uncategorized"}`}>
+                    {t("post.detail.backToList" as any)}
+                </BackButton>
 
-                    <ShareSection>
-                        <ShareText>{t("post.detail.actions.shareText" as any)}</ShareText>
-                        <ShareButton onClick={handleShare}>
-                            {t("post.detail.actions.share" as any)}
-                        </ShareButton>
-                    </ShareSection>
-
-                    <ActionSection>
-                        <ActionButton $variant="edit" onClick={handleUpdateClick}>
-                            {t("post.detail.actions.edit" as any)}
-                        </ActionButton>
-                        <ActionButton $variant="delete" onClick={handleDeleteClick}>
-                            {t("post.detail.actions.delete" as any)}
-                        </ActionButton>
-                    </ActionSection>
-                </FooterContent>
-            </PostFooter>
+                <ActionGroup>
+                    <IconButton onClick={handleShare}>
+                        📤 {t("post.detail.actions.share" as any)}
+                    </IconButton>
+                    <IconButton onClick={handleUpdateClick}>
+                        ✏️ {t("post.detail.actions.edit" as any)}
+                    </IconButton>
+                    <IconButton $variant="danger" onClick={handleDeleteClick}>
+                        🗑️ {t("post.detail.actions.delete" as any)}
+                    </IconButton>
+                </ActionGroup>
+            </ActionBar>
 
             {post._links && Object.keys(post._links).length > 0 && (
                 <ResourceLinksSection>
@@ -925,8 +926,8 @@ const PostDetailPage: React.FC = () => {
                                 onCancel={handleFormCancel}
                             />
                         </ModalContent>
-                    </FormModal>
-                    , document.getElementById('modal-root')!
+                    </FormModal>,
+                    document.getElementById('modal-root')!
                 )
             )}
 
