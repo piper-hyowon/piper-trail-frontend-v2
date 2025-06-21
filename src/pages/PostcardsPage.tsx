@@ -70,6 +70,7 @@ const MailboxSection = styled.section`
   align-items: center;
   margin-bottom: ${({theme}) => theme.spacing.lg};
   max-height: 300px;
+  position: relative;
 `;
 
 const MailboxWrapper = styled.div`
@@ -105,6 +106,9 @@ const ActionButtons = styled.div`
   justify-content: center;
   margin-top: ${({theme}) => theme.spacing.md};
   flex-wrap: wrap;
+
+  position: relative;
+  z-index: 10;
 `;
 
 const ActionButton = styled.button<{ $variant: 'primary' | 'secondary' }>`
