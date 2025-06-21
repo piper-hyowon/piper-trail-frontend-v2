@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+        xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+    <url>
+        <loc>https://www.piper-trail.com/</loc>
+        <lastmod>2025-06-21T15:57:13+00:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>가
+
+    <url>
+        <loc>https://www.piper-trail.com/about</loc>
+        <lastmod>2025-06-21T15:57:13+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.piper-trail.com/projects</loc>
+        <lastmod>2025-06-21T15:57:13+00:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.piper-trail.com/postcards</loc>
+        <lastmod>2025-06-21T15:57:13+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://www.piper-trail.com/dolphin</loc>
+        <lastmod>2025-06-21T15:57:13+00:00</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+
+    <url>
+        <loc>https://www.piper-trail.com/search</loc>
+        <lastmod>2025-06-21T15:57:13+00:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Blog Categories -->
+    <url>
+        <loc>https://www.piper-trail.com/tech</loc>
+        <lastmod>2025-06-21T15:57:13+00:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <url>
+        <loc>https://www.piper-trail.com/food</loc>
+        <lastmod>2025-06-21T15:57:13+00:00</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+</urlset>
