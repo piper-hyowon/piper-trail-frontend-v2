@@ -80,6 +80,15 @@ const MailboxWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  margin: 0 auto;
+  padding: 0 ${({theme}) => theme.spacing.md};
+
+  @media (max-width: 768px) {
+    height: 200px;
+    max-width: 300px;
+    padding: 0 ${({theme}) => theme.spacing.sm};
+  }
 `;
 
 const MailboxText = styled.div<{ $hasEntries: boolean }>`

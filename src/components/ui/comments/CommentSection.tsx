@@ -15,13 +15,13 @@ interface CommentSectionProps {
 
 const CommentSectionContainer = styled.section`
   margin-top: ${({theme}) => theme.spacing.xl};
-  padding-top: ${({theme}) => theme.spacing.xl};
+  padding-top: ${({theme}) => theme.spacing.md};
   border-top: 2px solid ${({theme}) => theme.colors.primary}20;
 `;
 
 const CommentTitle = styled.h3`
   color: ${({theme}) => theme.colors.primary};
-  margin-bottom: ${({theme}) => theme.spacing.lg};
+  margin-bottom: ${({theme}) => theme.spacing.md};
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.sm};
@@ -43,8 +43,16 @@ const LoadingMessage = styled.div`
 
 const NoComments = styled.div`
   text-align: center;
-  padding: ${({theme}) => theme.spacing.xl};
+  padding: ${({theme}) => theme.spacing.lg};
   color: ${({theme}) => theme.colors.text}60;
+
+  &::before {
+    content: '💬';
+    display: block;
+    font-size: 2rem;
+    margin-bottom: ${({theme}) => theme.spacing.sm};
+    opacity: 0.5;
+  }
 `;
 
 export const CommentSection: React.FC<CommentSectionProps> = ({postId, isAdmin = false}) => {

@@ -13,75 +13,82 @@ interface CommentFormProps {
 const FormContainer = styled.div`
   background: ${({theme}) => theme.colors.background};
   border-radius: ${({theme}) => theme.borderRadius};
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   margin-bottom: ${({theme}) => theme.spacing.lg};
-`;
-
-const FormTitle = styled.h3`
-  color: ${({theme}) => theme.colors.primary};
-  margin-bottom: ${({theme}) => theme.spacing.md};
 `;
 
 const FormRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: ${({theme}) => theme.spacing.md};
-  margin-bottom: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.sm};
+  margin-bottom: ${({theme}) => theme.spacing.sm};
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    gap: ${({theme}) => theme.spacing.xs};
   }
 `;
 
 const FormGroup = styled.div`
-  margin-bottom: ${({theme}) => theme.spacing.md};
-`;
-
-const FormLabel = styled.label`
-  display: block;
-  margin-bottom: ${({theme}) => theme.spacing.xs};
-  font-weight: bold;
-  color: ${({theme}) => theme.colors.text};
+  position: relative;
 `;
 
 const FormInput = styled.input<{ $hasError?: boolean }>`
   width: 100%;
-  padding: ${({theme}) => theme.spacing.sm};
+  padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.sm}`};
   border: 2px solid ${({theme, $hasError}) =>
-          $hasError ? theme.colors.error : `${theme.colors.primary}30`};
+          $hasError ? theme.colors.error : `${theme.colors.primary}20`};
   border-radius: ${({theme}) => theme.borderRadius};
   background: ${({theme}) => theme.colors.background};
   color: ${({theme}) => theme.colors.text};
+  font-size: ${({theme}) => theme.fontSizes.medium};
+  transition: ${({theme}) => theme.transitions.default};
 
   &:focus {
     border-color: ${({theme}) => theme.colors.primary};
     outline: none;
+    background: ${({theme}) => `${theme.colors.primary}05`};
+  }
+
+  &::placeholder {
+    color: ${({theme}) => theme.colors.text}50;
   }
 `;
 
 const FormSelect = styled.select`
   width: 100%;
-  padding: ${({theme}) => theme.spacing.sm};
-  border: 2px solid ${({theme}) => `${theme.colors.primary}30`};
+  padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.sm}`};
+  border: 2px solid ${({theme}) => `${theme.colors.primary}20`};
   border-radius: ${({theme}) => theme.borderRadius};
   background: ${({theme}) => theme.colors.background};
   color: ${({theme}) => theme.colors.text};
+  font-size: ${({theme}) => theme.fontSizes.medium};
+  cursor: pointer;
+  transition: ${({theme}) => theme.transitions.default};
 
   &:focus {
     border-color: ${({theme}) => theme.colors.primary};
     outline: none;
+    background: ${({theme}) => `${theme.colors.primary}05`};
+  }
+
+  option:first-child {
+    color: ${({theme}) => theme.colors.text}60;
   }
 `;
 
 const FormTextarea = styled.textarea<{ $hasError?: boolean; $fontFamily?: FontFamily; $textColor?: TextColor }>`
   width: 100%;
-  min-height: 120px;
-  padding: ${({theme}) => theme.spacing.md};
+  min-height: 100px;
+  padding: ${({theme}) => theme.spacing.sm};
   border: 2px solid ${({theme, $hasError}) =>
-          $hasError ? theme.colors.error : `${theme.colors.primary}30`};
+          $hasError ? theme.colors.error : `${theme.colors.primary}20`};
   border-radius: ${({theme}) => theme.borderRadius};
   background: ${({theme}) => theme.colors.background};
   resize: vertical;
+  font-size: ${({theme}) => theme.fontSizes.medium};
+  transition: ${({theme}) => theme.transitions.default};
+
   font-family: ${({$fontFamily}) => {
     switch ($fontFamily) {
       case FontFamily.SERIF:
@@ -94,6 +101,7 @@ const FormTextarea = styled.textarea<{ $hasError?: boolean; $fontFamily?: FontFa
         return 'inherit';
     }
   }};
+
   color: ${({$textColor, theme}) => {
     switch ($textColor) {
       case TextColor.BLACK:
@@ -112,20 +120,27 @@ const FormTextarea = styled.textarea<{ $hasError?: boolean; $fontFamily?: FontFa
   &:focus {
     border-color: ${({theme}) => theme.colors.primary};
     outline: none;
+    background: ${({theme}) => `${theme.colors.primary}05`};
+  }
+
+  &::placeholder {
+    color: ${({theme}) => theme.colors.text}50;
   }
 `;
 
 const ErrorMessage = styled.span`
   color: ${({theme}) => theme.colors.error};
   font-size: ${({theme}) => theme.fontSizes.small};
-  margin-top: ${({theme}) => theme.spacing.xs};
+  margin-top: 4px;
   display: block;
+  position: absolute;
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
-  gap: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.sm};
   justify-content: flex-end;
+  margin-top: ${({theme}) => theme.spacing.sm};
 `;
 
 const SubmitButton = styled.button`
@@ -140,6 +155,7 @@ const SubmitButton = styled.button`
 
   &:hover:not(:disabled) {
     opacity: 0.9;
+    transform: translateY(-1px);
   }
 
   &:disabled {
@@ -149,11 +165,13 @@ const SubmitButton = styled.button`
 `;
 
 const PreviewContainer = styled.div<{ $fontFamily?: FontFamily; $textColor?: TextColor }>`
-  background: ${({theme}) => theme.colors.background};
-  border: 1px solid ${({theme}) => `${theme.colors.primary}20`};
+  background: ${({theme}) => `${theme.colors.primary}05`};
+  border: 1px solid ${({theme}) => `${theme.colors.primary}15`};
   border-radius: ${({theme}) => theme.borderRadius};
-  padding: ${({theme}) => theme.spacing.md};
-  margin-top: ${({theme}) => theme.spacing.sm};
+  padding: ${({theme}) => theme.spacing.sm};
+  margin-top: ${({theme}) => theme.spacing.xs};
+  font-size: ${({theme}) => theme.fontSizes.small};
+
   font-family: ${({$fontFamily}) => {
     switch ($fontFamily) {
       case FontFamily.SERIF:
@@ -166,6 +184,7 @@ const PreviewContainer = styled.div<{ $fontFamily?: FontFamily; $textColor?: Tex
         return 'inherit';
     }
   }};
+
   color: ${({$textColor, theme}) => {
     switch ($textColor) {
       case TextColor.BLACK:
@@ -180,6 +199,13 @@ const PreviewContainer = styled.div<{ $fontFamily?: FontFamily; $textColor?: Tex
         return theme.colors.text;
     }
   }};
+`;
+
+const PreviewLabel = styled.span`
+  font-size: ${({theme}) => theme.fontSizes.small};
+  color: ${({theme}) => theme.colors.text}60;
+  margin-bottom: ${({theme}) => theme.spacing.xs};
+  display: block;
 `;
 
 export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => {
@@ -253,15 +279,12 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
 
     return (
         <FormContainer>
-            <FormTitle>{t('comment.form.title' as any)}</FormTitle>
-
             <form onSubmit={handleSubmit}>
                 <FormRow>
                     <FormGroup>
-                        <FormLabel>{t('comment.form.fields.nickname' as any)}</FormLabel>
                         <FormInput
                             type="text"
-                            placeholder={t('comment.form.placeholders.nickname' as any)}
+                            placeholder={t('comment.form.fields.nickname' as any) || "닉네임"}
                             value={formData.author}
                             onChange={(e) => handleChange('author', e.target.value)}
                             $hasError={!!errors.author}
@@ -270,10 +293,9 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
                     </FormGroup>
 
                     <FormGroup>
-                        <FormLabel>{t('comment.form.fields.password' as any)}</FormLabel>
                         <FormInput
                             type="password"
-                            placeholder={t('comment.form.placeholders.password' as any)}
+                            placeholder={t('comment.form.fields.password' as any) + " (4자 이상)" || "비밀번호 (4자 이상)"}
                             value={formData.password}
                             onChange={(e) => handleChange('password', e.target.value)}
                             $hasError={!!errors.password}
@@ -284,39 +306,43 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
 
                 <FormRow>
                     <FormGroup>
-                        <FormLabel>{t('comment.form.fields.font' as any)}</FormLabel>
                         <FormSelect
                             value={formData.fontFamily}
                             onChange={(e) => handleChange('fontFamily', e.target.value as FontFamily)}
                         >
-                            <option value={FontFamily.DEFAULT}>{t('comment.form.options.font.default' as any)}</option>
-                            <option value={FontFamily.SERIF}>{t('comment.form.options.font.serif' as any)}</option>
                             <option
-                                value={FontFamily.SANS_SERIF}>{t('comment.form.options.font.sansSerif' as any)}</option>
+                                value={FontFamily.DEFAULT}>📝 {t('comment.form.options.font.default' as any) || "기본 글꼴"}</option>
                             <option
-                                value={FontFamily.MONOSPACE}>{t('comment.form.options.font.monospace' as any)}</option>
+                                value={FontFamily.SERIF}>📖 {t('comment.form.options.font.serif' as any) || "명조체"}</option>
+                            <option
+                                value={FontFamily.SANS_SERIF}>📄 {t('comment.form.options.font.sansSerif' as any) || "고딕체"}</option>
+                            <option
+                                value={FontFamily.MONOSPACE}>💻 {t('comment.form.options.font.monospace' as any) || "고정폭"}</option>
                         </FormSelect>
                     </FormGroup>
 
                     <FormGroup>
-                        <FormLabel>{t('comment.form.fields.textColor' as any)}</FormLabel>
                         <FormSelect
                             value={formData.textColor}
                             onChange={(e) => handleChange('textColor', e.target.value as TextColor)}
                         >
-                            <option value={TextColor.DEFAULT}>{t('comment.form.options.color.default' as any)}</option>
-                            <option value={TextColor.BLACK}>{t('comment.form.options.color.black' as any)}</option>
-                            <option value={TextColor.BLUE}>{t('comment.form.options.color.blue' as any)}</option>
-                            <option value={TextColor.RED}>{t('comment.form.options.color.red' as any)}</option>
-                            <option value={TextColor.GREEN}>{t('comment.form.options.color.green' as any)}</option>
+                            <option
+                                value={TextColor.DEFAULT}>🎨 {t('comment.form.options.color.default' as any) || "기본 색상"}</option>
+                            <option
+                                value={TextColor.BLACK}>⚫ {t('comment.form.options.color.black' as any) || "검정"}</option>
+                            <option
+                                value={TextColor.BLUE}>🔵 {t('comment.form.options.color.blue' as any) || "파랑"}</option>
+                            <option
+                                value={TextColor.RED}>🔴 {t('comment.form.options.color.red' as any) || "빨강"}</option>
+                            <option
+                                value={TextColor.GREEN}>🟢 {t('comment.form.options.color.green' as any) || "초록"}</option>
                         </FormSelect>
                     </FormGroup>
                 </FormRow>
 
                 <FormGroup>
-                    <FormLabel>{t('comment.form.fields.content' as any)}</FormLabel>
                     <FormTextarea
-                        placeholder={t('comment.form.placeholders.content' as any)}
+                        placeholder={t('comment.form.placeholders.content' as any) || "댓글을 입력해주세요..."}
                         value={formData.content}
                         onChange={(e) => handleChange('content', e.target.value)}
                         $hasError={!!errors.content}
@@ -327,15 +353,15 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
                 </FormGroup>
 
                 {formData.content && (
-                    <FormGroup>
-                        <FormLabel>{t('comment.form.preview' as any)}</FormLabel>
+                    <div>
+                        <PreviewLabel>✨ {t('comment.form.preview' as any) || "미리보기"}</PreviewLabel>
                         <PreviewContainer
                             $fontFamily={formData.fontFamily}
                             $textColor={formData.textColor}
                         >
                             {formData.content}
                         </PreviewContainer>
-                    </FormGroup>
+                    </div>
                 )}
 
                 <ButtonGroup>
@@ -344,8 +370,8 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
                         disabled={createCommentMutation.isPending}
                     >
                         {createCommentMutation.isPending
-                            ? t('comment.form.submitting' as any)
-                            : t('comment.form.submit' as any)
+                            ? t('comment.form.submitting' as any) || "작성 중..."
+                            : t('comment.form.submit' as any) || "댓글 작성"
                         }
                     </SubmitButton>
                 </ButtonGroup>

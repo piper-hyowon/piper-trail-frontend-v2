@@ -16,16 +16,23 @@ const CommentContainer = styled.div<{ $reviewNeeded?: boolean }>`
   border: 1px solid ${({theme, $reviewNeeded}) =>
           $reviewNeeded ? `${theme.colors.text}30` : `${theme.colors.primary}20`};
   border-radius: ${({theme}) => theme.borderRadius};
-  padding: ${({theme}) => theme.spacing.md};
-  margin-bottom: ${({theme}) => theme.spacing.md};
+  padding: ${({theme}) => theme.spacing.sm};
+  margin-bottom: ${({theme}) => theme.spacing.sm};
   ${({$reviewNeeded}) => $reviewNeeded && 'border-style: dashed;'}
+
+  transition: ${({theme}) => theme.transitions.default};
+
+  &:hover {
+    border-color: ${({theme, $reviewNeeded}) =>
+            $reviewNeeded ? `${theme.colors.text}40` : `${theme.colors.primary}40`};
+  }
 `;
 
 const CommentHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${({theme}) => theme.spacing.sm};
+  margin-bottom: ${({theme}) => theme.spacing.xs};
 `;
 
 const AuthorInfo = styled.div`
@@ -45,7 +52,7 @@ const CommentDate = styled.span`
 `;
 
 const CommentContent = styled.div<{ $fontFamily?: FontFamily; $textColor?: TextColor; $reviewNeeded?: boolean }>`
-  margin-bottom: ${({theme}) => theme.spacing.md};
+  margin-bottom: ${({theme}) => theme.spacing.sm};
   line-height: 1.6;
 
   // 검토 중인 댓글은 기본 스타일로 고정 (백엔드에서 이미 처리하긴 했음)
@@ -109,8 +116,8 @@ const ActionButton = styled.button`
 `;
 
 const DeleteForm = styled.div`
-  margin-top: ${({theme}) => theme.spacing.sm};
-  padding: ${({theme}) => theme.spacing.sm};
+  margin-top: ${({theme}) => theme.spacing.xs};
+  padding: ${({theme}) => theme.spacing.xs};
   background: ${({theme}) => `${theme.colors.error}10`};
   border-radius: ${({theme}) => theme.borderRadius};
   border: 1px solid ${({theme}) => `${theme.colors.error}30`};
