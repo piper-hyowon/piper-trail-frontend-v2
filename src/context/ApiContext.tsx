@@ -168,7 +168,7 @@ export const ApiProvider: React.FC<{ children: ReactNode }> = ({
                     setMethod("GET")
                 }
                 const correctedUrl = url.startsWith("/") ? url : `/${url}`;
-                setApiUrl(correctedUrl);
+                setApiUrl(decodeURIComponent(correctedUrl));
                 navigate(correctedUrl);
             },
             [navigate, clearApiStatus]
@@ -179,7 +179,7 @@ export const ApiProvider: React.FC<{ children: ReactNode }> = ({
     useEffect(() => {
         const currentLocationPath = location.pathname + location.search;
         if (currentLocationPath !== apiUrl) {
-            setApiUrl(currentLocationPath);
+            setApiUrl(decodeURIComponent(currentLocationPath));
             // URL이 변경 = 새로운 GET 요청 성공
             setStatusCode(200);
             setApiStatus("success");

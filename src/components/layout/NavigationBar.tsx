@@ -675,7 +675,7 @@ const NavigationBar: React.FC = () => {
     useEffect(() => {
         const currentLocation = location.pathname + location.search;
         if (currentLocation !== prevLocationRef.current) {
-            setInputUrl(currentLocation);
+            setInputUrl(decodeURIComponent(currentLocation));
             prevLocationRef.current = currentLocation;
         }
     }, [location]);
@@ -727,7 +727,7 @@ const NavigationBar: React.FC = () => {
     };
 
     const handleUrlChange = (newUrl: string) => {
-        setInputUrl(newUrl);
+        setInputUrl(decodeURIComponent(newUrl));
     };
 
     const handleUrlSubmit = () => {
