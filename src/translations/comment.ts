@@ -59,6 +59,13 @@ export const commentTranslations = {
                     notFound: "Comment not found.",
                     failed: "Delete failed: {error}"
                 }
+            },
+            confetti: {
+                firstComment: 'Congratulations! You wrote the first comment! 🥇',
+                thankYou1: 'Thank you for your comment! Your feedback means a lot! 💝',
+                thankYou2: 'Thanks for your valuable comment! Let\'s grow together! 🌱',
+                thankYou3: 'What a great comment! Happy to connect with you! ✨',
+                thankYou4: 'Thank you for commenting! I\'ll keep creating better content! 🙏'
             }
         }
     },
@@ -122,6 +129,13 @@ export const commentTranslations = {
                     notFound: "댓글을 찾을 수 없습니다.",
                     failed: "삭제 실패: {error}"
                 }
+            },
+            confetti: {
+                firstComment: '축하합니다! 첫 번째 댓글을 작성하셨어요! 🥇',
+                thankYou1: '댓글 감사합니다! 여러분의 의견은 큰 힘이 됩니다! 💝',
+                thankYou2: '소중한 댓글 감사드려요! 함께 성장해나가요! 🌱',
+                thankYou3: '멋진 댓글이에요! 여러분과 소통할 수 있어 행복합니다! ✨',
+                thankYou4: '댓글 남겨주셔서 감사합니다! 더 좋은 콘텐츠로 보답하겠습니다! 🙏'
             }
         }
     }

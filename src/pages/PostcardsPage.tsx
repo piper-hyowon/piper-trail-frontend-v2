@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useMemo, useCallback} from 'react';
-import styled, {keyframes} from 'styled-components';
+import styled from 'styled-components';
 import ReactDOM from 'react-dom';
 import Mailbox3D from '../components/ui/stamps/Mailbox3D';
 import StampCard from '../components/ui/stamps/StampCard';
@@ -7,23 +7,13 @@ import PostcardCard from '../components/ui/stamps/PostcardCard';
 import {usePostcards, useCreatePostcard} from '../hooks/useApi';
 import {StampType} from '../types/api';
 import {useLanguage} from "../context/LanguageContext.tsx";
+import Confetti from "../components/ui/effects/Confetti.tsx";
 
 interface Stamp {
     id: string;
     name: string;
     color: string;
     description: string;
-}
-
-interface Particle {
-    id: number;
-    x: number;
-    y: number;
-    vx: number;
-    vy: number;
-    color: string;
-    rotation: number;
-    rotationSpeed: number;
 }
 
 const convertToStampType = (stampId: string): StampType => {
@@ -46,105 +36,30 @@ const convertPostcardResponse = (postcard: any) => ({
     nickname: postcard.nickname
 });
 
-const confettiFall = keyframes`
-  0% {
-    transform: translate(var(--x), -100px) rotate(var(--rotation));
-    opacity: 1;
-  }
-  100% {
-    transform: translate(calc(var(--x) + var(--drift)), calc(100vh + 100px)) rotate(calc(var(--rotation) + 360deg));
-    opacity: 0;
-  }
-`;
-
-const ConfettiContainer = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 20000;
-`;
-
-const ConfettiParticle = styled.div<{
-    $delay: number;
-    $duration: number;
-    $drift: number;
-    $x: number;
-    $rotation: number;
-    $color: string
-}>`
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background: ${({$color}) => $color};
-  animation: ${confettiFall} ${({$duration}) => $duration}s linear ${({$delay}) => $delay}s;
-  animation-fill-mode: forwards;
-  --x: ${({$x}) => $x}px;
-  --drift: ${({$drift}) => $drift}px;
-  --rotation: ${({$rotation}) => $rotation}deg;
-
-  &::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: inherit;
-    transform: rotate(45deg);
-  }
-`;
-
-const SuccessMessage = styled.div<{ $show: boolean }>`
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(${({$show}) => $show ? 1 : 0.8});
-  background: white;
-  padding: ${({theme}) => theme.spacing.xl};
-  border-radius: ${({theme}) => theme.borderRadius};
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  opacity: ${({$show}) => $show ? 1 : 0};
-  transition: all 0.3s ease;
-  z-index: 15000;
-`;
-
-const SuccessIcon = styled.div`
-  font-size: 60px;
-  margin-bottom: ${({theme}) => theme.spacing.md};
-`;
-
-const SuccessText = styled.h3`
-  color: ${({theme}) => theme.colors.primary};
-  margin: 0;
-  font-size: ${({theme}) => theme.fontSizes.xlarge};
-`;
-
-// 기존 스타일 컴포넌트들...
 const StampsContainer = styled.div`
   max-width: 1000px;
   margin: 0 auto;
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
   min-height: 70vh;
 `;
 
 const PageHeader = styled.header`
   text-align: center;
-  margin-bottom: ${({theme}) => theme.spacing.xl};
-  padding: ${({theme}) => theme.spacing.lg};
-  background: ${({theme}) => theme.colors.background};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => theme.spacing.md};
+    //background: ${({theme}) => theme.colors.background};
   border-radius: ${({theme}) => theme.borderRadius};
 `;
 
 const PageTitle = styled.h1`
   color: ${({theme}) => theme.colors.primary};
-  margin-bottom: ${({theme}) => theme.spacing.sm};
+  margin-bottom: ${({theme}) => theme.spacing.xs};
+  font-size: ${({theme}) => theme.fontSizes.xlarge};
 `;
 
 const PageDescription = styled.p`
   color: ${({theme}) => `${theme.colors.text}80`};
-  font-size: ${({theme}) => theme.fontSizes.large};
+  font-size: ${({theme}) => theme.fontSizes.small};
   line-height: 1.6;
   white-space: pre-line;
 `;
@@ -153,7 +68,18 @@ const MailboxSection = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: ${({theme}) => theme.spacing.xl};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
+  max-height: 300px;
+`;
+
+const MailboxWrapper = styled.div`
+  position: relative;
+  height: 300px;
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const MailboxText = styled.div<{ $hasEntries: boolean }>`
@@ -166,22 +92,23 @@ const MailboxText = styled.div<{ $hasEntries: boolean }>`
 
 const ActionButtons = styled.div`
   display: flex;
-  gap: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.sm};
   justify-content: center;
-  margin-top: ${({theme}) => theme.spacing.lg};
+  margin-top: ${({theme}) => theme.spacing.md};
+  flex-wrap: wrap;
 `;
 
 const ActionButton = styled.button<{ $variant: 'primary' | 'secondary' }>`
-  padding: ${({theme}) => `${theme.spacing.md} ${theme.spacing.lg}`};
+  padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.md}`};
   border: none;
   border-radius: ${({theme}) => theme.borderRadius};
   font-weight: bold;
-  font-size: ${({theme}) => theme.fontSizes.medium};
+  font-size: ${({theme}) => theme.fontSizes.small};
   cursor: pointer;
   transition: ${({theme}) => theme.transitions.default};
   display: flex;
   align-items: center;
-  gap: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.xs};
 
   background: ${({theme, $variant}) =>
           $variant === 'primary' ? theme.colors.primary : theme.colors.secondary};
@@ -193,7 +120,6 @@ const ActionButton = styled.button<{ $variant: 'primary' | 'secondary' }>`
             $variant === 'primary' ? `${theme.colors.primary}40` : `${theme.colors.secondary}40`};
   }
 `;
-
 const PostcardOverlay = styled.div<{ $isVisible: boolean }>`
   position: fixed;
   top: 0;
@@ -293,29 +219,40 @@ const Modal = styled.div<{ $isOpen: boolean }>`
   justify-content: center;
   z-index: ${({theme}) => theme.zIndex.modal};
   backdrop-filter: blur(5px);
+  padding: ${({theme}) => theme.spacing.md};
 `;
 
 const ModalContent = styled.div`
   background: ${({theme}) => theme.colors.background};
   border-radius: ${({theme}) => theme.borderRadius};
-  padding: ${({theme}) => theme.spacing.xl};
-  max-width: 900px;
-  width: 95%;
-  max-height: 90vh;
+  padding: ${({theme}) => theme.spacing.lg};
+  max-width: 700px;
+  width: 100%;
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${({theme}) => theme.colors.primary}30;
+    border-radius: 4px;
+  }
 `;
 
 const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: ${({theme}) => theme.spacing.lg};
+  margin-bottom: ${({theme}) => theme.spacing.md};
 `;
 
 const ModalTitle = styled.h3`
   color: ${({theme}) => theme.colors.primary};
   margin: 0;
+  font-size: 1.5rem;
 `;
 
 const CloseButton = styled.button`
@@ -332,9 +269,9 @@ const CloseButton = styled.button`
 
 const StampGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: ${({theme}) => theme.spacing.lg};
-  margin-bottom: ${({theme}) => theme.spacing.lg};
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: ${({theme}) => theme.spacing.md};
+  margin-bottom: ${({theme}) => theme.spacing.md};
 `;
 
 const FormGroup = styled.div`
@@ -367,7 +304,6 @@ const FormInput = styled.input`
     outline: none;
   }
 `;
-
 const FormTextarea = styled.textarea`
   width: 100%;
   min-height: 80px;
@@ -473,10 +409,7 @@ const PostcardsPage: React.FC = () => {
     const [mailboxClickCount, setMailboxClickCount] = useState(0);
     const [showClickHint, setShowClickHint] = useState(false);
 
-    // 종이조각 효과(엽서 작성시)
-    const [showConfetti, setShowConfetti] = useState(false);
-    const [confettiParticles, setConfettiParticles] = useState<Particle[]>([]);
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [showConfettiEffect, setShowConfettiEffect] = useState(false);
 
     const {data: postcardsResponse, isLoading, error, refetch} = usePostcards(0, 50);
     const createPostcardMutation = useCreatePostcard();
@@ -489,33 +422,6 @@ const PostcardsPage: React.FC = () => {
             message = message.replace(`{${param}}`, String(value));
         });
         return message;
-    };
-
-    const createConfetti = () => {
-        const colors = ['#FFD700', '#FF69B4', '#87CEEB', '#98FB98', '#DDA0DD', '#F0E68C', '#FF6347'];
-        const particles: Particle[] = [];
-
-        for (let i = 0; i < 150; i++) {
-            particles.push({
-                id: i,
-                x: Math.random() * window.innerWidth,
-                y: -20,
-                vx: (Math.random() - 0.5) * 4,
-                vy: Math.random() * 3 + 2,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                rotation: Math.random() * 360,
-                rotationSpeed: (Math.random() - 0.5) * 10
-            });
-        }
-
-        setConfettiParticles(particles);
-        setShowConfetti(true);
-
-        // 6초 후 제거
-        setTimeout(() => {
-            setShowConfetti(false);
-            setConfettiParticles([]);
-        }, 6000);
     };
 
     useEffect(() => {
@@ -662,13 +568,7 @@ const PostcardsPage: React.FC = () => {
             setMessage('');
             setShowModal(false);
 
-            setShowSuccessMessage(true);
-            createConfetti();
-
-            // 3초 후 성공 메시지 숨기기
-            setTimeout(() => {
-                setShowSuccessMessage(false);
-            }, 3000);
+            setShowConfettiEffect(true);
 
             // 목록 새로고침
             refetch();
@@ -752,7 +652,7 @@ const PostcardsPage: React.FC = () => {
             )}
 
             <MailboxSection>
-                <div style={{position: 'relative'}}>
+                <MailboxWrapper>
                     <MemoizedMailbox3D
                         hasEntries={stampEntries.length > 0}
                         onClick={handleMailboxClick}
@@ -761,7 +661,7 @@ const PostcardsPage: React.FC = () => {
                     <ClickHint $visible={showClickHint && stampEntries.length > 0}>
                         {t('postcard.mailbox.clickHint' as any)}
                     </ClickHint>
-                </div>
+                </MailboxWrapper>
 
                 <MailboxText $hasEntries={stampEntries.length > 0}>
                     {stampEntries.length > 0
@@ -789,32 +689,13 @@ const PostcardsPage: React.FC = () => {
                 </ActionButtons>
             </MailboxSection>
 
-            {/* 종이 가루 효과 */}
-            {showConfetti && ReactDOM.createPortal(
-                <ConfettiContainer>
-                    {confettiParticles.map((particle) => (
-                        <ConfettiParticle
-                            key={particle.id}
-                            $x={particle.x}
-                            $delay={Math.random() * 0.5}
-                            $duration={3 + Math.random() * 2}
-                            $drift={(Math.random() - 0.5) * 200}
-                            $rotation={particle.rotation}
-                            $color={particle.color}
-                        />
-                    ))}
-                </ConfettiContainer>,
-                document.body
-            )}
+            <Confetti
+                show={showConfettiEffect}
+                message={t('postcard.messages.success' as any)}
+                emoji="🎉"
+                onComplete={() => setShowConfettiEffect(false)}
+            />
 
-            {/* 성공 메시지 */}
-            {showSuccessMessage && ReactDOM.createPortal(
-                <SuccessMessage $show={showSuccessMessage}>
-                    <SuccessIcon>🎉</SuccessIcon>
-                    <SuccessText>{t('postcard.messages.success' as any)}</SuccessText>
-                </SuccessMessage>,
-                document.body
-            )}
 
             {showPostcards && stampEntries.length > 0 && ReactDOM.createPortal(
                 <PostcardOverlay $isVisible={true}>
