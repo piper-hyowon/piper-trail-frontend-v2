@@ -129,7 +129,7 @@ const WrittenText = styled.div`
 `;
 
 const FromHeader = styled.div`
-  font-size: 23px;
+  font-size: 20px;
   font-weight: 600;
   margin-bottom: 5px;
   transform: rotate(-0.8deg);

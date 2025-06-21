@@ -265,7 +265,7 @@ const ModalHeader = styled.div`
 const ModalTitle = styled.h3`
   color: ${({theme}) => theme.colors.primary};
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.2rem;
 `;
 
 const CloseButton = styled.button`
@@ -282,7 +282,7 @@ const CloseButton = styled.button`
 
 const StampGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: ${({theme}) => theme.spacing.md};
   margin-bottom: ${({theme}) => theme.spacing.md};
 `;
@@ -746,7 +746,6 @@ const PostcardsPage: React.FC = () => {
                         </FormGroup>
 
                         <FormGroup>
-                            <FormLabel>{t('postcard.modal.nickname' as any)}</FormLabel>
                             <FormInput
                                 type="text"
                                 placeholder={t('postcard.modal.nicknamePlaceholder' as any)}
@@ -757,7 +756,6 @@ const PostcardsPage: React.FC = () => {
                         </FormGroup>
 
                         <FormGroup>
-                            <FormLabel>{t('postcard.modal.message' as any)}</FormLabel>
                             <FormTextarea
                                 placeholder={t('postcard.modal.messagePlaceholder' as any)}
                                 value={message}

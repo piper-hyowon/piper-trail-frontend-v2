@@ -98,7 +98,7 @@ const CardContainer = styled.div<{ $stampType: string }>`
   background: ${({$stampType}) => getCardPattern($stampType)},
   linear-gradient(135deg, #fefefe 0%, #faf9f7 100%);
   border-radius: 8px;
-  padding: 25px;
+  padding: 10px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12),
   inset 0 1px 0 rgba(255, 255, 255, 0.9);
   position: relative;
@@ -150,8 +150,8 @@ const WrittenText = styled.div<{ $language: 'ko' | 'en' }>`
 `;
 
 const StampTitle = styled.div<{ $language: 'ko' | 'en' }>`
-  font-size: ${({$language}) => $language === 'ko' ? '22px' : '20px'};
-  font-weight: 700;
+  font-size: ${({$language}) => $language === 'ko' ? '18px' : '16px'};
+  font-weight: 580;
   margin-bottom: 8px;
   transform: rotate(-1.2deg);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -173,7 +173,7 @@ const StampSubtitle = styled.div<{ $language: 'ko' | 'en' }>`
 const StampContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin-top: 10px;
+  margin-top: 5px;
 `;
 
 const StampCard: React.FC<StampCardProps> = React.memo(({stamp, selected, onClick}) => {
