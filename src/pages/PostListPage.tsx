@@ -14,7 +14,7 @@ import {useLanguage} from '../context/LanguageContext';
 import type {CreatePostRequest} from "../types/api.ts";
 import ReactDOM from 'react-dom';
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 4;
 const DEFAULT_SORT = 'createdAt,desc';
 
 const SORT_OPTIONS = [
@@ -86,7 +86,7 @@ const PostListTitle = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 800;
   margin: 0 0 ${({theme}) => theme.spacing.xs} 0;
   animation: ${slideIn} 0.8s ease-out;
@@ -96,7 +96,7 @@ const PostCount = styled.p`
   margin: 0;
   color: ${({theme}) => theme.colors.text};
   opacity: 0.7;
-  font-size: ${({theme}) => theme.fontSizes.medium};
+  font-size: ${({theme}) => theme.fontSizes.small};
   font-weight: 500;
 `;
 
@@ -111,7 +111,7 @@ const CreatePostButton = styled.button`
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
   cursor: pointer;
-  font-size: ${({theme}) => theme.fontSizes.small};
+  font-size: ${({theme}) => theme.fontSizes.xsmall};
   transition: all ${({theme}) => theme.transitions.default};
   white-space: nowrap;
   height: fit-content;
@@ -185,7 +185,7 @@ const SortContainer = styled.div`
 `;
 
 const SortLabel = styled.label`
-  font-size: ${({theme}) => theme.fontSizes.small};
+  font-size: ${({theme}) => theme.fontSizes.xsmall};
   color: ${({theme}) => theme.colors.primary};
   font-weight: 600;
   margin: 0;
@@ -214,6 +214,10 @@ const StyledCard = styled(Card)`
     animation-delay: 0.3s;
   }
 
+  &:nth-child(4) {
+    animation-delay: 0.4s;
+  }
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
@@ -223,7 +227,7 @@ const StyledCard = styled(Card)`
 
 const StyledCardTitle = styled(CardTitle)`
   font-size: ${({theme}) => theme.fontSizes.medium}; 
-  font-weight: 600;
+  font-weight: 560;
   color: ${({theme}) => theme.colors.text};
   margin-bottom: ${({theme}) => theme.spacing.xs};
   transition: color ${({theme}) => theme.transitions.default};
@@ -264,7 +268,7 @@ const StyledCardFooter = styled(CardFooter)`
 const CardMeta = styled.div`
   display: flex;
   align-items: center;
-  gap: ${({theme}) => theme.spacing.sm}; 
+  gap: ${({theme}) => theme.spacing.sm};
   font-size: ${({theme}) => theme.fontSizes.small};
   color: ${({theme}) => theme.colors.text};
   opacity: 0.6;
@@ -284,7 +288,7 @@ const CardMeta = styled.div`
 const PostDate = styled.span`
   color: ${({theme}) => theme.colors.text};
   opacity: 0.5;
-  font-size: ${({theme}) => theme.fontSizes.small}; 
+  font-size: ${({theme}) => theme.fontSizes.small};
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
@@ -346,7 +350,7 @@ const ErrorContainer = styled.div`
 const PostsGrid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.sm}; 
+  gap: ${({theme}) => theme.spacing.sm};
 
   @media (min-width: 768px) {
     display: grid;
@@ -354,7 +358,7 @@ const PostsGrid = styled.div`
   }
 
   @media (min-width: 1024px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 `;
 
@@ -378,6 +382,12 @@ const NoPostsMessage = styled.div`
       opacity: 0.9;
     }
   }
+`;
+
+const PaginationSection = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const FormModal = styled.div`
@@ -875,12 +885,15 @@ const PostListPage: React.FC = () => {
                 )}
             </PostsGrid>
 
+            {/* 페이지네이션 섹션 */}
             {totalPages > 1 && (
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={handlePageChange}
-                />
+                <PaginationSection>
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
+                </PaginationSection>
             )}
 
             {/* 포스트 작성 모달 (검색 라우트가 아닐 때만) */}

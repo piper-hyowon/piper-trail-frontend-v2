@@ -240,7 +240,7 @@ const PostContent = styled.div`
 
   img {
     max-width: 100%;
-    max-height: 500px;
+    max-height: 350px;
     width: auto;
     height: auto;
     border-radius: 8px;

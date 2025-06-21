@@ -50,6 +50,8 @@ declare module 'styled-components' {
         skyColors: string[];
         borderRadius: string;
         fontSizes: {
+            xxsmall: string;
+            xsmall: string;
             small: string;
             medium: string;
             large: string;

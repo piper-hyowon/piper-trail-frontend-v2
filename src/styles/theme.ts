@@ -49,6 +49,8 @@ export interface Theme {
     skyColors: string[];
     borderRadius: string;
     fontSizes: {
+        xxsmall: string,
+        xsmall: string,
         small: string;
         medium: string;
         large: string;
@@ -117,6 +119,8 @@ export const theme: Record<ThemeMode, Theme> = {
         },
         borderRadius: '12px',
         fontSizes: {
+            xxsmall: '9px',
+            xsmall: '11px',
             small: '13px',
             medium: '15px',
             large: '17px',
@@ -183,6 +187,8 @@ export const theme: Record<ThemeMode, Theme> = {
         },
         borderRadius: '12px',
         fontSizes: {
+            xxsmall: '9px',
+            xsmall: '11px',
             small: '13px',
             medium: '15px',
             large: '17px',

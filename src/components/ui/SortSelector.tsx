@@ -21,6 +21,7 @@ const SortContainer = styled.div`
 const SortLabel = styled.span`
   font-weight: bold;
   color: ${({theme}) => theme.colors.text};
+  font-size: ${({theme}) => theme.fontSizes.xsmall};
 `;
 
 const Select = styled.select`
@@ -29,6 +30,8 @@ const Select = styled.select`
   border-radius: ${({theme}) => theme.borderRadius};
   color: ${({theme}) => theme.colors.text};
   padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.sm}`};
+  font-size: ${({theme}) => theme.fontSizes.xsmall};
+
 
   &:focus {
     border-color: ${({theme}) => theme.colors.primary};
