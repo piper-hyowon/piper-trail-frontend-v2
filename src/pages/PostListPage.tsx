@@ -14,7 +14,7 @@ import {useLanguage} from '../context/LanguageContext';
 import type {CreatePostRequest} from "../types/api.ts";
 import ReactDOM from 'react-dom';
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 3;
 const DEFAULT_SORT = 'createdAt,desc';
 
 const SORT_OPTIONS = [
@@ -214,10 +214,6 @@ const StyledCard = styled(Card)`
     animation-delay: 0.3s;
   }
 
-  &:nth-child(4) {
-    animation-delay: 0.4s;
-  }
-
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
@@ -226,11 +222,12 @@ const StyledCard = styled(Card)`
 `;
 
 const StyledCardTitle = styled(CardTitle)`
-  font-size: ${({theme}) => theme.fontSizes.large};
-  font-weight: 700;
+  font-size: ${({theme}) => theme.fontSizes.medium}; 
+  font-weight: 600;
   color: ${({theme}) => theme.colors.text};
   margin-bottom: ${({theme}) => theme.spacing.xs};
   transition: color ${({theme}) => theme.transitions.default};
+  line-height: 1.3;
 
   ${StyledCard}:hover & {
     color: ${({theme}) => theme.colors.primary};
@@ -241,21 +238,25 @@ const CardSubtitle = styled.div`
   color: ${({theme}) => theme.colors.text};
   opacity: 0.6;
   font-size: ${({theme}) => theme.fontSizes.small};
-  margin-bottom: ${({theme}) => theme.spacing.sm};
+  margin-bottom: ${({theme}) => theme.spacing.xs};
   font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;
 
 const StyledCardContent = styled(CardContent)`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.sm};
+  gap: ${({theme}) => theme.spacing.xs};
+  margin-bottom: ${({theme}) => theme.spacing.xs};
 `;
 
 const StyledCardFooter = styled(CardFooter)`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: ${({theme}) => theme.spacing.sm};
+  padding-top: ${({theme}) => theme.spacing.xs};
   border-top: 1px solid ${({theme}) => `${theme.colors.primary}05`};
   margin-top: auto;
 `;
@@ -263,7 +264,7 @@ const StyledCardFooter = styled(CardFooter)`
 const CardMeta = styled.div`
   display: flex;
   align-items: center;
-  gap: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.sm}; 
   font-size: ${({theme}) => theme.fontSizes.small};
   color: ${({theme}) => theme.colors.text};
   opacity: 0.6;
@@ -273,15 +274,25 @@ const CardMeta = styled.div`
     align-items: center;
     gap: ${({theme}) => theme.spacing.xs};
   }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 `;
 
 const PostDate = styled.span`
   color: ${({theme}) => theme.colors.text};
   opacity: 0.5;
-  font-size: ${({theme}) => theme.fontSizes.small};
+  font-size: ${({theme}) => theme.fontSizes.small}; 
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 `;
 
 const LoadingContainer = styled.div`
@@ -335,7 +346,7 @@ const ErrorContainer = styled.div`
 const PostsGrid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.sm}; 
 
   @media (min-width: 768px) {
     display: grid;
@@ -380,22 +391,19 @@ const FormModal = styled.div`
   justify-content: center;
   align-items: center;
   z-index: ${({theme}) => theme.zIndex.modal};
-  padding: 20px; // 패딩 추가로 가장자리 여백 확보
-  box-sizing: border-box; // 패딩 포함한 크기 계산
-
+  padding: 20px;
+  box-sizing: border-box;
 `;
 
 const ModalContent = styled.div`
   background-color: ${({theme}) => theme.colors.background};
   padding: ${({theme}) => theme.spacing.md};
   border-radius: ${({theme}) => theme.borderRadius};
-  max-width: 800px; // 1000px → 800px로 줄임
+  max-width: 800px;
   width: 90%;
-  max-height: 85vh; // 90vh → 85vh로 줄임
+  max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-
-  /* 스크롤바 스타일 추가 */
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -407,11 +415,11 @@ const ModalContent = styled.div`
   }
 
   @media (max-width: 768px) {
-    width: 95%;  // 100% → 95%로 변경
-    height: auto;  // 100% → auto로 변경
-    max-height: 95vh;  // 100vh → 95vh로 변경
-    margin: 10px;  // 여백 추가
-    border-radius: ${({theme}) => theme.borderRadius};  // 모바일에서도 둥근 모서리 유지
+    width: 95%;
+    height: auto;
+    max-height: 95vh;
+    margin: 10px;
+    border-radius: ${({theme}) => theme.borderRadius};
   }
 `;
 
