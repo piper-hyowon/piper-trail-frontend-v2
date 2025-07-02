@@ -391,9 +391,15 @@ const SeriesHomePage: React.FC = () => {
             </BackButton>
 
             <SeriesHero>
-                <SeriesTitle>{series.title}</SeriesTitle>
+                <SeriesTitle>
+                    {language === 'ko' ? series.title : (series.titleEn || series.title)}
+                </SeriesTitle>
                 {series.description && (
-                    <SeriesDescription>{series.description}</SeriesDescription>
+                    <SeriesDescription>
+                        {language === 'ko'
+                            ? series.description
+                            : (series.descriptionEn || series.description)}
+                    </SeriesDescription>
                 )}
 
                 <SeriesStats>

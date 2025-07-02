@@ -54,8 +54,10 @@ export interface PostDetail {
 export interface PostSeriesDetailResponse {
     seriesId: string;
     seriesTitle: string;
+    seriesTitleEn?: string;
     seriesSlug: string;
     seriesDescription: string;
+    seriesDescriptionEn?: string;
     currentOrder: number;
     totalCount: number;
     navigation: SeriesNavigationResponse;

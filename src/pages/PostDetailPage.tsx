@@ -1066,7 +1066,9 @@ const PostDetailPage: React.FC = () => {
                 <SeriesNavigationSection>
                     <SeriesHeader>
                         <SeriesTitle>
-                            📚 {post.series.seriesTitle}
+                            📚 {language === 'ko'
+                            ? post.series.seriesTitle
+                            : (post.series.seriesTitleEn || post.series.seriesTitle)}
                         </SeriesTitle>
                         <SeriesHomeLink to={`/series/${post.series.seriesSlug}`}>
                             시리즈 홈 →
@@ -1076,10 +1078,11 @@ const PostDetailPage: React.FC = () => {
                     <SeriesProgress>
                         <span>{post.series.currentOrder}편 / 총 {post.series.totalCount}편</span>
                         {post.series.seriesDescription && (
-                            <>
-                                <span>•</span>
-                                <span>{post.series.seriesDescription}</span>
-                            </>
+                            <span>
+                                {language === 'ko'
+                                    ? post.series.seriesDescription
+                                    : (post.series.seriesDescriptionEn || post.series.seriesDescription)}
+                            </span>
                         )}
                     </SeriesProgress>
 
