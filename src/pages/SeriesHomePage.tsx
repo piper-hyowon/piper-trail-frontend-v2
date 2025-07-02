@@ -428,7 +428,7 @@ const SeriesHomePage: React.FC = () => {
                         <TagList
                             tags={series.tags}
                             onTagClick={handleTagClick}
-                            variant="light"
+                            // variant="light"
                         />
                     </TagsSection>
                 )}
