@@ -15,7 +15,7 @@ import {
     AuthResponse,
     DashboardSummaryResponse,
     PostStatisticsResponse, PostcardResponse, StampType,
-    PostStat
+    PostStat, SeriesDetailResponse
 } from '../types/api';
 import {Language} from "../context/LanguageContext.tsx";
 
@@ -191,6 +191,10 @@ class ApiClient {
 
     async getPost(slug: string): Promise<PostDetail> {
         return this.request<PostDetail>(`/posts/${slug}`);
+    }
+
+    async getSeriesDetail(slug: string): Promise<SeriesDetailResponse> {
+        return this.request<SeriesDetailResponse>(`/series/${slug}`);
     }
 
     async getPostStats(slug: string): Promise<PostStat> {

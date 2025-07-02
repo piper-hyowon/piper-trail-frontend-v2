@@ -225,10 +225,11 @@ const StyledCard = styled(Card)`
   }
 `;
 
-const StyledCardTitle = styled(CardTitle)`
-  font-size: ${({theme}) => theme.fontSizes.medium}; 
+const StyledCardTitle = styled(CardTitle)<{ $isSeriesPost?: boolean }>`
+  font-size: ${({theme}) => theme.fontSizes.medium};
   font-weight: 560;
-  color: ${({theme}) => theme.colors.text};
+  color: ${({theme, $isSeriesPost}) =>
+          $isSeriesPost ? theme.colors.primary : theme.colors.text};
   margin-bottom: ${({theme}) => theme.spacing.xs};
   transition: color ${({theme}) => theme.transitions.default};
   line-height: 1.3;
@@ -237,7 +238,6 @@ const StyledCardTitle = styled(CardTitle)`
     color: ${({theme}) => theme.colors.primary};
   }
 `;
-
 const CardSubtitle = styled.div`
   color: ${({theme}) => theme.colors.text};
   opacity: 0.6;
@@ -461,6 +461,148 @@ const CloseButton = styled.button`
   }
 `;
 
+const SeriesCard = styled(StyledCard)`
+  position: relative;
+  background: ${({theme}) => `linear-gradient(135deg, ${theme.colors.fairy.lavender}15 0%, ${theme.colors.fairy.peach}15 100%)`};
+  border: 1px solid ${({theme}) => theme.colors.series.primary}30;
+  overflow: visible;
+  box-shadow: ${({theme}) => theme.shadows.fairy};
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: ${({theme}) => theme.gradients.fairyGradient};
+    border-radius: 12px;
+    opacity: 0;
+    z-index: -1;
+    transition: opacity ${({theme}) => theme.transitions.default};
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 60px;
+    height: 60px;
+    background: ${({theme}) => theme.gradients.magicGradient};
+    border-radius: 50%;
+    opacity: 0.6;
+    filter: blur(20px);
+  }
+
+  &:hover {
+    border-color: ${({theme}) => theme.colors.series.primary}50;
+    box-shadow: ${({theme}) => theme.shadows.magic};
+
+    &::before {
+      opacity: 0.3;
+    }
+  }
+`;
+const SeriesHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: ${({theme}) => theme.spacing.md};
+  position: relative;
+`;
+
+const SeriesBadge = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: ${({theme}) => theme.gradients.seriesGradient};
+  color: white;
+  padding: 5px 14px;
+  border-radius: 24px;
+  font-size: ${({theme}) => theme.fontSizes.xsmall};
+  font-weight: 600;
+  cursor: pointer;
+  transition: all ${({theme}) => theme.transitions.default};
+  position: relative;
+  z-index: 1;
+  box-shadow: ${({theme}) => theme.shadows.fairy};
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: ${({theme}) => theme.shadows.fairyGlow};
+  }
+
+  span:first-child {
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+  }
+`;
+
+const SeriesOrder = styled.div`
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 36px;
+  height: 36px;
+  background: ${({theme}) => theme.gradients.seriesAccent};
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: ${({theme}) => theme.fontSizes.medium};
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+`;
+
+const SeriesInfo = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: ${({theme}) => theme.spacing.md};
+  padding-top: ${({theme}) => theme.spacing.sm};
+  border-top: 1px solid ${({theme}) => theme.colors.series.primary}10;
+`;
+
+const SeriesProgress = styled.div`
+  font-size: ${({theme}) => theme.fontSizes.small};
+  color: ${({theme}) => theme.colors.series.primary};
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: ${({theme}) => theme.colors.series.primary};
+    border-radius: 50%;
+  }
+`;
+
+const LatestBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: ${({theme}) => theme.fontSizes.xxsmall};
+  background: ${({theme}) => theme.gradients.seriesAccent};
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  animation: pulse 2s infinite;
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.8;
+    }
+  }
+`;
+
 const PostListPage: React.FC = () => {
     const params = useParams();
     const location = useLocation();
@@ -499,6 +641,11 @@ const PostListPage: React.FC = () => {
         });
         return message;
     };
+
+    const handleSeriesHomeClick = useCallback((e: React.MouseEvent, seriesSlug: string) => {
+        e.stopPropagation();
+        navigate(`/series/${seriesSlug}`);
+    }, [navigate]);
 
     // API 호출
     let postsQuery;
@@ -769,17 +916,6 @@ const PostListPage: React.FC = () => {
                 </TitleRow>
 
                 <FilterContainer>
-                    {availableTags.length > 0 && !isSearchRoute && (
-                        <TagFilterSection>
-                            <h4>{t('post.list.filters.tagFilter' as any)}</h4>
-                            <TagList
-                                tags={availableTags}
-                                selectedTags={selectedTags}
-                                onTagClick={handleTagFilterClick}
-                            />
-                        </TagFilterSection>
-                    )}
-
                     {isSearchRoute && availableTags.length > 0 && (
                         <TagFilterSection>
                             <h4>{formatMessage('post.list.filters.searchResults', {query: searchQuery})}</h4>
@@ -829,40 +965,74 @@ const PostListPage: React.FC = () => {
 
             <PostsGrid>
                 {posts.length > 0 ? (
-                    posts.map((post) => (
-                        <StyledCard key={post.id} onClick={() => handleCardClick(post)}>
-                            <StyledCardTitle>{post.title}</StyledCardTitle>
-                            {post.subtitle && (
-                                <CardSubtitle>{post.subtitle}</CardSubtitle>
-                            )}
-                            <StyledCardContent>
-                                {post.tags && post.tags.length > 0 && (
-                                    <TagList
-                                        tags={post.tags}
-                                        onTagClick={handlePostTagClick}
-                                    />
+                    posts.map((post) => {
+                        const isSeriesPost = post.series !== null;
+                        const Card = isSeriesPost ? SeriesCard : StyledCard;
+
+                        return (
+                            <Card key={post.id} onClick={() => handleCardClick(post)}>
+                                {isSeriesPost && post.series && (
+                                    <>
+                                        <SeriesOrder>
+                                            {post.series.currentOrder}
+                                        </SeriesOrder>
+                                        <SeriesHeader>
+                                            <SeriesBadge
+                                                onClick={(e) => handleSeriesHomeClick(e, post.series!.seriesSlug)}>
+                                                <span style={{fontSize: '14px'}}>📚</span>
+                                                <span>{post.series.seriesTitle}</span>
+                                            </SeriesBadge>
+                                        </SeriesHeader>
+                                    </>
                                 )}
-                            </StyledCardContent>
-                            <StyledCardFooter>
-                                <CardMeta>
-                                    {post.category && (
-                                        <span>
-                                            <IoFolderOpenOutline/>
-                                            {post.category}
-                                        </span>
+
+                                <StyledCardTitle $isSeriesPost={isSeriesPost}>
+                                    {post.title}
+                                </StyledCardTitle>
+
+                                {post.subtitle && (
+                                    <CardSubtitle>{post.subtitle}</CardSubtitle>
+                                )}
+
+                                <StyledCardContent>
+                                    {post.tags && post.tags.length > 0 && (
+                                        <TagList
+                                            tags={post.tags}
+                                            onTagClick={handlePostTagClick}
+                                        />
                                     )}
-                                    <span>
-                                        <IoEyeOutline/>
-                                        {statsData?.[post.slug]?.viewCount ?? post.viewCount ?? 0}
-                                    </span>
-                                </CardMeta>
-                                <PostDate>
-                                    <IoCalendarOutline/>
-                                    {new Date(post.createdAt).toLocaleDateString()}
-                                </PostDate>
-                            </StyledCardFooter>
-                        </StyledCard>
-                    ))
+                                </StyledCardContent>
+
+                                <StyledCardFooter>
+                                    <CardMeta>
+                                        {post.category && (
+                                            <span>
+        <IoFolderOpenOutline/>
+                                                {post.category}
+      </span>
+                                        )}
+                                        <span>
+      <IoEyeOutline/>
+                                            {statsData?.[post.slug]?.viewCount ?? post.viewCount ?? 0}
+    </span>
+                                    </CardMeta>
+                                    <PostDate>
+                                        <IoCalendarOutline/>
+                                        {new Date(post.createdAt).toLocaleDateString()}
+                                    </PostDate>
+                                </StyledCardFooter>
+
+                                {isSeriesPost && post.series && (
+                                    <SeriesInfo>
+                                        <SeriesProgress>
+                                            {post.series.currentOrder}편 / 총 {post.series.totalCount}편
+                                        </SeriesProgress>
+                                        {post.series.isLatest && <LatestBadge>NEW</LatestBadge>}
+                                    </SeriesInfo>
+                                )}
+                            </Card>
+                        );
+                    })
                 ) : (
                     <NoPostsMessage>
                         <p>

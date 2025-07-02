@@ -19,6 +19,11 @@ export interface Theme {
         pinkGradient: string;
         techGradient: string;
         socialGradient: string;
+        seriesGradient: string;
+        seriesAccent: string;
+        fairyGradient: string;
+        magicGradient: string;
+        dreamGradient: string;
     };
     colors: {
         background: string;
@@ -44,7 +49,28 @@ export interface Theme {
             red: string;
             green: string;
         };
+        series: {
+            primary: string;
+            secondary: string;
+            card: string;
+            badge: string;
+        };
+        fairy: {
+            lavender: string;
+            mint: string;
+            peach: string;
+            sky: string;
+            rose: string;
+            gold: string;
+        };
     };
+
+    shadows: {
+        fairy: string;
+        fairyGlow: string;
+        magic: string;
+    },
+
     seaColors: string[];
     skyColors: string[];
     borderRadius: string;
@@ -91,6 +117,11 @@ export const theme: Record<ThemeMode, Theme> = {
             pinkGradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
             techGradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
             socialGradient: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+            seriesGradient: 'linear-gradient(135deg, #E8B4F3 0%, #B4D4F1 50%, #D4F1E8 100%)',
+            seriesAccent: 'linear-gradient(135deg, #FFD3BA 0%, #FFB5E8 50%, #D4B5FF 100%)',
+            fairyGradient: 'linear-gradient(135deg, #C3B4F3 0%, #E8D4F1 25%, #F1D4E8 50%, #D4E8F1 75%, #B4F3E8 100%)',
+            magicGradient: 'radial-gradient(circle at 30% 50%, rgba(255, 181, 232, 0.3) 0%, rgba(212, 181, 255, 0.3) 25%, rgba(181, 234, 255, 0.3) 50%, transparent 70%)',
+            dreamGradient: 'linear-gradient(135deg, #FFEAA7 0%, #FDCB6E 25%, #FFB5E8 50%, #C7ECEE 75%, #DFE6E9 100%)',
         },
         colors: {
             background: '#FEFEFE',
@@ -115,7 +146,27 @@ export const theme: Record<ThemeMode, Theme> = {
                 blue: '#1E6091',
                 red: '#B22222',
                 green: '#228B22',
-            }
+            },
+            series: {
+                primary: '#B4A7D6',  // 라벤더 퍼플
+                secondary: '#FFD3BA', // 피치
+                card: 'rgba(195, 180, 243, 0.08)', // 연한 라벤더
+                badge: '#C3B4F3', // 밝은 라벤더
+            },
+            fairy: {
+                lavender: '#E8D4F1',
+                mint: '#B4F3E8',
+                peach: '#FFE5CC',
+                sky: '#D4E8F1',
+                rose: '#FFD1DC',
+                gold: '#FFF3CD',
+            },
+        },
+
+        shadows: {
+            fairy: '0 4px 20px rgba(195, 180, 243, 0.25)',
+            fairyGlow: '0 0 30px rgba(232, 212, 241, 0.4)',
+            magic: '0 10px 40px rgba(180, 167, 214, 0.3)',
         },
         borderRadius: '12px',
         fontSizes: {
@@ -159,6 +210,12 @@ export const theme: Record<ThemeMode, Theme> = {
             pinkGradient: 'linear-gradient(135deg, #f48fb1 0%, #ec407a 100%)',
             techGradient: 'linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%)',
             socialGradient: 'linear-gradient(135deg, #66bb6a 0%, #4caf50 100%)',
+            seriesGradient: 'linear-gradient(135deg, #9B88B4 0%, #7EA3C4 50%, #88C4B4 100%)',
+            seriesAccent: 'linear-gradient(135deg, #D4A894 0%, #D49BC4 50%, #A894D4 100%)',
+            fairyGradient: 'linear-gradient(135deg, #8B7AA3 0%, #A894B1 25%, #B194A8 50%, #94A8B1 75%, #7AA38B 100%)',
+            magicGradient: 'radial-gradient(circle at 30% 50%, rgba(212, 152, 196, 0.3) 0%, rgba(168, 148, 212, 0.3) 25%, rgba(148, 186, 212, 0.3) 50%, transparent 70%)',
+            dreamGradient: 'linear-gradient(135deg, #BFA06A 0%, #BA9B6E 25%, #D49BC4 50%, #97B5B7 75%, #9FA6A9 100%)',
+
         },
         colors: {
             background: '#121212',
@@ -183,7 +240,27 @@ export const theme: Record<ThemeMode, Theme> = {
                 blue: '#42A5F5',
                 red: '#EF5350',
                 green: '#66BB6A',
-            }
+            },
+            series: {
+                primary: '#A894D4',  // 더스티 라벤더
+                secondary: '#D4A894', // 더스티 피치
+                card: 'rgba(168, 148, 212, 0.12)', // 연한 더스티 라벤더
+                badge: '#9B88B4', // 딥 라벤더
+            },
+            fairy: {
+                lavender: '#A894B1',
+                mint: '#7AA38B',
+                peach: '#BFA299',
+                sky: '#94A8B1',
+                rose: '#BFA1AC',
+                gold: '#BFB39D',
+            },
+        },
+
+        shadows: {
+            fairy: '0 4px 20px rgba(195, 180, 243, 0.25)',
+            fairyGlow: '0 0 30px rgba(232, 212, 241, 0.4)',
+            magic: '0 10px 40px rgba(180, 167, 214, 0.3)',
         },
         borderRadius: '12px',
         fontSizes: {

@@ -288,6 +288,14 @@ export const useCreatePostcard = () => {
     });
 };
 
+export const useSeriesDetail = (slug: string) => {
+    return useQuery({
+        queryKey: ['series', slug],
+        queryFn: () => apiClient.getSeriesDetail(slug),
+        enabled: !!slug,
+    });
+};
+
 // 로그인 1단계 (/auth/login)
 export const useLogin = () => {
     return useMutation({

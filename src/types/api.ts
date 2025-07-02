@@ -12,12 +12,20 @@ export interface PostSummary {
     subtitle: string;
     subtitleEn: string;
     slug: string;
-    preview: string;
-    previewEn: string;
     category: string;
     tags: string[];
     createdAt: Date;
     updatedAt: Date;
+    series: SeriesInfoResponse | null;
+}
+
+export interface SeriesInfoResponse {
+    seriesId: string;
+    seriesTitle: string;
+    seriesSlug: string;
+    currentOrder: number;
+    totalCount: number;
+    isLatest: boolean;
 }
 
 export interface LinkInfo {
@@ -26,10 +34,86 @@ export interface LinkInfo {
     title: string;
 }
 
-export interface PostDetail extends PostSummary {
+export interface PostDetail {
+    id: string;
+    title: string;
+    titleEn: string;
+    subtitle: string;
+    subtitleEn: string;
+    slug: string;
+    category: string;
+    tags: string[];
+    createdAt: Date;
+    updatedAt: Date;
     content: string;
     contentEn: string;
     _links: Map<string, LinkInfo>;
+    series: PostSeriesDetailResponse
+}
+
+export interface PostSeriesDetailResponse {
+    seriesId: string;
+    seriesTitle: string;
+    seriesSlug: string;
+    seriesDescription: string;
+    currentOrder: number;
+    totalCount: number;
+    navigation: SeriesNavigationResponse;
+}
+
+export interface SeriesDetailResponse {
+    id: string;
+    slug: string;
+    category: string;
+    title: string;
+    titleEn: string | null;
+    description: string;
+    descriptionEn: string | null;
+    totalCount: number;
+    tags: string[];
+    createdAt: string;
+    lastUpdated: string;
+    posts: SeriesPostItem[];
+}
+
+export interface SeriesNavigationResponse {
+    prev?: NavigationItem;
+    next?: NavigationItem;
+    allPosts: NavigationItem[];
+}
+
+export interface NavigationItem {
+    id: string;
+    title: string;
+    slug: string;
+    order: number;
+    current: boolean;
+}
+
+export interface SeriesPostItem {
+    id: string;
+    slug: string;
+    title: string;
+    titleEn: string | null;
+    subtitle: string;
+    subtitleEn: string | null;
+    order: number;
+    createdAt: string;
+    viewCount: number;
+}
+
+export interface SeriesNavigationResponse {
+    prev?: NavigationItem;
+    next?: NavigationItem;
+    allPosts: NavigationItem[];
+}
+
+export interface NavigationItem {
+    id: string;
+    title: string;
+    slug: string;
+    order: number;
+    current: boolean;
 }
 
 export interface PostStat {

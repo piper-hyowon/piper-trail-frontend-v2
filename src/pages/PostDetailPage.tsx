@@ -474,6 +474,211 @@ const CloseButton = styled.button`
   }
 `;
 
+const SeriesNavigationSection = styled.div`
+  background: ${({theme}) => `linear-gradient(135deg, ${theme.colors.fairy.lavender}20 0%, ${theme.colors.fairy.sky}20 50%, ${theme.colors.fairy.mint}20 100%)`};
+  border-radius: 20px;
+  padding: ${({theme}) => theme.spacing.lg};
+  margin-bottom: ${({theme}) => theme.spacing.xl};
+  border: 1px solid ${({theme}) => theme.colors.series.primary}20;
+  position: relative;
+  overflow: hidden;
+  box-shadow: ${({theme}) => theme.shadows.fairy};
+
+  &::before {
+    content: '✨';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2rem;
+    opacity: 0.3;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: -50px;
+    width: 150px;
+    height: 150px;
+    background: ${({theme}) => theme.gradients.magicGradient};
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+`;
+
+const SeriesHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: ${({theme}) => theme.spacing.md};
+  position: relative;
+  z-index: 1;
+`;
+
+const SeriesTitle = styled.h3`
+  color: ${({theme}) => theme.colors.series.primary};
+  font-size: ${({theme}) => theme.fontSizes.large};
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: ${({theme}) => theme.spacing.sm};
+
+  span:first-child {
+    font-size: 1.2em;
+  }
+`;
+
+const SeriesHomeLink = styled(Link)`
+  font-size: ${({theme}) => theme.fontSizes.small};
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 24px;
+  background: ${({theme}) => theme.gradients.seriesAccent};
+  transition: all ${({theme}) => theme.transitions.default};
+  white-space: nowrap;
+  box-shadow: ${({theme}) => theme.shadows.fairy};
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: ${({theme}) => theme.colors.fairy.gold}50;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.5s ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: ${({theme}) => theme.shadows.fairyGlow};
+
+    &::before {
+      width: 100px;
+      height: 100px;
+    }
+  }
+`;
+
+const SeriesProgress = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({theme}) => theme.spacing.md};
+  margin-bottom: ${({theme}) => theme.spacing.lg};
+  font-size: ${({theme}) => theme.fontSizes.small};
+  color: ${({theme}) => theme.colors.text};
+  position: relative;
+  z-index: 1;
+
+  &::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: ${({theme}) => theme.colors.series.primary}20;
+    border-radius: 1px;
+  }
+
+  span:first-child {
+    color: ${({theme}) => theme.colors.series.primary};
+    font-weight: 700;
+    font-size: ${({theme}) => theme.fontSizes.medium};
+  }
+`;
+
+const NavigationGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: ${({theme}) => theme.spacing.md};
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const NavCard = styled(Link)<{ $disabled?: boolean }>`
+  display: block;
+  padding: ${({theme}) => theme.spacing.md};
+  background: ${({theme}) => theme.colors.background};
+  border: 2px solid ${({theme}) => theme.colors.series.primary}10;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all ${({theme}) => theme.transitions.default};
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: ${({theme}) => theme.gradients.seriesGradient};
+    transform: translateY(-3px);
+    transition: transform ${({theme}) => theme.transitions.default};
+  }
+
+  ${props => props.$disabled ? `
+    pointer-events: none;
+    opacity: 0.4;
+  ` : `
+    &:hover {
+      border-color: ${props.theme.colors.series.primary}30;
+      transform: translateY(-2px);
+      
+      &::before {
+        transform: translateY(0);
+      }
+    }
+  `}
+`;
+
+const NavDirection = styled.div`
+  font-size: ${({theme}) => theme.fontSizes.xsmall};
+  color: ${({theme}) => theme.colors.series.primary};
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`;
+
+const NavTitle = styled.div`
+  color: ${({theme}) => theme.colors.text};
+  font-weight: 600;
+  line-height: 1.4;
+  font-size: ${({theme}) => theme.fontSizes.medium};
+
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+`;
+
 const PostDetailPage: React.FC = () => {
     const {category, postSlug} = useParams<{
         category: string;
@@ -857,7 +1062,55 @@ const PostDetailPage: React.FC = () => {
                     </TagSection>
                 )}
             </PostHeader>
+            {post.series && (
+                <SeriesNavigationSection>
+                    <SeriesHeader>
+                        <SeriesTitle>
+                            📚 {post.series.seriesTitle}
+                        </SeriesTitle>
+                        <SeriesHomeLink to={`/series/${post.series.seriesSlug}`}>
+                            시리즈 홈 →
+                        </SeriesHomeLink>
+                    </SeriesHeader>
 
+                    <SeriesProgress>
+                        <span>{post.series.currentOrder}편 / 총 {post.series.totalCount}편</span>
+                        {post.series.seriesDescription && (
+                            <>
+                                <span>•</span>
+                                <span>{post.series.seriesDescription}</span>
+                            </>
+                        )}
+                    </SeriesProgress>
+
+                    <NavigationGrid>
+                        <NavCard
+                            to={post.series.navigation.prev ? `/${post.category || 'uncategorized'}/${post.series.navigation.prev.slug}` : '#'}
+                            $disabled={!post.series.navigation.prev}
+                        >
+                            <NavDirection>
+                                ← 이전 글
+                            </NavDirection>
+                            <NavTitle>
+                                {post.series.navigation.prev?.title || '첫 번째 글입니다'}
+                            </NavTitle>
+                        </NavCard>
+
+                        <NavCard
+                            to={post.series.navigation.next ? `/${post.category || 'uncategorized'}/${post.series.navigation.next.slug}` : '#'}
+                            $disabled={!post.series.navigation.next}
+                            style={{textAlign: 'right'}}
+                        >
+                            <NavDirection style={{justifyContent: 'flex-end'}}>
+                                다음 글 →
+                            </NavDirection>
+                            <NavTitle>
+                                {post.series.navigation.next?.title || '마지막 글입니다'}
+                            </NavTitle>
+                        </NavCard>
+                    </NavigationGrid>
+                </SeriesNavigationSection>
+            )}
             <PostContent>
                 <div dangerouslySetInnerHTML={{
                     __html: renderMarkdown(post.content || post.content)

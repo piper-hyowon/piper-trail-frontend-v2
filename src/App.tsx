@@ -18,6 +18,7 @@ import PostcardsPage from "./pages/PostcardsPage.tsx";
 import DolphinPage from "./pages/DolphinPage.tsx";
 import {EasterEggProvider} from "./context/EasterEggDolphinContext.tsx";
 import EasterEggPage from "./pages/EasterEggPage.tsx";
+import SeriesHomePage from "./pages/SeriesHomePage.tsx";
 
 const VALID_CATEGORIES = BLOG_CATEGORIES.map(e => e.name);
 
@@ -69,6 +70,7 @@ const App: React.FC = () => {
                                             </React.Fragment>
                                         ))}
                                         <Route path="/search" element={<PostListPage/>}/>
+                                        <Route path="/series/:slug" element={<SeriesHomePage/>}/>
 
 
                                         {/* 미분류 포스트 (null, uncategorized) */}

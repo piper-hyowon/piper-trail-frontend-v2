@@ -20,6 +20,11 @@ declare module 'styled-components' {
             pinkGradient: string;
             techGradient: string;
             socialGradient: string;
+            seriesGradient: string;
+            seriesAccent: string;
+            fairyGradient: string;
+            magicGradient: string;
+            dreamGradient: string;
         };
         colors: {
             background: string;
@@ -45,6 +50,25 @@ declare module 'styled-components' {
                 red: string;
                 green: string;
             };
+            series: {
+                primary: string;
+                secondary: string;
+                card: string;
+                badge: string;
+            };
+            fairy: {
+                lavender: string;
+                mint: string;
+                peach: string;
+                sky: string;
+                rose: string;
+                gold: string;
+            };
+        };
+        shadows: {
+            fairy: string;
+            fairyGlow: string;
+            magic: string;
         };
         seaColors: string[];
         skyColors: string[];

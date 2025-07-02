@@ -5,6 +5,7 @@ import {commonTranslations} from './common';
 import {postcardTranslations} from "./postcard.ts";
 import {postTranslations} from "./post.ts";
 import {commentTranslations} from "./comment.ts";
+import {seriesTranslations} from "./series.ts";
 
 export const translations = {
         en: {
@@ -15,6 +16,7 @@ export const translations = {
             ...postcardTranslations.en,
             ...postTranslations.en,
             ...commentTranslations.en,
+            ...seriesTranslations.en,
         },
         ko: {
             ...layoutTranslations.ko,
@@ -23,7 +25,8 @@ export const translations = {
             ...commonTranslations.ko,
             ...postcardTranslations.ko,
             ...postTranslations.ko,
-            ...commentTranslations.ko
+            ...commentTranslations.ko,
+            ...seriesTranslations.ko
         }
     }
 ;
