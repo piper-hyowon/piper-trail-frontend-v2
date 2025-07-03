@@ -8,6 +8,8 @@ import {usePostcards, useCreatePostcard} from '../hooks/useApi';
 import {StampType} from '../types/api';
 import {useLanguage} from "../context/LanguageContext.tsx";
 import Confetti from "../components/ui/effects/Confetti.tsx";
+import FloatingAnimalsBackground from "../components/ui/effects/FloatingAnimalsBackground.tsx";
+import {DolphinPageFont} from "./DolphinPage.tsx";
 
 interface Stamp {
     id: string;
@@ -36,29 +38,73 @@ const convertPostcardResponse = (postcard: any) => ({
     nickname: postcard.nickname
 });
 
+const PageWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: ${({theme}) => theme.gradients.postcardVintageGradient};
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
+
 const StampsContainer = styled.div`
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  padding: ${({theme}) => theme.spacing.lg};
+
+  font-family: 'DXcutecute', 'Comic Sans MS', cursive;
+`;
+
+const BackgroundAnimalsWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1;
+`;
+
+const ContentWrapper = styled.div`
+  position: relative;
+  z-index: 2;
+  width: 100%;
   max-width: 1000px;
   margin: 0 auto;
-  padding: ${({theme}) => theme.spacing.md};
-  min-height: 70vh;
 `;
 
 const PageHeader = styled.header`
   text-align: center;
-  margin-bottom: ${({theme}) => theme.spacing.lg};
+  margin: 0 auto ${({theme}) => theme.spacing.lg} auto;
   padding: ${({theme}) => theme.spacing.md};
-    //background: ${({theme}) => theme.colors.background};
+  background: ${({theme}) => `${theme.colors.postcard.cardBackground}dd`};
   border-radius: ${({theme}) => theme.borderRadius};
+  box-shadow: ${({theme}) => theme.shadows.postcardSoft};
+  backdrop-filter: blur(10px);
+  max-width: 50%;
+
+  @media (max-width: 768px) {
+    max-width: 80%;
+  }
 `;
 
 const PageTitle = styled.h1`
-  color: ${({theme}) => theme.colors.primary};
+  color: ${({theme}) => theme.colors.postcard.chocolateBrown};
   margin-bottom: ${({theme}) => theme.spacing.xs};
   font-size: ${({theme}) => theme.fontSizes.xlarge};
 `;
 
 const PageDescription = styled.p`
-  color: ${({theme}) => `${theme.colors.text}80`};
+  color: ${({theme}) => theme.colors.postcard.textSoft};
   font-size: ${({theme}) => theme.fontSizes.small};
   line-height: 1.6;
   white-space: pre-line;
@@ -69,7 +115,6 @@ const MailboxSection = styled.section`
   flex-direction: column;
   align-items: center;
   margin-bottom: ${({theme}) => theme.spacing.lg};
-  max-height: 300px;
   position: relative;
 `;
 
@@ -81,7 +126,6 @@ const MailboxWrapper = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-
   margin: 0 auto;
   padding: 0 ${({theme}) => theme.spacing.md};
 
@@ -95,9 +139,12 @@ const MailboxWrapper = styled.div`
 const MailboxText = styled.div<{ $hasEntries: boolean }>`
   margin-top: ${({theme}) => theme.spacing.md};
   text-align: center;
-  color: ${({theme}) => theme.colors.primary};
+  color: ${({theme}) => theme.colors.postcard.textWarm};
   font-weight: bold;
   font-size: ${({theme}) => theme.fontSizes.large};
+  background: ${({theme}) => `${theme.colors.postcard.cardBackground}aa`};
+  padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.md}`};
+  border-radius: ${({theme}) => theme.borderRadius};
 `;
 
 const ActionButtons = styled.div`
@@ -106,7 +153,6 @@ const ActionButtons = styled.div`
   justify-content: center;
   margin-top: ${({theme}) => theme.spacing.md};
   flex-wrap: wrap;
-
   position: relative;
   z-index: 10;
 `;
@@ -122,17 +168,20 @@ const ActionButton = styled.button<{ $variant: 'primary' | 'secondary' }>`
   display: flex;
   align-items: center;
   gap: ${({theme}) => theme.spacing.xs};
+  box-shadow: ${({theme}) => theme.shadows.postcardSoft};
 
   background: ${({theme, $variant}) =>
-          $variant === 'primary' ? theme.colors.primary : theme.colors.secondary};
-  color: white;
+          $variant === 'primary' ? theme.colors.postcard.accent : theme.colors.postcard.softBrown};
+  color: ${({theme}) => theme.colors.postcard.lightCream};
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px ${({theme, $variant}) =>
-            $variant === 'primary' ? `${theme.colors.primary}40` : `${theme.colors.secondary}40`};
+    box-shadow: ${({theme}) => theme.shadows.postcardWarm};
+    background: ${({theme, $variant}) =>
+            $variant === 'primary' ? theme.colors.postcard.chocolateBrown : theme.colors.postcard.accent};
   }
 `;
+
 const PostcardOverlay = styled.div<{ $isVisible: boolean }>`
   position: fixed;
   top: 0;
@@ -158,16 +207,16 @@ const PostcardListContent = styled.div`
   }
 
   &::-webkit-scrollbar-track {
-    background: ${({theme}) => `${theme.colors.text}10`};
+    background: ${({theme}) => theme.colors.postcard.lightCream};
     border-radius: 4px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: ${({theme}) => `${theme.colors.text}30`};
+    background: ${({theme}) => theme.colors.postcard.softBrown};
     border-radius: 4px;
 
     &:hover {
-      background: ${({theme}) => `${theme.colors.text}50`};
+      background: ${({theme}) => theme.colors.postcard.chocolateBrown};
     }
   }
 `;
@@ -177,14 +226,15 @@ const PostcardListHeader = styled.div`
   margin-bottom: ${({theme}) => theme.spacing.lg};
   position: sticky;
   top: 0;
-  background: rgba(0, 0, 0, 0.9);
+  background: ${({theme}) => theme.gradients.postcardWarmGradient};
   padding: ${({theme}) => theme.spacing.md};
   border-radius: ${({theme}) => theme.borderRadius};
   backdrop-filter: blur(10px);
+  box-shadow: ${({theme}) => theme.shadows.postcardWarm};
 `;
 
 const PostcardListTitle = styled.h2`
-  color: white;
+  color: ${({theme}) => theme.colors.postcard.lightCream};
   margin: 0 0 ${({theme}) => theme.spacing.sm} 0;
   display: flex;
   align-items: center;
@@ -193,8 +243,8 @@ const PostcardListTitle = styled.h2`
 `;
 
 const ClosePostcardsButton = styled.button`
-  background: ${({theme}) => theme.colors.primary};
-  color: white;
+  background: ${({theme}) => theme.colors.postcard.accent};
+  color: ${({theme}) => theme.colors.postcard.lightCream};
   border: none;
   padding: ${({theme}) => `${theme.spacing.sm} ${theme.spacing.lg}`};
   border-radius: ${({theme}) => theme.borderRadius};
@@ -203,7 +253,7 @@ const ClosePostcardsButton = styled.button`
   transition: ${({theme}) => theme.transitions.default};
 
   &:hover {
-    background: ${({theme}) => theme.colors.secondary};
+    background: ${({theme}) => theme.colors.postcard.chocolateBrown};
     transform: translateY(-1px);
   }
 `;
@@ -236,21 +286,21 @@ const Modal = styled.div<{ $isOpen: boolean }>`
 `;
 
 const ModalContent = styled.div`
-  background: ${({theme}) => theme.colors.background};
+  background: ${({theme}) => theme.colors.postcard.cardBackground};
   border-radius: ${({theme}) => theme.borderRadius};
   padding: ${({theme}) => theme.spacing.lg};
   max-width: 700px;
   width: 100%;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: ${({theme}) => theme.shadows.postcardWarm};
 
   &::-webkit-scrollbar {
     width: 8px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: ${({theme}) => theme.colors.primary}30;
+    background: ${({theme}) => theme.colors.postcard.softBrown};
     border-radius: 4px;
   }
 `;
@@ -263,7 +313,7 @@ const ModalHeader = styled.div`
 `;
 
 const ModalTitle = styled.h3`
-  color: ${({theme}) => theme.colors.primary};
+  color: ${({theme}) => theme.colors.postcard.chocolateBrown};
   margin: 0;
   font-size: 1.2rem;
 `;
@@ -273,10 +323,10 @@ const CloseButton = styled.button`
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: ${({theme}) => `${theme.colors.text}60`};
+  color: ${({theme}) => theme.colors.postcard.textSoft};
 
   &:hover {
-    color: ${({theme}) => theme.colors.text};
+    color: ${({theme}) => theme.colors.postcard.chocolateBrown};
   }
 `;
 
@@ -293,13 +343,13 @@ const FormGroup = styled.div`
 
 const FormLabel = styled.label<{ $required?: boolean }>`
   display: block;
-  color: ${({theme}) => theme.colors.text};
+  color: ${({theme}) => theme.colors.postcard.textWarm};
   font-weight: bold;
   margin-bottom: ${({theme}) => theme.spacing.xs};
 
   &::after {
     content: ${({$required}) => $required ? '"*"' : '""'};
-    color: ${({theme}) => theme.colors.error};
+    color: ${({theme}) => theme.colors.postcard.heartPink};
     margin-left: 4px;
   }
 `;
@@ -307,30 +357,33 @@ const FormLabel = styled.label<{ $required?: boolean }>`
 const FormInput = styled.input`
   width: 100%;
   padding: ${({theme}) => theme.spacing.sm};
-  border: 2px solid ${({theme}) => `${theme.colors.primary}30`};
+  border: 2px solid ${({theme}) => theme.colors.postcard.warmBeige};
   border-radius: ${({theme}) => theme.borderRadius};
-  background: ${({theme}) => theme.colors.background};
-  color: ${({theme}) => theme.colors.text};
+  background: ${({theme}) => theme.colors.postcard.lightCream};
+  color: ${({theme}) => theme.colors.postcard.textWarm};
 
   &:focus {
-    border-color: ${({theme}) => theme.colors.primary};
+    border-color: ${({theme}) => theme.colors.postcard.accent};
     outline: none;
+    box-shadow: 0 0 0 3px ${({theme}) => `${theme.colors.postcard.accent}20`};
   }
 `;
+
 const FormTextarea = styled.textarea`
   width: 100%;
   min-height: 80px;
   padding: ${({theme}) => theme.spacing.sm};
-  border: 2px solid ${({theme}) => `${theme.colors.primary}30`};
+  border: 2px solid ${({theme}) => theme.colors.postcard.warmBeige};
   border-radius: ${({theme}) => theme.borderRadius};
-  background: ${({theme}) => theme.colors.background};
-  color: ${({theme}) => theme.colors.text};
+  background: ${({theme}) => theme.colors.postcard.lightCream};
+  color: ${({theme}) => theme.colors.postcard.textWarm};
   resize: vertical;
   font-family: inherit;
 
   &:focus {
-    border-color: ${({theme}) => theme.colors.primary};
+    border-color: ${({theme}) => theme.colors.postcard.accent};
     outline: none;
+    box-shadow: 0 0 0 3px ${({theme}) => `${theme.colors.postcard.accent}20`};
   }
 `;
 
@@ -338,24 +391,29 @@ const SubmitButton = styled.button<{ $disabled: boolean }>`
   width: 100%;
   padding: ${({theme}) => theme.spacing.md};
   background: ${({theme, $disabled}) =>
-          $disabled ? `${theme.colors.text}40` : theme.colors.primary};
-  color: white;
+          $disabled ? theme.colors.postcard.warmBeige : theme.colors.postcard.accent};
+  color: ${({theme}) => theme.colors.postcard.lightCream};
   border: none;
   border-radius: ${({theme}) => theme.borderRadius};
   font-weight: bold;
   cursor: ${({$disabled}) => $disabled ? 'not-allowed' : 'pointer'};
   transition: ${({theme}) => theme.transitions.default};
+  box-shadow: ${({theme}) => theme.shadows.postcardSoft};
 
   &:hover:not(:disabled) {
-    background: ${({theme}) => theme.colors.secondary};
+    background: ${({theme}) => theme.colors.postcard.chocolateBrown};
+    box-shadow: ${({theme}) => theme.shadows.postcardWarm};
   }
 `;
 
 const LoadingMessage = styled.div`
   text-align: center;
-  color: ${({theme}) => theme.colors.text};
+  color: ${({theme}) => theme.colors.postcard.textWarm};
   font-size: ${({theme}) => theme.fontSizes.large};
   margin: ${({theme}) => theme.spacing.xl} 0;
+  background: ${({theme}) => `${theme.colors.postcard.cardBackground}dd`};
+  padding: ${({theme}) => theme.spacing.md};
+  border-radius: ${({theme}) => theme.borderRadius};
 `;
 
 const ErrorMessage = styled.div`
@@ -363,16 +421,19 @@ const ErrorMessage = styled.div`
   color: ${({theme}) => theme.colors.error};
   font-size: ${({theme}) => theme.fontSizes.large};
   margin: ${({theme}) => theme.spacing.xl} 0;
+  background: ${({theme}) => `${theme.colors.postcard.cardBackground}dd`};
+  padding: ${({theme}) => theme.spacing.md};
+  border-radius: ${({theme}) => theme.borderRadius};
 `;
 
 const RateLimitNotice = styled.div`
-  background: ${({theme}) => `${theme.colors.error}20`};
-  border: 2px solid ${({theme}) => `${theme.colors.error}40`};
+  background: ${({theme}) => `${theme.colors.postcard.heartPink}20`};
+  border: 2px solid ${({theme}) => theme.colors.postcard.heartPink};
   border-radius: ${({theme}) => theme.borderRadius};
   padding: ${({theme}) => theme.spacing.md};
   margin-bottom: ${({theme}) => theme.spacing.md};
   text-align: center;
-  color: ${({theme}) => theme.colors.error};
+  color: ${({theme}) => theme.colors.postcard.chocolateBrown};
   font-weight: bold;
 `;
 
@@ -381,8 +442,8 @@ const ClickHint = styled.div<{ $visible: boolean }>`
   top: -50px;
   left: 50%;
   transform: translateX(-50%);
-  background: ${({theme}) => theme.colors.primary};
-  color: white;
+  background: ${({theme}) => theme.colors.postcard.accent};
+  color: ${({theme}) => theme.colors.postcard.lightCream};
   padding: ${({theme}) => `${theme.spacing.xs} ${theme.spacing.sm}`};
   border-radius: ${({theme}) => theme.borderRadius};
   font-size: ${({theme}) => theme.fontSizes.small};
@@ -391,6 +452,7 @@ const ClickHint = styled.div<{ $visible: boolean }>`
   transition: opacity 0.3s ease;
   pointer-events: none;
   z-index: 10;
+  box-shadow: ${({theme}) => theme.shadows.postcardSoft};
 
   &::after {
     content: '';
@@ -399,7 +461,7 @@ const ClickHint = styled.div<{ $visible: boolean }>`
     left: 50%;
     transform: translateX(-50%);
     border: 6px solid transparent;
-    border-top-color: ${({theme}) => theme.colors.primary};
+    border-top-color: ${({theme}) => theme.colors.postcard.accent};
   }
 `;
 
@@ -418,7 +480,6 @@ const PostcardsPage: React.FC = () => {
     const [rateLimitCountdown, setRateLimitCountdown] = useState(0);
     const [rateLimitMessage, setRateLimitMessage] = useState('');
 
-    // 더블클릭시 엽서 리스트 팝업
     const [mailboxClickCount, setMailboxClickCount] = useState(0);
     const [showClickHint, setShowClickHint] = useState(false);
 
@@ -575,7 +636,6 @@ const PostcardsPage: React.FC = () => {
                 message: finalMessage
             });
 
-            // 폼 초기화, 모달 닫기
             setSelectedStampId('');
             setNickname('');
             setMessage('');
@@ -583,7 +643,6 @@ const PostcardsPage: React.FC = () => {
 
             setShowConfettiEffect(true);
 
-            // 목록 새로고침
             refetch();
         } catch (error: any) {
             console.error('엽서 등록 실패:', error);
@@ -629,86 +688,106 @@ const PostcardsPage: React.FC = () => {
 
     if (isLoading) {
         return (
-            <StampsContainer>
-                <LoadingMessage>{t('postcard.messages.loadingPostcards' as any)}</LoadingMessage>
-            </StampsContainer>
+            <>
+                <DolphinPageFont/>
+                <PageWrapper>
+                    <StampsContainer>
+                        <LoadingMessage>{t('postcard.messages.loadingPostcards' as any)}</LoadingMessage>
+                    </StampsContainer>
+                </PageWrapper>
+            </>
         );
     }
 
     if (error) {
         return (
-            <StampsContainer>
-                <ErrorMessage>
-                    {t('postcard.messages.loadingError' as any)}
-                    <br/>
-                    <button onClick={() => refetch()}>{t('postcard.messages.retry' as any)}</button>
-                </ErrorMessage>
-            </StampsContainer>
+            <>
+                <DolphinPageFont/>
+                <PageWrapper>
+                    <StampsContainer>
+                        <ErrorMessage>
+                            {t('postcard.messages.loadingError' as any)}
+                            <br/>
+                            <button onClick={() => refetch()}>{t('postcard.messages.retry' as any)}</button>
+                        </ErrorMessage>
+                    </StampsContainer>
+                </PageWrapper>
+            </>
         );
     }
 
     return (
-        <StampsContainer>
-            <PageHeader>
-                <PageTitle>{t('postcard.title' as any)}</PageTitle>
-                <PageDescription>
-                    {t('postcard.description' as any)}
-                </PageDescription>
-            </PageHeader>
+        <>
+            <DolphinPageFont/>
+            <PageWrapper>
+                <BackgroundAnimalsWrapper>
+                    <FloatingAnimalsBackground/>
+                </BackgroundAnimalsWrapper>
 
-            {isRateLimited && (
-                <RateLimitNotice>
-                    {rateLimitMessage}
-                    <br/>
-                    {formatMessage('postcard.rateLimit.countdown', {seconds: rateLimitCountdown})}
-                </RateLimitNotice>
-            )}
+                <StampsContainer>
+                    <ContentWrapper>
+                        <PageHeader>
+                            <PageTitle>{t('postcard.title' as any)}</PageTitle>
+                            <PageDescription>
+                                {t('postcard.description' as any)}
+                            </PageDescription>
+                        </PageHeader>
 
-            <MailboxSection>
-                <MailboxWrapper>
-                    <MemoizedMailbox3D
-                        hasEntries={stampEntries.length > 0}
-                        onClick={handleMailboxClick}
-                        entries={stampEntries}
+                        {isRateLimited && (
+                            <RateLimitNotice>
+                                {rateLimitMessage}
+                                <br/>
+                                {formatMessage('postcard.rateLimit.countdown', {seconds: rateLimitCountdown})}
+                            </RateLimitNotice>
+                        )}
+
+                        <MailboxSection>
+                            <MailboxWrapper>
+                                <MemoizedMailbox3D
+                                    hasEntries={stampEntries.length > 0}
+                                    onClick={handleMailboxClick}
+                                    entries={stampEntries}
+                                />
+                                <ClickHint $visible={showClickHint && stampEntries.length > 0}>
+                                    {t('postcard.mailbox.clickHint' as any)}
+                                </ClickHint>
+                            </MailboxWrapper>
+
+                            <MailboxText $hasEntries={stampEntries.length > 0}>
+                                {stampEntries.length > 0
+                                    ? formatMessage('postcard.mailbox.hasEntries', {count: stampEntries.length})
+                                    : t('postcard.mailbox.empty' as any)
+                                }
+                            </MailboxText>
+
+                            <ActionButtons>
+                                <ActionButton
+                                    $variant="primary"
+                                    onClick={() => setShowModal(true)}
+                                    disabled={createPostcardMutation.isPending}
+                                >
+                                    {createPostcardMutation.isPending
+                                        ? t('postcard.buttons.sending' as any)
+                                        : t('postcard.buttons.writePostcard' as any)
+                                    }
+                                </ActionButton>
+                                {stampEntries.length > 0 && (
+                                    <ActionButton $variant="secondary" onClick={handleShowPostcardsClick}>
+                                        {formatMessage('postcard.buttons.viewPostcards', {count: stampEntries.length})}
+                                    </ActionButton>
+                                )}
+                            </ActionButtons>
+                        </MailboxSection>
+                    </ContentWrapper>
+
+                    <Confetti
+                        show={showConfettiEffect}
+                        message={t('postcard.messages.success' as any)}
+                        emoji="🎉"
+                        onComplete={() => setShowConfettiEffect(false)}
                     />
-                    <ClickHint $visible={showClickHint && stampEntries.length > 0}>
-                        {t('postcard.mailbox.clickHint' as any)}
-                    </ClickHint>
-                </MailboxWrapper>
-
-                <MailboxText $hasEntries={stampEntries.length > 0}>
-                    {stampEntries.length > 0
-                        ? formatMessage('postcard.mailbox.hasEntries', {count: stampEntries.length})
-                        : t('postcard.mailbox.empty' as any)
-                    }
-                </MailboxText>
-
-                <ActionButtons>
-                    <ActionButton
-                        $variant="primary"
-                        onClick={() => setShowModal(true)}
-                        disabled={createPostcardMutation.isPending}
-                    >
-                        {createPostcardMutation.isPending
-                            ? t('postcard.buttons.sending' as any)
-                            : t('postcard.buttons.writePostcard' as any)
-                        }
-                    </ActionButton>
-                    {stampEntries.length > 0 && (
-                        <ActionButton $variant="secondary" onClick={handleShowPostcardsClick}>
-                            {formatMessage('postcard.buttons.viewPostcards', {count: stampEntries.length})}
-                        </ActionButton>
-                    )}
-                </ActionButtons>
-            </MailboxSection>
-
-            <Confetti
-                show={showConfettiEffect}
-                message={t('postcard.messages.success' as any)}
-                emoji="🎉"
-                onComplete={() => setShowConfettiEffect(false)}
-            />
-
+                </StampsContainer>
+            </PageWrapper>
 
             {showPostcards && stampEntries.length > 0 && ReactDOM.createPortal(
                 <PostcardOverlay $isVisible={true}>
@@ -729,7 +808,6 @@ const PostcardsPage: React.FC = () => {
                 document.getElementById('modal-root')!
             )}
 
-            {/* 엽서 작성 모달 */}
             {showModal && ReactDOM.createPortal(
                 <Modal $isOpen={showModal}>
                     <ModalContent>
@@ -780,7 +858,7 @@ const PostcardsPage: React.FC = () => {
                 </Modal>,
                 document.getElementById('modal-root')!
             )}
-        </StampsContainer>
+        </>
     );
 };
 

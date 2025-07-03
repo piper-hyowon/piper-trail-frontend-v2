@@ -25,6 +25,9 @@ declare module 'styled-components' {
             fairyGradient: string;
             magicGradient: string;
             dreamGradient: string;
+            postcardWarmGradient: string;
+            postcardSoftGradient: string;
+            postcardVintageGradient: string;
         };
         colors: {
             background: string;
@@ -64,11 +67,30 @@ declare module 'styled-components' {
                 rose: string;
                 gold: string;
             };
+            postcard: {
+                creamBase: string;
+                warmBeige: string;
+                softBrown: string;
+                chocolateBrown: string;
+                lightCream: string;
+                cardBackground: string;
+                textWarm: string;
+                textSoft: string;
+                accent: string;
+                whale: string;
+                octopus: string;
+                seal: string;
+                turtle: string;
+                heartPink: string;
+                envelope: string;
+            };
         };
         shadows: {
             fairy: string;
             fairyGlow: string;
             magic: string;
+            postcardSoft: string;
+            postcardWarm: string;
         };
         seaColors: string[];
         skyColors: string[];

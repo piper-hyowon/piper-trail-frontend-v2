@@ -24,6 +24,10 @@ export interface Theme {
         fairyGradient: string;
         magicGradient: string;
         dreamGradient: string;
+        // Postcard 그라데이션 추가
+        postcardWarmGradient: string;
+        postcardSoftGradient: string;
+        postcardVintageGradient: string;
     };
     colors: {
         background: string;
@@ -63,12 +67,33 @@ export interface Theme {
             rose: string;
             gold: string;
         };
+        // Postcard 색상 추가
+        postcard: {
+            creamBase: string;
+            warmBeige: string;
+            softBrown: string;
+            chocolateBrown: string;
+            lightCream: string;
+            cardBackground: string;
+            textWarm: string;
+            textSoft: string;
+            accent: string;
+            whale: string;
+            octopus: string;
+            seal: string;
+            turtle: string;
+            heartPink: string;
+            envelope: string;
+        };
     };
 
     shadows: {
         fairy: string;
         fairyGlow: string;
         magic: string;
+        // Postcard 그림자 추가
+        postcardSoft: string;
+        postcardWarm: string;
     },
 
     seaColors: string[];
@@ -122,6 +147,10 @@ export const theme: Record<ThemeMode, Theme> = {
             fairyGradient: 'linear-gradient(135deg, #C3B4F3 0%, #E8D4F1 25%, #F1D4E8 50%, #D4E8F1 75%, #B4F3E8 100%)',
             magicGradient: 'radial-gradient(circle at 30% 50%, rgba(255, 181, 232, 0.3) 0%, rgba(212, 181, 255, 0.3) 25%, rgba(181, 234, 255, 0.3) 50%, transparent 70%)',
             dreamGradient: 'linear-gradient(135deg, #FFEAA7 0%, #FDCB6E 25%, #FFB5E8 50%, #C7ECEE 75%, #DFE6E9 100%)',
+            // Postcard 그라데이션
+            postcardWarmGradient: 'linear-gradient(135deg, #F5F0E8 0%, #EAE0D5 50%, #DDD0C2 100%)',
+            postcardSoftGradient: 'linear-gradient(to bottom, #F8F5F0 0%, #F2EDE6 100%)',
+            postcardVintageGradient: 'radial-gradient(circle at center, #F5F0E8 0%, #E8DDD0 70%, #DDD0C2 100%)',
         },
         colors: {
             background: '#FEFEFE',
@@ -148,10 +177,10 @@ export const theme: Record<ThemeMode, Theme> = {
                 green: '#228B22',
             },
             series: {
-                primary: '#B4A7D6',  // 라벤더 퍼플
-                secondary: '#FFD3BA', // 피치
-                card: 'rgba(195, 180, 243, 0.08)', // 연한 라벤더
-                badge: '#C3B4F3', // 밝은 라벤더
+                primary: '#B4A7D6',
+                secondary: '#FFD3BA',
+                card: 'rgba(195, 180, 243, 0.08)',
+                badge: '#C3B4F3',
             },
             fairy: {
                 lavender: '#E8D4F1',
@@ -161,12 +190,33 @@ export const theme: Record<ThemeMode, Theme> = {
                 rose: '#FFD1DC',
                 gold: '#FFF3CD',
             },
+            // Postcard 색상 팔레트
+            postcard: {
+                creamBase: '#F5F0E8',        // 메인 크림 베이스
+                warmBeige: '#EAE0D5',        // 따뜻한 베이지
+                softBrown: '#C8B5A0',        // 부드러운 브라운
+                chocolateBrown: '#8B7355',   // 초콜릿 브라운
+                lightCream: '#F8F5F0',       // 연한 크림
+                cardBackground: '#FEFCF8',   // 카드 배경
+                textWarm: '#6B5B4A',         // 따뜻한 텍스트
+                textSoft: '#8B7D6B',         // 부드러운 텍스트
+                accent: '#D4A574',           // 포인트 색상
+                whale: '#A8A398',            // 고래 색상
+                octopus: '#D4C4A8',          // 문어 색상
+                seal: '#C8B5A0',             // 물개 색상
+                turtle: '#B8A890',           // 거북이 색상
+                heartPink: '#E8C4A8',        // 하트 핑크
+                envelope: '#F2E8D8',         // 편지봉투 색상
+            },
         },
 
         shadows: {
             fairy: '0 4px 20px rgba(195, 180, 243, 0.25)',
             fairyGlow: '0 0 30px rgba(232, 212, 241, 0.4)',
             magic: '0 10px 40px rgba(180, 167, 214, 0.3)',
+            // Postcard 그림자
+            postcardSoft: '0 4px 20px rgba(200, 181, 160, 0.15)',
+            postcardWarm: '0 8px 32px rgba(139, 115, 85, 0.12)',
         },
         borderRadius: '12px',
         fontSizes: {
@@ -215,7 +265,10 @@ export const theme: Record<ThemeMode, Theme> = {
             fairyGradient: 'linear-gradient(135deg, #8B7AA3 0%, #A894B1 25%, #B194A8 50%, #94A8B1 75%, #7AA38B 100%)',
             magicGradient: 'radial-gradient(circle at 30% 50%, rgba(212, 152, 196, 0.3) 0%, rgba(168, 148, 212, 0.3) 25%, rgba(148, 186, 212, 0.3) 50%, transparent 70%)',
             dreamGradient: 'linear-gradient(135deg, #BFA06A 0%, #BA9B6E 25%, #D49BC4 50%, #97B5B7 75%, #9FA6A9 100%)',
-
+            // Postcard 다크 그라데이션
+            postcardWarmGradient: 'linear-gradient(135deg, #3A342D 0%, #4A3F35 50%, #5A4E40 100%)',
+            postcardSoftGradient: 'linear-gradient(to bottom, #2D2A25 0%, #3A342D 100%)',
+            postcardVintageGradient: 'radial-gradient(circle at center, #3A342D 0%, #2D2A25 70%, #252018 100%)',
         },
         colors: {
             background: '#121212',
@@ -242,10 +295,10 @@ export const theme: Record<ThemeMode, Theme> = {
                 green: '#66BB6A',
             },
             series: {
-                primary: '#A894D4',  // 더스티 라벤더
-                secondary: '#D4A894', // 더스티 피치
-                card: 'rgba(168, 148, 212, 0.12)', // 연한 더스티 라벤더
-                badge: '#9B88B4', // 딥 라벤더
+                primary: '#A894D4',
+                secondary: '#D4A894',
+                card: 'rgba(168, 148, 212, 0.12)',
+                badge: '#9B88B4',
             },
             fairy: {
                 lavender: '#A894B1',
@@ -255,12 +308,33 @@ export const theme: Record<ThemeMode, Theme> = {
                 rose: '#BFA1AC',
                 gold: '#BFB39D',
             },
+            // Postcard 다크 색상 팔레트
+            postcard: {
+                creamBase: '#3A342D',        // 다크 크림 베이스
+                warmBeige: '#4A3F35',        // 다크 베이지
+                softBrown: '#5A4E40',        // 다크 브라운
+                chocolateBrown: '#6B5B4A',   // 다크 초콜릿
+                lightCream: '#2D2A25',       // 다크 연한 크림
+                cardBackground: '#252018',   // 다크 카드 배경
+                textWarm: '#C8B5A0',         // 다크 따뜻한 텍스트
+                textSoft: '#B8A890',         // 다크 부드러운 텍스트
+                accent: '#8B7355',           // 다크 포인트 색상
+                whale: '#6B6158',            // 다크 고래 색상
+                octopus: '#8B7D6B',          // 다크 문어 색상
+                seal: '#7A6B58',             // 다크 물개 색상
+                turtle: '#6B5B4A',           // 다크 거북이 색상
+                heartPink: '#9B7D6B',        // 다크 하트 핑크
+                envelope: '#5A4E40',         // 다크 편지봉투 색상
+            },
         },
 
         shadows: {
             fairy: '0 4px 20px rgba(195, 180, 243, 0.25)',
             fairyGlow: '0 0 30px rgba(232, 212, 241, 0.4)',
             magic: '0 10px 40px rgba(180, 167, 214, 0.3)',
+            // Postcard 다크 그림자
+            postcardSoft: '0 4px 20px rgba(0, 0, 0, 0.3)',
+            postcardWarm: '0 8px 32px rgba(0, 0, 0, 0.4)',
         },
         borderRadius: '12px',
         fontSizes: {

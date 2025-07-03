@@ -54,7 +54,7 @@ const bubbleFloat = keyframes`
   }
 `;
 
-const DolphinPageFont = createGlobalStyle`
+export const DolphinPageFont = createGlobalStyle`
   @font-face {
     font-family: 'DXcutecute';
     src: url('/fonts/The Jamsil 3 Regular.ttf') format('truetype'); // TODO: 저작권 검색해보기
