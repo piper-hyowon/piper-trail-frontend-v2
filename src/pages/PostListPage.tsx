@@ -512,13 +512,13 @@ const SeriesHeader = styled.div`
 const SeriesBadge = styled.div`
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: ${({theme}) => theme.gradients.seriesGradient};
   color: white;
-  padding: 5px 14px;
-  border-radius: 24px;
-  font-size: ${({theme}) => theme.fontSizes.xsmall};
-  font-weight: 600;
+  padding: 8px 20px;
+  border-radius: 28px;
+  font-size: ${({theme}) => theme.fontSizes.small};
+  font-weight: 700;
   cursor: pointer;
   transition: all ${({theme}) => theme.transitions.default};
   position: relative;
@@ -532,6 +532,7 @@ const SeriesBadge = styled.div`
   }
 
   span:first-child {
+    font-size: 18px; // 이모지 크기 증가 (기존 14px)
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
   }
 `;
@@ -999,6 +1000,8 @@ const PostListPage: React.FC = () => {
                                         <TagList
                                             tags={post.tags}
                                             onTagClick={handlePostTagClick}
+                                            maxVisible={4}
+                                            variant="subtle"  // subtle 스타일 사용
                                         />
                                     )}
                                 </StyledCardContent>

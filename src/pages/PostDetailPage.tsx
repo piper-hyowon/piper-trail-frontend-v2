@@ -1056,11 +1056,7 @@ const PostDetailPage: React.FC = () => {
                     </PostMetaItem>
                 </PostMeta>
 
-                {post.tags && post.tags.length > 0 && (
-                    <TagSection>
-                        <TagList tags={post.tags} onTagClick={handleTagClick}/>
-                    </TagSection>
-                )}
+
             </PostHeader>
             {post.series && (
                 <SeriesNavigationSection>
@@ -1120,6 +1116,11 @@ const PostDetailPage: React.FC = () => {
                 }}/>
             </PostContent>
 
+            {post.tags && post.tags.length > 0 && (
+                <TagSection>
+                    <TagList tags={post.tags} onTagClick={handleTagClick}/>
+                </TagSection>
+            )}
             <ActionBar>
                 <BackButton to={`/${post.category || "uncategorized"}`}>
                     {t("post.detail.backToList" as any)}

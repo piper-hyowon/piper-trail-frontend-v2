@@ -461,9 +461,13 @@ const SeriesHomePage: React.FC = () => {
                                 )}
 
                                 <div style={{paddingRight: '80px'}}>
-                                    <PostTitle>{post.title}</PostTitle>
-                                    {post.subtitle && (
-                                        <PostSubtitle>{post.subtitle}</PostSubtitle>
+                                    <PostTitle>
+                                        {language === 'ko' ? post.title : (post.titleEn || post.title)}
+                                    </PostTitle>
+                                    {(language === 'ko' ? post.subtitle : (post.subtitleEn || post.subtitle)) && (
+                                        <PostSubtitle>
+                                            {language === 'ko' ? post.subtitle : (post.subtitleEn || post.subtitle)}
+                                        </PostSubtitle>
                                     )}
                                     <PostMeta>
                                         <span>
