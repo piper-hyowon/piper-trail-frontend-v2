@@ -22,16 +22,18 @@ import SeriesHomePage from "./pages/SeriesHomePage.tsx";
 
 const VALID_CATEGORIES = BLOG_CATEGORIES.map(e => e.name);
 
-const queryClient = new QueryClient({
+// TODO:
+export const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
+            refetchOnWindowFocus: true,
+            refetchOnMount: true,
             retry: 1,
-            // refetchOnWindowFocus: false,
-        }
-
-    }
-
-})
+            staleTime: 0,
+            gcTime: 5 * 60 * 1000,
+        },
+    },
+});
 
 const App: React.FC = () => {
     return (

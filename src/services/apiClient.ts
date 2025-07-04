@@ -70,6 +70,7 @@ class ApiClient {
 
         const headers: Record<string, string> = {
             'Accept-Language': this.language,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',  // TODO: 임시
         };
 
         if (!(options.body instanceof FormData)) {
@@ -90,6 +91,7 @@ class ApiClient {
             const response = await fetch(url, {
                 ...options,
                 headers,
+                cache: 'no-store', // TODO: 임시
             });
 
             // 401 에러 시 토큰 갱신 시도
@@ -98,7 +100,7 @@ class ApiClient {
                 if (refreshed) {
                     // 갱신된 토큰으로 재시도
                     headers['Authorization'] = `Bearer ${this.accessToken}`;
-                    const retryResponse = await fetch(url, {...options, headers});
+                    const retryResponse = await fetch(url, {...options, headers, cache: 'no-store'}); // cache TODO:
 
                     if (!retryResponse.ok) {
                         throw new Error(`HTTP ${retryResponse.status}: ${retryResponse.statusText}`);

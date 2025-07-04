@@ -44,8 +44,8 @@ export const usePostsByCategory = (
     return useQuery({
         queryKey: ["posts", "category", categoryName, params, language],
         queryFn: () => apiClient.getPostsByCategory(categoryName, params),
-        staleTime: 60 * 60 * 1000, // 1시간
-        gcTime: 2 * 60 * 60 * 1000, // 2시간
+        staleTime: 0, // TODO: 60 * 60 * 1000, // 1시간
+        gcTime: 5 * 60 * 1000, // TODO: 2 * 60 * 60 * 1000, // 2시간
         enabled: categoryName !== undefined, // categoryName이 정의되어 있을 때만 실행 (null 포함)
     });
 };

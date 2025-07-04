@@ -1074,11 +1074,15 @@ const PostDetailPage: React.FC = () => {
                     <SeriesProgress>
                         <span>{post.series.currentOrder}편 / 총 {post.series.totalCount}편</span>
                         {post.series.seriesDescription && (
-                            <span>
-                                {language === 'ko'
-                                    ? post.series.seriesDescription
-                                    : (post.series.seriesDescriptionEn || post.series.seriesDescription)}
-                            </span>
+                            <span
+                                dangerouslySetInnerHTML={{
+                                    __html: renderMarkdown(
+                                        language === 'ko'
+                                            ? post.series.seriesDescription
+                                            : (post.series.seriesDescriptionEn || post.series.seriesDescription)
+                                    )
+                                }}
+                            />
                         )}
                     </SeriesProgress>
 
