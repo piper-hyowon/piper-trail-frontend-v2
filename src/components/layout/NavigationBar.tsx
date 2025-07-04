@@ -430,7 +430,7 @@ const NavigationBar: React.FC = () => {
     } = useApi();
 
     // 상태 관리
-    const [inputUrl, setInputUrl] = useState<string>(location.pathname + location.search);
+    const [inputUrl, setInputUrl] = useState<string>('');
     const [showHeadersPanel, setShowHeadersPanel] = useState<boolean>(false);
     const [showMethodChangeAlert, setShowMethodChangeAlert] = useState<boolean>(false);
     const [showMethodNotAllowedAlert, setShowMethodNotAllowedAlert] = useState<boolean>(false);
@@ -671,14 +671,27 @@ const NavigationBar: React.FC = () => {
         setMethod('GET');
     };
 
-    // URL 동기화
+    useEffect(() => {
+        const currentPath = location.pathname + location.search;
+        try {
+            setInputUrl(decodeURIComponent(currentPath));
+        } catch (e) {
+            setInputUrl(currentPath);
+        }
+        prevLocationRef.current = currentPath;
+    }, []);
+
     useEffect(() => {
         const currentLocation = location.pathname + location.search;
         if (currentLocation !== prevLocationRef.current) {
-            setInputUrl(decodeURIComponent(currentLocation));
+            try {
+                setInputUrl(decodeURIComponent(currentLocation));
+            } catch (e) {
+                setInputUrl(currentLocation);
+            }
             prevLocationRef.current = currentLocation;
         }
-    }, [location]);
+    }, [location.pathname, location.search]);
 
     // URL 동기화 및 PostDetailPage 버튼 이벤트 리스너
     useEffect(() => {
@@ -727,7 +740,7 @@ const NavigationBar: React.FC = () => {
     };
 
     const handleUrlChange = (newUrl: string) => {
-        setInputUrl(decodeURIComponent(newUrl));
+        setInputUrl(newUrl);
     };
 
     const handleUrlSubmit = () => {

@@ -11,7 +11,7 @@ import {
 import {useLanguage} from '../context/LanguageContext';
 import TagList from '../components/ui/TagList';
 import {useSeriesDetail} from '../hooks/useApi';
-import {renderMarkdown} from '../utils/markdown';  // 추가
+import {renderMarkdown} from '../utils/markdown';
 
 const fadeIn = keyframes`
   from {
@@ -43,7 +43,7 @@ const BackButton = styled(Link)`
   text-decoration: none;
   font-weight: 500;
   font-size: ${({theme}) => theme.fontSizes.small};
-  margin-bottom: ${({theme}) => theme.spacing.lg};
+  margin-bottom: ${({theme}) => theme.spacing.md};
   transition: ${({theme}) => theme.transitions.default};
 
   &:hover {
@@ -53,159 +53,168 @@ const BackButton = styled(Link)`
 `;
 
 const SeriesHero = styled.div`
-  background: ${({theme}) => theme.gradients.seriesGradient};
-  color: white;
-  padding: ${({theme}) => theme.spacing.lg} ${({theme}) => theme.spacing.md};
-  border-radius: 24px;
-  text-align: center;
-  margin-bottom: ${({theme}) => theme.spacing.xl};
+  background: linear-gradient(135deg,
+  ${({theme}) => theme.colors.series.primary}08 0%,
+  ${({theme}) => theme.colors.series.secondary}08 100%);
+  border: 1px solid ${({theme}) => theme.colors.series.primary}20;
+  color: ${({theme}) => theme.colors.text};
+  padding: ${({theme}) => theme.spacing.lg};
+  border-radius: 16px;
+  margin-bottom: ${({theme}) => theme.spacing.md};
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 30px ${({theme}) => theme.colors.series.primary}30;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px ${({theme}) => theme.colors.series.primary}10;
 
   @media (min-width: 768px) {
-    padding: ${({theme}) => theme.spacing.xl} ${({theme}) => theme.spacing.lg};
+    padding: ${({theme}) => theme.spacing.lg};
   }
 
   &::before {
     content: '';
     position: absolute;
     top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: ${({theme}) => theme.gradients.seriesAccent};
-    opacity: 0.1;
-    border-radius: 50%;
-    animation: rotate 20s linear infinite;
+    right: -30%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle,
+    ${({theme}) => theme.colors.series.primary}15 0%,
+    transparent 70%);
+    pointer-events: none;
   }
 
-  @keyframes rotate {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -50%;
+    left: -30%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle,
+    ${({theme}) => theme.colors.series.secondary}10 0%,
+    transparent 70%);
+    pointer-events: none;
   }
+`;
+
+const SeriesHeader = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({theme}) => theme.spacing.sm};
+  position: relative;
+  z-index: 1;
 `;
 
 const SeriesTitle = styled.h1`
-  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-size: clamp(1.2rem, 3vw, 1.6rem);
   font-weight: 800;
-  margin-bottom: ${({theme}) => theme.spacing.sm};
-  position: relative;
-  z-index: 1;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  margin: 0;
+  line-height: 1.2;
+  background: ${({theme}) => theme.gradients.seriesGradient};
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 2px 4px ${({theme}) => theme.colors.series.primary}20);
 `;
 
 const SeriesDescription = styled.div`
-  font-size: ${({theme}) => theme.fontSizes.medium};
-  opacity: 0.95;
-  margin-bottom: ${({theme}) => theme.spacing.lg};
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
-  line-height: 1.6;
-  position: relative;
-  z-index: 1;
+  max-width: 95%;
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.85;
+  line-height: 1.5;
+  font-size: 0.8rem;
+  padding-left: ${({theme}) => theme.spacing.md};
+  border-left: 4px solid ${({theme}) => theme.colors.series.primary}30;
 
-  @media (min-width: 768px) {
-    font-size: ${({theme}) => theme.fontSizes.large};
-    margin-bottom: ${({theme}) => theme.spacing.xl};
-  }
-
-  p {
+  * {
+    font-size: 0.8rem !important;
+    color: ${({theme}) => theme.colors.text} !important;
     margin: 0;
   }
 
-  strong {
-    font-weight: 700;
-  }
+  p {
+    margin-bottom: 0.3rem;
 
-  em {
-    font-style: italic;
-  }
-
-  a {
-    color: rgba(255, 255, 255, 0.9);
-    text-decoration: underline;
-
-    &:hover {
-      color: white;
+    &:last-child {
+      margin-bottom: 0;
     }
+  }
+
+  strong, b {
+    color: ${({theme}) => theme.colors.series.primary} !important;
+    font-weight: 600;
   }
 `;
 
-const SeriesStats = styled.div`
+const SeriesMetaRow = styled.div`
   display: flex;
-  gap: ${({theme}) => theme.spacing.lg};
-  justify-content: center;
+  align-items: center;
+  gap: ${({theme}) => theme.spacing.md};
   flex-wrap: wrap;
-  position: relative;
-  z-index: 1;
-  margin-bottom: ${({theme}) => theme.spacing.md};
-
-  @media (min-width: 768px) {
-    gap: ${({theme}) => theme.spacing.xl};
-    margin-bottom: ${({theme}) => theme.spacing.lg};
-  }
+  padding-top: ${({theme}) => theme.spacing.xs};
+  border-top: 1px solid ${({theme}) => theme.colors.series.primary}10;
 `;
 
 const StatItem = styled.div`
-  text-align: center;
-  background: rgba(255, 255, 255, 0.25);
-  padding: ${({theme}) => theme.spacing.md} ${({theme}) => theme.spacing.lg};
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: ${({theme}) => theme.fontSizes.small};
+  padding: 4px 10px;
+  background: ${({theme}) => theme.colors.series.primary}08;
   border-radius: 20px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
   transition: all ${({theme}) => theme.transitions.default};
 
   &:hover {
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.35);
-  }
-
-  .value {
-    font-size: 2.5rem;
-    font-weight: 800;
-    display: block;
-    margin-bottom: 4px;
-    background: linear-gradient(to right, #fff, #fff3cd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
+    background: ${({theme}) => theme.colors.series.primary}15;
+    transform: translateY(-1px);
   }
 
   .label {
-    font-size: ${({theme}) => theme.fontSizes.small};
-    opacity: 0.95;
+    color: ${({theme}) => theme.colors.text};
+    opacity: 0.7;
     display: flex;
     align-items: center;
-    gap: 6px;
-    justify-content: center;
-    font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    gap: 4px;
+
+    svg {
+      color: ${({theme}) => theme.colors.series.primary};
+      font-size: 0.9rem;
+    }
+  }
+
+  .value {
+    font-weight: 700;
+    color: ${({theme}) => theme.colors.series.primary};
+    text-shadow: 0 0 20px ${({theme}) => theme.colors.series.primary}40;
   }
 `;
 
 const TagsSection = styled.div`
-  margin-top: ${({theme}) => theme.spacing.lg};
-  display: flex;
-  justify-content: center;
-  position: relative;
-  z-index: 1;
+  flex: 1;
+
+  /* 태그 스타일 커스터마이즈 */
+
+  > div > div {
+    background: ${({theme}) => theme.colors.series.secondary}15 !important;
+    border: 1px solid ${({theme}) => theme.colors.series.secondary}30 !important;
+    color: ${({theme}) => theme.colors.series.secondary} !important;
+
+    &:hover {
+      background: ${({theme}) => theme.colors.series.secondary}25 !important;
+      border-color: ${({theme}) => theme.colors.series.secondary}50 !important;
+      transform: translateY(-1px);
+    }
+  }
 `;
 
 const PostsSection = styled.div`
-  margin-top: ${({theme}) => theme.spacing.xl};
+  margin-top: ${({theme}) => theme.spacing.lg};
 `;
 
 const PostsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: ${({theme}) => theme.spacing.md};
 
   @media (max-width: 768px) {
@@ -413,57 +422,60 @@ const SeriesHomePage: React.FC = () => {
             </BackButton>
 
             <SeriesHero>
-                <SeriesTitle>
-                    {language === 'ko' ? series.title : (series.titleEn || series.title)}
-                </SeriesTitle>
-                {series.description && (
-                    <SeriesDescription
-                        dangerouslySetInnerHTML={{
-                            __html: renderMarkdown(
-                                language === 'ko'
-                                    ? series.description
-                                    : (series.descriptionEn || series.description)
-                            )
-                        }}
-                    />
-                )}
+                <SeriesHeader>
+                    <SeriesTitle>
+                        {language === 'ko' ? series.title : (series.titleEn || series.title)}
+                    </SeriesTitle>
 
-                <SeriesStats>
-                    <StatItem>
-                        <span className="value">{series.totalCount}</span>
-                        <span className="label">
-                            <IoBookOutline/> {t('series.home.stats.totalPosts' as any)}
-                        </span>
-                    </StatItem>
-
-                    <StatItem>
-                        <span className="value">{totalReadTime}</span>
-                        <span className="label">
-                            <IoTimeOutline/> {t('series.home.stats.minRead' as any)}
-                        </span>
-                    </StatItem>
-
-                    {series.createdAt && (
-                        <StatItem>
-                            <span className="value">
-                                {calculateDaysAgo(series.createdAt)}
-                            </span>
-                            <span className="label">
-                                <IoCalendarOutline/> {t('series.home.stats.daysAgo' as any)}
-                            </span>
-                        </StatItem>
-                    )}
-                </SeriesStats>
-
-                {series.tags && series.tags.length > 0 && (
-                    <TagsSection>
-                        <TagList
-                            tags={series.tags}
-                            onTagClick={handleTagClick}
-                            // variant="light"
+                    {series.description && (
+                        <SeriesDescription
+                            dangerouslySetInnerHTML={{
+                                __html: renderMarkdown(
+                                    language === 'ko'
+                                        ? series.description
+                                        : (series.descriptionEn || series.description)
+                                )
+                            }}
                         />
-                    </TagsSection>
-                )}
+                    )}
+
+                    <SeriesMetaRow>
+                        {series.tags && series.tags.length > 0 && (
+                            <TagsSection>
+                                <TagList
+                                    tags={series.tags}
+                                    onTagClick={handleTagClick}
+                                />
+                            </TagsSection>
+                        )}
+
+                        <StatItem>
+                            <span className="label">
+                                <IoBookOutline/>
+                            </span>
+                            <span className="value">{series.totalCount}</span>
+                            <span className="label">{t('series.home.stats.totalPosts' as any)}</span>
+                        </StatItem>
+
+                        <StatItem>
+                            <span className="label">
+                                <IoTimeOutline/>
+                            </span>
+                            <span className="value">{totalReadTime}</span>
+                            <span className="label">{t('series.home.stats.minRead' as any)}</span>
+                        </StatItem>
+
+                        {series.createdAt && (
+                            <StatItem>
+                                <span className="label">
+                                    <IoCalendarOutline/>
+                                </span>
+                                <span className="value">{calculateDaysAgo(series.createdAt)}</span>
+                                <span className="label">{t('series.home.stats.daysAgo' as any)}</span>
+                            </StatItem>
+                        )}
+                    </SeriesMetaRow>
+                </SeriesHeader>
             </SeriesHero>
 
             <PostsSection>
