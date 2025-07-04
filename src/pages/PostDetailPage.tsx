@@ -59,6 +59,7 @@ const PostHeader = styled.header`
 `;
 
 const PostTitle = styled.h1`
+  font-family: 'Press Start 2P', 'Noto Sans KR';
   color: ${({theme}) => theme.colors.text};
   font-size: clamp(1.6rem, 3.5vw, 2.2rem);
   line-height: 1.3;
@@ -68,6 +69,7 @@ const PostTitle = styled.h1`
 `;
 
 const PostSubtitle = styled.h2`
+  font-family: 'Press Start 2P', 'Noto Sans KR';
   color: ${({theme}) => theme.colors.text};
   opacity: 0.7;
   font-size: clamp(1rem, 2.5vw, 1.3rem);
@@ -122,7 +124,10 @@ const PostContent = styled.div`
   font-size: 0.95rem;
   color: ${({theme}) => theme.colors.text};
   margin-bottom: ${({theme}) => theme.spacing.xl};
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Nanum Myeongjo', serif;
+  //font-family: 'Press Start 2P', 'Noto Sans KR', cursive;
+
+
 
   h1, h2, h3, h4, h5, h6 {
     color: ${({theme}) => theme.colors.text};
