@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef} from 'react';
 import styled from 'styled-components';
 import {useLanguage} from '../../context/LanguageContext';
-import {renderMarkdown} from "../../utils/markdoown.ts";
+import {renderMarkdown} from "../../utils/markdown.ts";
 import type {CreatePostRequest, ImageMapping, UpdatePostRequest} from "../../types/api.ts";
 
 interface PostFormProps {

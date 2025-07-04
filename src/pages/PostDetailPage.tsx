@@ -15,7 +15,7 @@ import AuthModal from "../components/ui/AuthModal";
 import ApiLink from "../components/ui/ApiLink";
 import {CommentSection} from "../components/ui/comments/CommentSection.tsx";
 import {useLanguage} from "../context/LanguageContext";
-import {renderMarkdown} from "../utils/markdoown.ts";
+import {renderMarkdown} from "../utils/markdown.ts";
 import type {UpdatePostRequest} from "../types/api.ts";
 import ReactDOM from 'react-dom';
 
