@@ -11,6 +11,7 @@ import {
 import {useLanguage} from '../context/LanguageContext';
 import TagList from '../components/ui/TagList';
 import {useSeriesDetail} from '../hooks/useApi';
+import {renderMarkdown} from '../utils/markdown';  // 추가
 
 const fadeIn = keyframes`
   from {
@@ -98,7 +99,7 @@ const SeriesTitle = styled.h1`
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 `;
 
-const SeriesDescription = styled.p`
+const SeriesDescription = styled.div`
   font-size: ${({theme}) => theme.fontSizes.medium};
   opacity: 0.95;
   margin-bottom: ${({theme}) => theme.spacing.lg};
@@ -112,6 +113,27 @@ const SeriesDescription = styled.p`
   @media (min-width: 768px) {
     font-size: ${({theme}) => theme.fontSizes.large};
     margin-bottom: ${({theme}) => theme.spacing.xl};
+  }
+
+  p {
+    margin: 0;
+  }
+
+  strong {
+    font-weight: 700;
+  }
+
+  em {
+    font-style: italic;
+  }
+
+  a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: underline;
+
+    &:hover {
+      color: white;
+    }
   }
 `;
 
@@ -395,11 +417,15 @@ const SeriesHomePage: React.FC = () => {
                     {language === 'ko' ? series.title : (series.titleEn || series.title)}
                 </SeriesTitle>
                 {series.description && (
-                    <SeriesDescription>
-                        {language === 'ko'
-                            ? series.description
-                            : (series.descriptionEn || series.description)}
-                    </SeriesDescription>
+                    <SeriesDescription
+                        dangerouslySetInnerHTML={{
+                            __html: renderMarkdown(
+                                language === 'ko'
+                                    ? series.description
+                                    : (series.descriptionEn || series.description)
+                            )
+                        }}
+                    />
                 )}
 
                 <SeriesStats>

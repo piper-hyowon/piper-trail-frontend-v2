@@ -99,7 +99,7 @@ export const renderMarkdown = (content: string) => {
     const tables: string[] = [];
 
     renderedContent = renderedContent.replace(
-        /(\|[^\n]+\|)(\n\|[\s\-:|]+\|)?(\n\|[^\n]+\|)*/g,
+        /(\|[^\n]+\|)(\n\|[\s\-:|]+\|)(\n\|[^\n]+\|)*/g,
         (match) => {
             const lines = match.trim().split('\n');
             if (lines.length >= 2) {
