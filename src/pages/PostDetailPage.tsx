@@ -128,7 +128,6 @@ const PostContent = styled.div`
   //font-family: 'Press Start 2P', 'Noto Sans KR', cursive;
 
 
-
   h1, h2, h3, h4, h5, h6 {
     color: ${({theme}) => theme.colors.text};
     margin-top: ${({theme}) => theme.spacing.xl};
@@ -478,160 +477,13 @@ const CloseButton = styled.button`
     opacity: 1;
   }
 `;
-
 const SeriesNavigationSection = styled.div`
-  background: ${({theme}) => `linear-gradient(135deg, ${theme.colors.fairy.lavender}20 0%, ${theme.colors.fairy.sky}20 50%, ${theme.colors.fairy.mint}20 100%)`};
-  border-radius: 20px;
+  background: ${({theme}) => theme.colors.background};
+  border: 1px solid ${({theme}) => theme.colors.series.primary}20;
+  border-radius: 12px;
   padding: ${({theme}) => theme.spacing.lg};
   margin-bottom: ${({theme}) => theme.spacing.xl};
-  border: 1px solid ${({theme}) => theme.colors.series.primary}20;
   position: relative;
-  overflow: hidden;
-  box-shadow: ${({theme}) => theme.shadows.fairy};
-
-  &::before {
-    content: '✨';
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 2rem;
-    opacity: 0.3;
-    animation: float 3s ease-in-out infinite;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -50px;
-    left: -50px;
-    width: 150px;
-    height: 150px;
-    background: ${({theme}) => theme.gradients.magicGradient};
-    border-radius: 50%;
-    opacity: 0.5;
-  }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-`;
-
-const SeriesHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${({theme}) => theme.spacing.md};
-  position: relative;
-  z-index: 1;
-`;
-
-const SeriesTitle = styled.h3`
-  color: ${({theme}) => theme.colors.series.primary};
-  font-size: ${({theme}) => theme.fontSizes.large};
-  font-weight: 700;
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: ${({theme}) => theme.spacing.sm};
-
-  span:first-child {
-    font-size: 1.2em;
-  }
-`;
-
-const SeriesHomeLink = styled(Link)`
-  font-size: ${({theme}) => theme.fontSizes.small};
-  color: white;
-  text-decoration: none;
-  font-weight: 600;
-  padding: 8px 20px;
-  border-radius: 24px;
-  background: ${({theme}) => theme.gradients.seriesAccent};
-  transition: all ${({theme}) => theme.transitions.default};
-  white-space: nowrap;
-  box-shadow: ${({theme}) => theme.shadows.fairy};
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: ${({theme}) => theme.colors.fairy.gold}50;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: all 0.5s ease;
-  }
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${({theme}) => theme.shadows.fairyGlow};
-
-    &::before {
-      width: 100px;
-      height: 100px;
-    }
-  }
-`;
-
-const SeriesProgress = styled.div`
-  display: flex;
-  align-items: center;
-  gap: ${({theme}) => theme.spacing.md};
-  margin-bottom: ${({theme}) => theme.spacing.lg};
-  font-size: ${({theme}) => theme.fontSizes.small};
-  color: ${({theme}) => theme.colors.text};
-  position: relative;
-  z-index: 1;
-
-  &::before {
-    content: '';
-    position: absolute;
-    bottom: -8px;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: ${({theme}) => theme.colors.series.primary}20;
-    border-radius: 1px;
-  }
-
-  span:first-child {
-    color: ${({theme}) => theme.colors.series.primary};
-    font-weight: 700;
-    font-size: ${({theme}) => theme.fontSizes.medium};
-  }
-`;
-
-const NavigationGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: ${({theme}) => theme.spacing.md};
-  position: relative;
-  z-index: 1;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const NavCard = styled(Link)<{ $disabled?: boolean }>`
-  display: block;
-  padding: ${({theme}) => theme.spacing.md};
-  background: ${({theme}) => theme.colors.background};
-  border: 2px solid ${({theme}) => theme.colors.series.primary}10;
-  border-radius: 12px;
-  text-decoration: none;
-  transition: all ${({theme}) => theme.transitions.default};
-  position: relative;
-  overflow: hidden;
 
   &::before {
     content: '';
@@ -641,32 +493,203 @@ const NavCard = styled(Link)<{ $disabled?: boolean }>`
     right: 0;
     height: 3px;
     background: ${({theme}) => theme.gradients.seriesGradient};
-    transform: translateY(-3px);
-    transition: transform ${({theme}) => theme.transitions.default};
+    border-radius: 12px 12px 0 0;
   }
+`;
+
+const SeriesHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: ${({theme}) => theme.spacing.md};
+  gap: ${({theme}) => theme.spacing.md};
+`;
+
+const SeriesTitle = styled.h3`
+  color: ${({theme}) => theme.colors.series.primary};
+  font-size: ${({theme}) => theme.fontSizes.medium};
+  font-weight: 700;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: ${({theme}) => theme.spacing.xs};
+
+  span:first-child {
+    font-size: 1.1em;
+  }
+`;
+
+const SeriesHomeLink = styled(Link)`
+  font-size: ${({theme}) => theme.fontSizes.xsmall};
+  color: ${({theme}) => theme.colors.series.primary};
+  text-decoration: none;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 16px;
+  background: ${({theme}) => theme.colors.series.primary}10;
+  transition: all ${({theme}) => theme.transitions.default};
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    background: ${({theme}) => theme.colors.series.primary}20;
+    transform: translateY(-1px);
+  }
+`;
+
+const SeriesInfo = styled.div`
+  margin-bottom: ${({theme}) => theme.spacing.md};
+
+  .series-count {
+    display: inline-block;
+    color: ${({theme}) => theme.colors.series.primary};
+    font-weight: 600;
+    font-size: ${({theme}) => theme.fontSizes.small};
+    margin-bottom: ${({theme}) => theme.spacing.sm};
+  }
+
+  .series-description {
+    font-size: ${({theme}) => theme.fontSizes.small};
+    color: ${({theme}) => theme.colors.text};
+    opacity: 0.8;
+    line-height: 1.6;
+    max-height: 60px;
+    overflow-y: auto;
+    padding-right: ${({theme}) => theme.spacing.sm};
+
+    p {
+      margin: 0 0 ${({theme}) => theme.spacing.xs} 0;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    strong {
+      font-weight: 600;
+      color: ${({theme}) => theme.colors.text};
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    code {
+      background: ${({theme}) => theme.colors.primary}10;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: ${({theme}) => theme.colors.primary}05;
+      border-radius: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ${({theme}) => theme.colors.primary}20;
+      border-radius: 2px;
+
+      &:hover {
+        background: ${({theme}) => theme.colors.primary}30;
+      }
+    }
+
+    scrollbar-width: thin;
+    scrollbar-color: ${({theme}) => `${theme.colors.primary}20 ${theme.colors.primary}05`};
+  }
+`;
+
+const NavigationScroll = styled.div`
+  display: flex;
+  gap: ${({theme}) => theme.spacing.md};
+  overflow-x: auto;
+  padding: ${({theme}) => theme.spacing.sm} ${({theme}) => theme.spacing.xs};
+  margin: 0 -${({theme}) => theme.spacing.sm};
+
+  &::-webkit-scrollbar {
+    height: 8px;
+    display: block !important;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: ${({theme}) => theme.colors.primary}10;
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${({theme}) => theme.colors.primary}40;
+    border-radius: 4px;
+    min-width: 30px;
+
+    &:hover {
+      background: ${({theme}) => theme.colors.primary}60;
+    }
+  }
+
+  scrollbar-width: thin;
+  scrollbar-color: ${({theme}) => `${theme.colors.primary}40 ${theme.colors.primary}10`};
+
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 8px;
+    width: 30px;
+    background: linear-gradient(to right, transparent, ${({theme}) => theme.colors.background});
+    pointer-events: none;
+  }
+`;
+
+const NavCard = styled(Link)<{ $disabled?: boolean; $isActive?: boolean }>`
+  display: flex;
+  flex-direction: column;
+  padding: ${({theme}) => theme.spacing.sm};
+  background: ${({theme}) => theme.colors.background};
+  border: 1px solid ${({theme, $isActive}) =>
+          $isActive ? theme.colors.series.primary : `${theme.colors.primary}10`};
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all ${({theme}) => theme.transitions.default};
+  min-width: 200px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
 
   ${props => props.$disabled ? `
     pointer-events: none;
-    opacity: 0.4;
+    opacity: 0.6;
+    cursor: default;
   ` : `
     &:hover {
-      border-color: ${props.theme.colors.series.primary}30;
+      border-color: ${props.theme.colors.series.primary}50;
       transform: translateY(-2px);
-      
-      &::before {
-        transform: translateY(0);
-      }
+      box-shadow: 0 4px 12px ${props.theme.colors.primary}15;
     }
+  `}
+
+  ${props => props.$isActive && `
+    background: ${props.theme.colors.series.primary}05;
+    box-shadow: 0 2px 8px ${props.theme.colors.series.primary}20;
   `}
 `;
 
 const NavDirection = styled.div`
   font-size: ${({theme}) => theme.fontSizes.xsmall};
   color: ${({theme}) => theme.colors.series.primary};
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -674,10 +697,9 @@ const NavDirection = styled.div`
 
 const NavTitle = styled.div`
   color: ${({theme}) => theme.colors.text};
-  font-weight: 600;
-  line-height: 1.4;
-  font-size: ${({theme}) => theme.fontSizes.medium};
-
+  font-weight: 500;
+  line-height: 1.3;
+  font-size: ${({theme}) => theme.fontSizes.small};
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1067,19 +1089,23 @@ const PostDetailPage: React.FC = () => {
                 <SeriesNavigationSection>
                     <SeriesHeader>
                         <SeriesTitle>
-                            📚 {language === 'ko'
-                            ? post.series.seriesTitle
-                            : (post.series.seriesTitleEn || post.series.seriesTitle)}
+                            <span>📚</span>
+                            {language === 'ko'
+                                ? post.series.seriesTitle
+                                : (post.series.seriesTitleEn || post.series.seriesTitle)}
                         </SeriesTitle>
                         <SeriesHomeLink to={`/series/${post.series.seriesSlug}`}>
                             시리즈 홈 →
                         </SeriesHomeLink>
                     </SeriesHeader>
 
-                    <SeriesProgress>
-                        <span>{post.series.currentOrder}편 / 총 {post.series.totalCount}편</span>
+                    <SeriesInfo>
+                        <div className="series-count">
+                            {post.series.currentOrder}편 / 총 {post.series.totalCount}편
+                        </div>
                         {post.series.seriesDescription && (
-                            <span
+                            <div
+                                className="series-description"
                                 dangerouslySetInnerHTML={{
                                     __html: renderMarkdown(
                                         language === 'ko'
@@ -1089,34 +1115,36 @@ const PostDetailPage: React.FC = () => {
                                 }}
                             />
                         )}
-                    </SeriesProgress>
+                    </SeriesInfo>
 
-                    <NavigationGrid>
-                        <NavCard
-                            to={post.series.navigation.prev ? `/${post.category || 'uncategorized'}/${post.series.navigation.prev.slug}` : '#'}
-                            $disabled={!post.series.navigation.prev}
-                        >
-                            <NavDirection>
-                                ← 이전 글
-                            </NavDirection>
-                            <NavTitle>
-                                {post.series.navigation.prev?.title || '첫 번째 글입니다'}
-                            </NavTitle>
-                        </NavCard>
+                    <NavigationScroll>
+                        {post.series.navigation.prev && (
+                            <NavCard
+                                to={`/${post.category || 'uncategorized'}/${post.series.navigation.prev.slug}`}
+                            >
+                                <NavDirection>← 이전</NavDirection>
+                                <NavTitle>{post.series.navigation.prev.title}</NavTitle>
+                            </NavCard>
+                        )}
 
                         <NavCard
-                            to={post.series.navigation.next ? `/${post.category || 'uncategorized'}/${post.series.navigation.next.slug}` : '#'}
-                            $disabled={!post.series.navigation.next}
-                            style={{textAlign: 'right'}}
+                            to="#"
+                            $isActive={true}
+                            $disabled={true}
                         >
-                            <NavDirection style={{justifyContent: 'flex-end'}}>
-                                다음 글 →
-                            </NavDirection>
-                            <NavTitle>
-                                {post.series.navigation.next?.title || '마지막 글입니다'}
-                            </NavTitle>
+                            <NavDirection>현재 글</NavDirection>
+                            <NavTitle>{post.title}</NavTitle>
                         </NavCard>
-                    </NavigationGrid>
+
+                        {post.series.navigation.next && (
+                            <NavCard
+                                to={`/${post.category || 'uncategorized'}/${post.series.navigation.next.slug}`}
+                            >
+                                <NavDirection>다음 →</NavDirection>
+                                <NavTitle>{post.series.navigation.next.title}</NavTitle>
+                            </NavCard>
+                        )}
+                    </NavigationScroll>
                 </SeriesNavigationSection>
             )}
             <PostContent>
