@@ -28,7 +28,16 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
-    // 표 처리
+    renderedContent = renderedContent.replace(
+        /!\[([^\]]*)\]\(([^)]+)\)/g,
+        '<img src="$2" alt="$1" />'
+    );
+
+    renderedContent = renderedContent.replace(
+        /\[([^\]]+)\]\(([^)]+)\)/g,
+        '<a href="$2" target="_blank">$1</a>'
+    );
+
     const renderTable = (tableText: string) => {
         const lines = tableText.trim().split('\n');
         if (lines.length < 2) return tableText;
@@ -40,7 +49,7 @@ export const renderMarkdown = (content: string) => {
             const tag = index === 0 ? 'th' : 'td';
             html += '<tr>';
             cells.forEach(cell => {
-                html += `<${tag}>${cell.trim()}</${tag}>`;
+                html += `<${tag}>${renderInlineElements(cell.trim())}</${tag}>`;
             });
             html += '</tr>';
         });
@@ -53,29 +62,88 @@ export const renderMarkdown = (content: string) => {
         (match) => renderTable(match)
     );
 
-    // 헤더 처리
+    const blockquotes: string[] = [];
+    renderedContent = renderedContent.replace(
+        /^(>+)(.*)$/gm,
+        (match, arrows, content) => {
+            const level = arrows.length;
+            const placeholder = `___BLOCKQUOTE_${blockquotes.length}___`;
+            blockquotes.push(`<blockquote>${content.trim()}</blockquote>`);
+            return placeholder;
+        }
+    );
+
+    renderedContent = renderedContent.replace(
+        /(___BLOCKQUOTE_\d+___\n?)+/g,
+        (match) => {
+            const quotes = match.trim().split('\n').map(line => {
+                const index = parseInt(line.match(/___BLOCKQUOTE_(\d+)___/)?.[1] || '0');
+                return blockquotes[index].replace(/<\/?blockquote>/g, '');
+            });
+            return `<blockquote>${quotes.join('<br>')}</blockquote>`;
+        }
+    );
+
     renderedContent = renderedContent.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, text) => {
         const level = hashes.length;
-        return `<h${level}>${text.trim()}</h${level}>`;
+        const cleanText = renderInlineElements(text.trim());
+        return `<h${level}>${cleanText}</h${level}>`;
     });
 
-    renderedContent = renderedContent
-        .replace(/^---+$/gm, '<hr />')
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\*(.*?)\*/g, '<em>$1</em>')
-        .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" />')
-        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+    renderedContent = renderedContent.replace(/^---+$/gm, '<hr />');
 
-    // 문단
+    renderedContent = renderedContent.replace(
+        /^(\s*)[-*+]\s+(.+)$/gm,
+        (match, indent, content) => {
+            const level = Math.floor(indent.length / 2);
+            return `<ul_item level="${level}">${renderInlineElements(content)}</ul_item>`;
+        }
+    );
+
+    renderedContent = renderedContent.replace(
+        /^(\s*)\d+\.\s+(.+)$/gm,
+        (match, indent, content) => {
+            const level = Math.floor(indent.length / 2);
+            return `<ol_item level="${level}">${renderInlineElements(content)}</ol_item>`;
+        }
+    );
+
+    renderedContent = processLists(renderedContent);
+
+    function renderInlineElements(text: string): string {
+        return text
+            .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/__(.*?)__/g, '<strong>$1</strong>')
+            .replace(/_(.*?)_/g, '<em>$1</em>')
+            .replace(/~~(.*?)~~/g, '<del>$1</del>')
+            .replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>')
+            .replace(/~\{([^}]+)\}/g, '<sub>$1</sub>');
+    }
+
     renderedContent = renderedContent
         .split(/\n\n+/)
         .map(paragraph => {
-            if (paragraph.match(/^<(h[1-6]|pre|table|hr|blockquote)|^___[A-Z]+_\d+___/)) {
+            paragraph = paragraph.trim();
+
+            if (paragraph.match(/^<(h[1-6]|pre|table|hr|blockquote|ul|ol)|^___[A-Z]+_\d+___/)) {
                 return paragraph;
             }
-            return `<p>${paragraph.replace(/\n/g, '<br />')}</p>`;
+
+            if (!paragraph) return '';
+
+            return `<p>${renderInlineElements(paragraph).replace(/\n/g, '<br />')}</p>`;
         })
-        .join('\n');
+        .filter(p => p) // 빈 요소 제거
+        .join('\n\n');
+
+    blockquotes.forEach((quote, index) => {
+        const placeholder = `___BLOCKQUOTE_${index}___`;
+        if (renderedContent.includes(placeholder)) {
+            renderedContent = renderedContent.replace(placeholder, quote);
+        }
+    });
 
     codeBlocks.forEach((code, index) => {
         renderedContent = renderedContent.replace(`___CODEBLOCK_${index}___`, code);
@@ -87,3 +155,52 @@ export const renderMarkdown = (content: string) => {
 
     return renderedContent;
 };
+
+function processLists(content: string): string {
+    const lines = content.split('\n');
+    const result: string[] = [];
+    let currentList: { type: 'ul' | 'ol', level: number } | null = null;
+    let openLists: Array<{ type: 'ul' | 'ol', level: number }> = [];
+
+    for (const line of lines) {
+        const ulMatch = line.match(/^<ul_item level="(\d+)">(.+)<\/ul_item>$/);
+        const olMatch = line.match(/^<ol_item level="(\d+)">(.+)<\/ol_item>$/);
+
+        if (ulMatch || olMatch) {
+            const [, levelStr, content] = ulMatch || olMatch || [];
+            const level = parseInt(levelStr);
+            const type = ulMatch ? 'ul' : 'ol';
+
+            while (openLists.length < level + 1) {
+                result.push(`<${type}>`);
+                openLists.push({type, level: openLists.length});
+            }
+
+            while (openLists.length > level + 1) {
+                const list = openLists.pop();
+                if (list) result.push(`</${list.type}>`);
+            }
+
+            if (openLists[level] && openLists[level].type !== type) {
+                result.push(`</${openLists[level].type}>`);
+                result.push(`<${type}>`);
+                openLists[level] = {type, level};
+            }
+
+            result.push(`<li>${content}</li>`);
+        } else {
+            while (openLists.length > 0) {
+                const list = openLists.pop();
+                if (list) result.push(`</${list.type}>`);
+            }
+            result.push(line);
+        }
+    }
+
+    while (openLists.length > 0) {
+        const list = openLists.pop();
+        if (list) result.push(`</${list.type}>`);
+    }
+
+    return result.join('\n');
+}
