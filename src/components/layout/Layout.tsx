@@ -18,23 +18,26 @@ const LayoutContainer = styled.div`
   background: ${({theme}) => theme.gradients.contentBackground};
 `;
 
-const NavigationWrapper = styled.div`
+const NavigationWrapper = styled.div<{ $isHidden: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: ${({theme}) => theme.zIndex.navigation};
   background: ${({theme}) => theme.gradients.contentBackground};
+  transform: translateY(${({$isHidden}) => $isHidden ? '-100%' : '0'});
+  transition: transform 0.3s ease-in-out;
 `;
 
 const MainContentWrapper = styled.div<{
     $navHeight: number;
     $footerHeight: number;
     $statusHeight: number;
-    $isFullWidth: boolean
+    $isFullWidth: boolean;
+    $navHidden: boolean;
 }>`
   position: fixed;
-  top: ${({$navHeight}) => $navHeight}px;
+  top: ${({$navHeight, $navHidden}) => $navHidden ? 0 : $navHeight}px;
   bottom: ${({$footerHeight, $statusHeight}) => $footerHeight + $statusHeight}px;
   left: 0;
   right: 0;
@@ -42,6 +45,7 @@ const MainContentWrapper = styled.div<{
   overflow-x: hidden;
   z-index: 1;
   background: ${({theme, $isFullWidth}) => $isFullWidth ? theme.skyColors[0] : theme.gradients.contentBackground};
+  transition: top 0.3s ease-in-out;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -98,11 +102,16 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
     const [navHeight, setNavHeight] = useState(150);
     const [footerHeight, setFooterHeight] = useState(100);
     const [statusHeight, setStatusHeight] = useState(80);
+    const [isNavHidden, setIsNavHidden] = useState(false);
+
     const navRef = useRef<HTMLDivElement | null>(null);
     const footerRef = useRef<HTMLDivElement | null>(null);
     const statusRef = useRef<HTMLDivElement | null>(null);
+    const mainContentRef = useRef<HTMLDivElement | null>(null);
 
-    // 현재 경로가 전체 너비를 사용해야 하는지 확인
+    const lastScrollY = useRef(0);
+    const scrollTimer = useRef<NodeJS.Timeout | null>(null);
+
     const isFullWidth = FULL_WIDTH_ROUTES.includes(location.pathname);
 
     useEffect(() => {
@@ -118,10 +127,8 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
             }
         };
 
-        // 초기 높이 설정
         updateHeights();
 
-        // ResizeObserver로 동적 높이 변화 감지
         const resizeObserver = new ResizeObserver(updateHeights);
 
         if (navRef.current) {
@@ -134,7 +141,6 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
             resizeObserver.observe(statusRef.current!);
         }
 
-        // 윈도우 리사이즈 시에도 업데이트
         window.addEventListener('resize', updateHeights);
 
         return () => {
@@ -143,14 +149,79 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
         };
     }, []);
 
+    useEffect(() => {
+        const mainContentElement = mainContentRef.current;
+        if (!mainContentElement) return;
+
+        let ticking = false;
+
+        const handleScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const currentScrollY = mainContentElement.scrollTop;
+
+                    // 스크롤 방향 감지
+                    if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
+                        // 아래로 스크롤 & 100px 이상 스크롤했을 때
+                        setIsNavHidden(true);
+                    } else if (currentScrollY < lastScrollY.current - 5) {
+                        // 위로 5px 이상 스크롤
+                        setIsNavHidden(false);
+                    }
+
+                    // 최상단에서는 항상 표시
+                    if (currentScrollY < 50) {
+                        setIsNavHidden(false);
+                    }
+
+                    lastScrollY.current = currentScrollY;
+                    ticking = false;
+
+                    // 스크롤이 멈춘 후 2초 뒤에 네비게이션 표시
+                    if (scrollTimer.current) {
+                        clearTimeout(scrollTimer.current!);
+                    }
+
+                    scrollTimer.current = setTimeout(() => {
+                        setIsNavHidden(false);
+                    }, 2000);
+                });
+
+                ticking = true;
+            }
+        };
+
+        mainContentElement.addEventListener('scroll', handleScroll);
+
+        return () => {
+            mainContentElement.removeEventListener('scroll', handleScroll);
+            if (scrollTimer.current) {
+                clearTimeout(scrollTimer.current!);
+            }
+        };
+    }, []);
+
+    useEffect(() => {
+        setIsNavHidden(false);
+        if (mainContentRef.current) {
+            mainContentRef.current!.scrollTop = 0;
+        }
+    }, [location.pathname]);
+
     return (
         <LayoutContainer>
-            <NavigationWrapper ref={navRef}>
+            <NavigationWrapper ref={navRef} $isHidden={isNavHidden}>
                 <NavigationBar/>
             </NavigationWrapper>
 
-            <MainContentWrapper $navHeight={navHeight} $footerHeight={footerHeight} $statusHeight={statusHeight}
-                                $isFullWidth={isFullWidth}>
+            <MainContentWrapper
+                ref={mainContentRef}
+                $navHeight={navHeight}
+                $footerHeight={footerHeight}
+                $statusHeight={statusHeight}
+                $isFullWidth={isFullWidth}
+                $navHidden={isNavHidden}
+            >
                 <MainContent $isFullWidth={isFullWidth}>
                     {children}
                 </MainContent>
