@@ -153,6 +153,8 @@ export const renderMarkdown = (content: string) => {
         renderedContent = renderedContent.replace(`___INLINECODE_${index}___`, code);
     });
 
+    renderedContent = renderedContent.replace(/<img/g, '<img loading="lazy"');
+
     return renderedContent;
 };
 

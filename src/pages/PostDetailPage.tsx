@@ -269,6 +269,16 @@ const PostContent = styled.div`
     }
   }
 
+  img[src$=".gif"] {
+    max-width: 100%;
+    max-height: 500px;
+    background: ${({theme}) => theme.colors.primary}05;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+
   table {
     width: 100%;
     border-collapse: collapse;
