@@ -161,16 +161,18 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
                     const currentScrollY = mainContentElement.scrollTop;
 
                     // 스크롤 방향 감지
-                    if (currentScrollY > lastScrollY.current && currentScrollY > 100) {
-                        // 아래로 스크롤 & 100px 이상 스크롤했을 때
+                    const scrollDiff = currentScrollY - lastScrollY.current;
+
+                    if (scrollDiff > 10 && currentScrollY > 150) {
+                        // 아래로 10px 이상 스크롤 & 150px 이상 스크롤
                         setIsNavHidden(true);
-                    } else if (currentScrollY < lastScrollY.current - 5) {
-                        // 위로 5px 이상 스크롤
+                    } else if (scrollDiff < -30) {
+                        // 위로 30px 이상 스크롤
                         setIsNavHidden(false);
                     }
 
                     // 최상단에서는 항상 표시
-                    if (currentScrollY < 50) {
+                    if (currentScrollY < 100) {
                         setIsNavHidden(false);
                     }
 
@@ -184,7 +186,7 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
 
                     scrollTimer.current = setTimeout(() => {
                         setIsNavHidden(false);
-                    }, 2000);
+                    }, 3000);
                 });
 
                 ticking = true;
