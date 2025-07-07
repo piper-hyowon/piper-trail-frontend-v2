@@ -110,7 +110,6 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
     const mainContentRef = useRef<HTMLDivElement | null>(null);
 
     const lastScrollY = useRef(0);
-    const scrollTimer = useRef<NodeJS.Timeout | null>(null);
 
     const isFullWidth = FULL_WIDTH_ROUTES.includes(location.pathname);
 
@@ -184,17 +183,6 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
 
                     lastScrollY.current = currentScrollY;
                     ticking = false;
-
-                    // 페이지 하단이 아닐 때만 타이머 설정
-                    if (!isNearBottom) {
-                        if (scrollTimer.current) {
-                            clearTimeout(scrollTimer.current!);
-                        }
-
-                        scrollTimer.current = setTimeout(() => {
-                            setIsNavHidden(false);
-                        }, 3000);
-                    }
                 });
 
                 ticking = true;
@@ -205,9 +193,6 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
 
         return () => {
             mainContentElement.removeEventListener('scroll', handleScroll);
-            if (scrollTimer.current) {
-                clearTimeout(scrollTimer.current!);
-            }
         };
     }, []);
 
