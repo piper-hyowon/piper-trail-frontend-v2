@@ -91,6 +91,33 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
+    // 인라인 요소 렌더링
+    function renderInlineElements(text: string): string {
+        if (text.includes('%%INLINECODE') || text.includes('%%CODEBLOCK')) {
+            return text;
+        }
+
+        let result = text;
+
+        // 1. Bold + Italic 처리 (***text***)
+        result = result.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+
+        // 2. Bold 처리 (**text** 또는 __text__)
+        result = result.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+        result = result.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+
+        // 3. Italic 처리 (*text* 또는 _text_)
+        // 단어 경계를 확인하여 더 정확한 매칭
+        result = result.replace(/\b\*([^*\s][^*]*[^*\s])\*\b/g, '<em>$1</em>');
+        result = result.replace(/\b_([^_\s][^_]*[^_\s])_\b/g, '<em>$1</em>');
+
+        result = result.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+        result = result.replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>');
+        result = result.replace(/~\{([^}]+)\}/g, '<sub>$1</sub>');
+
+        return result;
+    }
+
     // 8. 제목 처리
     renderedContent = renderedContent.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, text) => {
         const level = hashes.length;
@@ -106,7 +133,7 @@ export const renderMarkdown = (content: string) => {
         /^(\s*)[-*+]\s+(.+)$/gm,
         (match, indent, content) => {
             const level = Math.floor(indent.length / 2);
-            return `<ul_item level="${level}">${renderInlineElements(content)}</ul_item>`;
+            return `<ul_item level="${level}">${content}</ul_item>`;
         }
     );
 
@@ -114,35 +141,13 @@ export const renderMarkdown = (content: string) => {
         /^(\s*)\d+\.\s+(.+)$/gm,
         (match, indent, content) => {
             const level = Math.floor(indent.length / 2);
-            return `<ol_item level="${level}">${renderInlineElements(content)}</ol_item>`;
+            return `<ol_item level="${level}">${content}</ol_item>`;
         }
     );
 
-    renderedContent = processLists(renderedContent);
+    renderedContent = processLists(renderedContent, renderInlineElements);
 
-    // 인라인 요소
-    function renderInlineElements(text: string): string {
-        if (text.includes('%%INLINECODE') || text.includes('%%CODEBLOCK')) {
-            return text;
-        }
-
-        return text
-            // Bold + Italic (3개 별표)
-            .replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>')
-            // Bold (2개 별 or 언더스코어)
-            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-            .replace(/__([^_]+)__/g, '<strong>$1</strong>')
-            // Italic (1개 별표 or 언더스코어)
-            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
-            .replace(/_([^_]+)_/g, '<em>$1</em>')
-            // 취소선
-            .replace(/~~([^~]+)~~/g, '<del>$1</del>')
-            // 위첨자
-            .replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>')
-            // 아래첨자
-            .replace(/~\{([^}]+)\}/g, '<sub>$1</sub>');
-    }
-
+    // 단락
     renderedContent = renderedContent
         .split(/\n\n+/)
         .map(paragraph => {
@@ -180,7 +185,7 @@ export const renderMarkdown = (content: string) => {
     return renderedContent;
 };
 
-function processLists(content: string): string {
+function processLists(content: string, renderInlineElements: (text: string) => string): string {
     const lines = content.split('\n');
     const result: string[] = [];
     let currentList: { type: 'ul' | 'ol', level: number } | null = null;
@@ -211,7 +216,7 @@ function processLists(content: string): string {
                 openLists[level] = {type, level};
             }
 
-            result.push(`<li>${content}</li>`);
+            result.push(`<li>${renderInlineElements(content)}</li>`);
         } else {
             while (openLists.length > 0) {
                 const list = openLists.pop();
