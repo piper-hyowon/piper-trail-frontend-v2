@@ -238,7 +238,7 @@ const PostContent = styled.div`
 
     li {
       margin-bottom: ${({theme}) => theme.spacing.xs};
-      line-height: 1.7;
+      line-height: 1.4;
     }
   }
 

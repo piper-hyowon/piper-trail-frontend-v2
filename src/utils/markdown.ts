@@ -7,7 +7,7 @@ export const renderMarkdown = (content: string) => {
     renderedContent = renderedContent.replace(
         /```(\w*)([\r\n\s])([\s\S]*?)```/g,
         (match, lang, separator, code) => {
-            const placeholder = `___CODEBLOCK_${codeBlocks.length}___`;
+            const placeholder = `%%CODEBLOCK${codeBlocks.length}%%`;
             const trimmedCode = code.trim();
             codeBlocks.push(
                 `<pre><code class="language-${lang || 'text'}">${trimmedCode
@@ -22,7 +22,7 @@ export const renderMarkdown = (content: string) => {
     renderedContent = renderedContent.replace(
         /`([^`\n]+)`/g,
         (match, code) => {
-            const placeholder = `___INLINECODE_${inlineCodes.length}___`;
+            const placeholder = `%%INLINECODE${inlineCodes.length}%%`;
             inlineCodes.push(`<code>${code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code>`);
             return placeholder;
         }
@@ -67,17 +67,17 @@ export const renderMarkdown = (content: string) => {
         /^(>+)(.*)$/gm,
         (match, arrows, content) => {
             const level = arrows.length;
-            const placeholder = `___BLOCKQUOTE_${blockquotes.length}___`;
+            const placeholder = `%%BLOCKQUOTE${blockquotes.length}%%`;
             blockquotes.push(`<blockquote>${content.trim()}</blockquote>`);
             return placeholder;
         }
     );
 
     renderedContent = renderedContent.replace(
-        /(___BLOCKQUOTE_\d+___\n?)+/g,
+        /(%%BLOCKQUOTE\d+%%\n?)+/g,
         (match) => {
             const quotes = match.trim().split('\n').map(line => {
-                const index = parseInt(line.match(/___BLOCKQUOTE_(\d+)___/)?.[1] || '0');
+                const index = parseInt(line.match(/%%BLOCKQUOTE(\d+)%%/)?.[1] || '0');
                 return blockquotes[index].replace(/<\/?blockquote>/g, '');
             });
             return `<blockquote>${quotes.join('<br>')}</blockquote>`;
@@ -111,6 +111,10 @@ export const renderMarkdown = (content: string) => {
     renderedContent = processLists(renderedContent);
 
     function renderInlineElements(text: string): string {
+        if (text.includes('%%INLINECODE') || text.includes('%%CODEBLOCK')) {
+            return text;
+        }
+
         return text
             .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -127,7 +131,7 @@ export const renderMarkdown = (content: string) => {
         .map(paragraph => {
             paragraph = paragraph.trim();
 
-            if (paragraph.match(/^<(h[1-6]|pre|table|hr|blockquote|ul|ol)|^___[A-Z]+_\d+___/)) {
+            if (paragraph.match(/^<(h[1-6]|pre|table|hr|blockquote|ul|ol)|^%%[A-Z]+\d+%%/)) {
                 return paragraph;
             }
 
@@ -135,22 +139,22 @@ export const renderMarkdown = (content: string) => {
 
             return `<p>${renderInlineElements(paragraph).replace(/\n/g, '<br />')}</p>`;
         })
-        .filter(p => p) // 빈 요소 제거
+        .filter(p => p)
         .join('\n\n');
 
     blockquotes.forEach((quote, index) => {
-        const placeholder = `___BLOCKQUOTE_${index}___`;
+        const placeholder = `%%BLOCKQUOTE${index}%%`;
         if (renderedContent.includes(placeholder)) {
             renderedContent = renderedContent.replace(placeholder, quote);
         }
     });
 
     codeBlocks.forEach((code, index) => {
-        renderedContent = renderedContent.replace(`___CODEBLOCK_${index}___`, code);
+        renderedContent = renderedContent.replace(`%%CODEBLOCK${index}%%`, code);
     });
 
     inlineCodes.forEach((code, index) => {
-        renderedContent = renderedContent.replace(`___INLINECODE_${index}___`, code);
+        renderedContent = renderedContent.replace(`%%INLINECODE${index}%%`, code);
     });
 
     renderedContent = renderedContent.replace(/<img/g, '<img loading="lazy"');
