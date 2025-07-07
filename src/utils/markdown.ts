@@ -3,6 +3,7 @@ export const renderMarkdown = (content: string) => {
 
     let renderedContent = content;
 
+    // 1. 코드 블록 처리
     const codeBlocks: string[] = [];
     renderedContent = renderedContent.replace(
         /```(\w*)([\r\n\s])([\s\S]*?)```/g,
@@ -18,6 +19,7 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
+    // 2. 인라인 코드
     const inlineCodes: string[] = [];
     renderedContent = renderedContent.replace(
         /`([^`\n]+)`/g,
@@ -28,16 +30,19 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
+    // 3. 이미지
     renderedContent = renderedContent.replace(
         /!\[([^\]]*)\]\(([^)]+)\)/g,
         '<img src="$2" alt="$1" />'
     );
 
+    // 4. 링크
     renderedContent = renderedContent.replace(
         /\[([^\]]+)\]\(([^)]+)\)/g,
         '<a href="$2" target="_blank">$1</a>'
     );
 
+    // 5. 테이블
     const renderTable = (tableText: string) => {
         const lines = tableText.trim().split('\n');
         if (lines.length < 2) return tableText;
@@ -62,6 +67,7 @@ export const renderMarkdown = (content: string) => {
         (match) => renderTable(match)
     );
 
+    // 6. 인용문
     const blockquotes: string[] = [];
     renderedContent = renderedContent.replace(
         /^(>+)(.*)$/gm,
@@ -73,6 +79,7 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
+    // 7. 인용문 병합
     renderedContent = renderedContent.replace(
         /(%%BLOCKQUOTE\d+%%\n?)+/g,
         (match) => {
@@ -84,14 +91,17 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
+    // 8. 제목 처리
     renderedContent = renderedContent.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, text) => {
         const level = hashes.length;
         const cleanText = renderInlineElements(text.trim());
         return `<h${level}>${cleanText}</h${level}>`;
     });
 
+    // 9. 수평선
     renderedContent = renderedContent.replace(/^---+$/gm, '<hr />');
 
+    // 10. 리스트
     renderedContent = renderedContent.replace(
         /^(\s*)[-*+]\s+(.+)$/gm,
         (match, indent, content) => {
@@ -110,19 +120,26 @@ export const renderMarkdown = (content: string) => {
 
     renderedContent = processLists(renderedContent);
 
+    // 인라인 요소
     function renderInlineElements(text: string): string {
         if (text.includes('%%INLINECODE') || text.includes('%%CODEBLOCK')) {
             return text;
         }
 
         return text
-            .replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/__(.*?)__/g, '<strong>$1</strong>')
-            .replace(/_(.*?)_/g, '<em>$1</em>')
-            .replace(/~~(.*?)~~/g, '<del>$1</del>')
+            // Bold + Italic (3개 별표)
+            .replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>')
+            // Bold (2개 별 or 언더스코어)
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/__([^_]+)__/g, '<strong>$1</strong>')
+            // Italic (1개 별표 or 언더스코어)
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+            .replace(/_([^_]+)_/g, '<em>$1</em>')
+            // 취소선
+            .replace(/~~([^~]+)~~/g, '<del>$1</del>')
+            // 위첨자
             .replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>')
+            // 아래첨자
             .replace(/~\{([^}]+)\}/g, '<sub>$1</sub>');
     }
 
@@ -157,6 +174,7 @@ export const renderMarkdown = (content: string) => {
         renderedContent = renderedContent.replace(`%%INLINECODE${index}%%`, code);
     });
 
+    // 이미지 lazy loading
     renderedContent = renderedContent.replace(/<img/g, '<img loading="lazy"');
 
     return renderedContent;
