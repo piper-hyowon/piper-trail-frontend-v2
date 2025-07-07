@@ -3,7 +3,7 @@ export const renderMarkdown = (content: string) => {
 
     let renderedContent = content;
 
-    // 1. 코드 블록 처리
+    // 1. 코드 블록
     const codeBlocks: string[] = [];
     renderedContent = renderedContent.replace(
         /```(\w*)([\r\n\s])([\s\S]*?)```/g,
@@ -30,19 +30,29 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
-    // 3. 이미지
+    // Bold/Italic 먼저 (리스트보다)
+    // Bold + Italic
+    renderedContent = renderedContent.replace(/\*\*\*([^*]+)\*\*\*/g, '%%BOLDITALIC%%$1%%ENDBOLDITALIC%%');
+    // Bold
+    renderedContent = renderedContent.replace(/\*\*([^*]+)\*\*/g, '%%BOLD%%$1%%ENDBOLD%%');
+    renderedContent = renderedContent.replace(/__([^_]+)__/g, '%%BOLD%%$1%%ENDBOLD%%');
+    // Italic
+    renderedContent = renderedContent.replace(/(?<!\*)\*(?!\*)([^*\n]+)\*(?!\*)/g, '%%ITALIC%%$1%%ENDITALIC%%');
+    renderedContent = renderedContent.replace(/(?<!_)_(?!_)([^_\n]+)_(?!_)/g, '%%ITALIC%%$1%%ENDITALIC%%');
+
+    // 이미지
     renderedContent = renderedContent.replace(
         /!\[([^\]]*)\]\(([^)]+)\)/g,
         '<img src="$2" alt="$1" />'
     );
 
-    // 4. 링크
+    // 링크
     renderedContent = renderedContent.replace(
         /\[([^\]]+)\]\(([^)]+)\)/g,
         '<a href="$2" target="_blank">$1</a>'
     );
 
-    // 5. 테이블
+    // 테이블
     const renderTable = (tableText: string) => {
         const lines = tableText.trim().split('\n');
         if (lines.length < 2) return tableText;
@@ -54,7 +64,7 @@ export const renderMarkdown = (content: string) => {
             const tag = index === 0 ? 'th' : 'td';
             html += '<tr>';
             cells.forEach(cell => {
-                html += `<${tag}>${renderInlineElements(cell.trim())}</${tag}>`;
+                html += `<${tag}>${cell.trim()}</${tag}>`;
             });
             html += '</tr>';
         });
@@ -67,7 +77,7 @@ export const renderMarkdown = (content: string) => {
         (match) => renderTable(match)
     );
 
-    // 6. 인용문
+    // 인용문
     const blockquotes: string[] = [];
     renderedContent = renderedContent.replace(
         /^(>+)(.*)$/gm,
@@ -79,7 +89,7 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
-    // 7. 인용문 병합
+    // 인용문 병합
     renderedContent = renderedContent.replace(
         /(%%BLOCKQUOTE\d+%%\n?)+/g,
         (match) => {
@@ -91,44 +101,15 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
-    // 인라인 요소 렌더링
-    function renderInlineElements(text: string): string {
-        if (text.includes('%%INLINECODE') || text.includes('%%CODEBLOCK')) {
-            return text;
-        }
-
-        let result = text;
-
-        // 1. Bold + Italic 처리 (***text***)
-        result = result.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
-
-        // 2. Bold 처리 (**text** 또는 __text__)
-        result = result.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-        result = result.replace(/__([^_]+)__/g, '<strong>$1</strong>');
-
-        // 3. Italic 처리 (*text* 또는 _text_)
-        // 단어 경계를 확인하여 더 정확한 매칭
-        result = result.replace(/\b\*([^*\s][^*]*[^*\s])\*\b/g, '<em>$1</em>');
-        result = result.replace(/\b_([^_\s][^_]*[^_\s])_\b/g, '<em>$1</em>');
-
-        result = result.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-        result = result.replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>');
-        result = result.replace(/~\{([^}]+)\}/g, '<sub>$1</sub>');
-
-        return result;
-    }
-
-    // 8. 제목 처리
     renderedContent = renderedContent.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, text) => {
         const level = hashes.length;
-        const cleanText = renderInlineElements(text.trim());
-        return `<h${level}>${cleanText}</h${level}>`;
+        return `<h${level}>${text.trim()}</h${level}>`;
     });
 
-    // 9. 수평선
+    // hr
     renderedContent = renderedContent.replace(/^---+$/gm, '<hr />');
 
-    // 10. 리스트
+    // 리스트
     renderedContent = renderedContent.replace(
         /^(\s*)[-*+]\s+(.+)$/gm,
         (match, indent, content) => {
@@ -145,7 +126,12 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
-    renderedContent = processLists(renderedContent, renderInlineElements);
+    renderedContent = processLists(renderedContent);
+
+    // 취소선, 위첨자, 아래첨자
+    renderedContent = renderedContent.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+    renderedContent = renderedContent.replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>');
+    renderedContent = renderedContent.replace(/~\{([^}]+)\}/g, '<sub>$1</sub>');
 
     // 단락
     renderedContent = renderedContent
@@ -159,10 +145,14 @@ export const renderMarkdown = (content: string) => {
 
             if (!paragraph) return '';
 
-            return `<p>${renderInlineElements(paragraph).replace(/\n/g, '<br />')}</p>`;
+            return `<p>${paragraph.replace(/\n/g, '<br />')}</p>`;
         })
         .filter(p => p)
         .join('\n\n');
+
+    renderedContent = renderedContent.replace(/%%BOLDITALIC%%(.+?)%%ENDBOLDITALIC%%/g, '<strong><em>$1</em></strong>');
+    renderedContent = renderedContent.replace(/%%BOLD%%(.+?)%%ENDBOLD%%/g, '<strong>$1</strong>');
+    renderedContent = renderedContent.replace(/%%ITALIC%%(.+?)%%ENDITALIC%%/g, '<em>$1</em>');
 
     blockquotes.forEach((quote, index) => {
         const placeholder = `%%BLOCKQUOTE${index}%%`;
@@ -185,7 +175,7 @@ export const renderMarkdown = (content: string) => {
     return renderedContent;
 };
 
-function processLists(content: string, renderInlineElements: (text: string) => string): string {
+function processLists(content: string): string {
     const lines = content.split('\n');
     const result: string[] = [];
     let currentList: { type: 'ul' | 'ol', level: number } | null = null;
@@ -216,7 +206,7 @@ function processLists(content: string, renderInlineElements: (text: string) => s
                 openLists[level] = {type, level};
             }
 
-            result.push(`<li>${renderInlineElements(content)}</li>`);
+            result.push(`<li>${content}</li>`);
         } else {
             while (openLists.length > 0) {
                 const list = openLists.pop();
