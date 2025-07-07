@@ -159,11 +159,17 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
             if (!ticking) {
                 window.requestAnimationFrame(() => {
                     const currentScrollY = mainContentElement.scrollTop;
-
-                    // 스크롤 방향 감지
+                    const scrollHeight = mainContentElement.scrollHeight;
+                    const clientHeight = mainContentElement.clientHeight;
                     const scrollDiff = currentScrollY - lastScrollY.current;
 
-                    if (scrollDiff > 10 && currentScrollY > 150) {
+                    // 페이지 하단 근처
+                    const isNearBottom = currentScrollY + clientHeight >= scrollHeight - 100;
+
+                    // 페이지 하단에서는 항상 표시
+                    if (isNearBottom) {
+                        setIsNavHidden(false);
+                    } else if (scrollDiff > 10 && currentScrollY > 150) {
                         // 아래로 10px 이상 스크롤 & 150px 이상 스크롤
                         setIsNavHidden(true);
                     } else if (scrollDiff < -30) {
@@ -171,7 +177,7 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
                         setIsNavHidden(false);
                     }
 
-                    // 최상단에서는 항상 표시
+                    // 최상단에서는 항상 네비게이션 표시
                     if (currentScrollY < 100) {
                         setIsNavHidden(false);
                     }
@@ -179,14 +185,16 @@ const Layout: React.FC<LayoutProps> = ({children}) => {
                     lastScrollY.current = currentScrollY;
                     ticking = false;
 
-                    // 스크롤이 멈춘 후 2초 뒤에 네비게이션 표시
-                    if (scrollTimer.current) {
-                        clearTimeout(scrollTimer.current!);
-                    }
+                    // 페이지 하단이 아닐 때만 타이머 설정
+                    if (!isNearBottom) {
+                        if (scrollTimer.current) {
+                            clearTimeout(scrollTimer.current!);
+                        }
 
-                    scrollTimer.current = setTimeout(() => {
-                        setIsNavHidden(false);
-                    }, 3000);
+                        scrollTimer.current = setTimeout(() => {
+                            setIsNavHidden(false);
+                        }, 3000);
+                    }
                 });
 
                 ticking = true;
