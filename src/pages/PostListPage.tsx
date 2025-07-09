@@ -981,7 +981,7 @@ const PostListPage: React.FC = () => {
                                             <SeriesBadge
                                                 onClick={(e) => handleSeriesHomeClick(e, post.series!.seriesSlug)}>
                                                 <span style={{fontSize: '14px'}}>📚</span>
-                                                <span>{post.series.seriesTitle}</span>
+                                                <span>{language === "ko" ? post.series.seriesTitle : post.series.seriesTitleEn}</span>
                                             </SeriesBadge>
                                         </SeriesHeader>
                                     </>
