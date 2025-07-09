@@ -309,6 +309,122 @@ const PostContent = styled.div`
       overflow-x: auto;
     }
   }
+  
+  .terminal-container {
+    margin: ${({theme}) => theme.spacing.lg} 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    background: #1e1e1e;
+  }
+
+  .terminal-header {
+    background: #323232;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .terminal-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .terminal-button {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .terminal-button.close {
+    background: #ff5f56;
+  }
+
+  .terminal-button.minimize {
+    background: #ffbd2e;
+  }
+
+  .terminal-button.maximize {
+    background: #27c93f;
+  }
+
+  .terminal-title {
+    color: #d4d4d4;
+    font-size: 13px;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .terminal-run-button {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s;
+
+    &:hover {
+      background: #45a049;
+    }
+
+    &:disabled {
+      background: #666;
+      cursor: not-allowed;
+    }
+  }
+
+  .terminal-body {
+    background: #1e1e1e;
+    min-height: 150px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 14px;
+  }
+
+  .terminal-output {
+    color: #d4d4d4;
+    line-height: 1.5;
+  }
+
+  .terminal-welcome {
+    color: #6a9955;
+    font-style: italic;
+  }
+
+  .terminal-line {
+    color: #4ec9b0;
+    margin-bottom: 5px;
+  }
+
+  .terminal-output-text {
+    color: #ffffff;
+    white-space: pre-wrap;
+  }
+
+  .terminal-success {
+    color: #4ec9b0;
+    margin-top: 10px;
+  }
+
+  .terminal-error {
+    color: #f48771;
+    margin-top: 10px;
+  }
+
+  .terminal-error-stack {
+    color: #808080;
+    font-size: 0.9em;
+    margin-top: 5px;
+    padding-left: 20px;
+    font-family: monospace;
+    white-space: pre;
+  }
 
   @media (max-width: 768px) {
     font-size: 0.95rem;

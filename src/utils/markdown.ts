@@ -2,19 +2,52 @@ export const renderMarkdown = (content: string) => {
     if (!content) return '';
 
     let renderedContent = content;
+    let terminalId = 0;
 
     // 1. 코드 블록
     const codeBlocks: string[] = [];
     renderedContent = renderedContent.replace(
-        /```(\w*)([\r\n\s])([\s\S]*?)```/g,
-        (match, lang, separator, code) => {
+        /```(\w+(?:-run)?)([\r\n\s])([\s\S]*?)```/g,
+        (match, langTag, separator, code) => {
             const placeholder = `%%CODEBLOCK${codeBlocks.length}%%`;
             const trimmedCode = code.trim();
-            codeBlocks.push(
-                `<pre><code class="language-${lang || 'text'}">${trimmedCode
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')}</code></pre>`
-            );
+
+            // 실행 가능 여부 확인
+            const isExecutable = langTag.endsWith('-run');
+            const language = langTag.replace('-run', '');
+
+            if (isExecutable && (language === 'js' || language === 'javascript')) {
+                // JavaScript 터미널 UI 생성
+                terminalId++;
+                codeBlocks.push(
+                    `<div class="terminal-container" id="terminal-${terminalId}">
+                        <div class="terminal-header">
+                            <div class="terminal-buttons">
+                                <span class="terminal-button close"></span>
+                                <span class="terminal-button minimize"></span>
+                                <span class="terminal-button maximize"></span>
+                            </div>
+                            <div class="terminal-title">JavaScript Console</div>
+                            <button class="terminal-run-button" 
+                                    onclick="window.runJavaScriptCode(${terminalId}, \`${trimmedCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                                ▶ Run
+                            </button>
+                        </div>
+                        <div class="terminal-body" id="terminal-body-${terminalId}">
+                            <div class="terminal-output" id="terminal-output-${terminalId}">
+                                <div class="terminal-welcome">Ready to run JavaScript. Click "Run" to execute.</div>
+                            </div>
+                        </div>
+                    </div>`
+                );
+            } else {
+                // 일반 코드 블록
+                codeBlocks.push(
+                    `<pre><code class="language-${language || 'text'}">${trimmedCode
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')}</code></pre>`
+                );
+            }
             return placeholder;
         }
     );
@@ -223,3 +256,79 @@ function processLists(content: string): string {
 
     return result.join('\n');
 }
+
+declare global {
+    interface Window {
+        runJavaScriptCode: (terminalId: number, code: string) => void;
+    }
+}
+
+window.runJavaScriptCode = (terminalId: number, code: string) => {
+    const outputDiv = document.getElementById(`terminal-output-${terminalId}`);
+    const terminalBody = document.getElementById(`terminal-body-${terminalId}`);
+    const button = event?.target as HTMLButtonElement;
+
+    if (!outputDiv || !terminalBody) return;
+
+    // 버튼 상태 변경
+    if (button) {
+        button.disabled = true;
+        button.textContent = '⚡ Running...';
+    }
+
+    // 터미널 클리어
+    outputDiv.innerHTML = `<div class="terminal-line">$ node script.js</div>`;
+
+    // 입력 필드 추가
+    const inputField = document.createElement('input');
+    inputField.type = 'text';
+    inputField.className = 'terminal-input-field';
+    inputField.style.cssText = 'display: none; background: transparent; border: none; color: white; width: 100%; outline: none; font-family: monospace;';
+    terminalBody.appendChild(inputField);
+
+    const logs: string[] = [];
+    const originalConsole = {
+        log: console.log,
+        error: console.error,
+        warn: console.warn,
+        info: console.info
+    };
+
+    // 출력 헬퍼
+    const addOutput = (text: string) => {
+        outputDiv.innerHTML += `<div class="terminal-output-text">${text}</div>`;
+        terminalBody.scrollTop = terminalBody.scrollHeight;
+    };
+
+    console.log = (...args: any[]) => {
+        const text = args.map(arg =>
+            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+        ).join(' ');
+        addOutput(text);
+    };
+
+    console.error = (...args: any[]) => {
+        addOutput(`<span style="color: #f48771;">❌ ${args.join(' ')}</span>`);
+    };
+
+    console.warn = (...args: any[]) => {
+        addOutput(`<span style="color: #ffbd2e;">⚠️ ${args.join(' ')}</span>`);
+    };
+
+    console.info = (...args: any[]) => {
+        addOutput(`<span style="color: #4ec9b0;">ℹ️ ${args.join(' ')}</span>`);
+    };
+
+    try {
+        const func = new Function(code);
+        func();
+
+        if (typeof (window as any).runPigGame === 'function') {
+            (window as any).runPigGame(outputDiv, inputField);
+        }
+
+    } catch (error) {
+        outputDiv.innerHTML += `<div class="terminal-error">❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}</div>`;
+    } finally {
+    }
+};
