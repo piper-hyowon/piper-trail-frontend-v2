@@ -33,7 +33,9 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: ${({theme}) => theme.zIndex.modalOverlay}; // 9998
+  padding: 20px;
+  box-sizing: border-box;
 `;
 
 const ModalContent = styled.div`
@@ -42,8 +44,11 @@ const ModalContent = styled.div`
   padding: ${({theme}) => theme.spacing.lg};
   width: 100%;
   max-width: 400px;
+  max-height: 90vh; 
+  overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-`;
+  margin: auto;
+  position: relative;`;
 
 const ModalHeader = styled.div`
   margin-bottom: ${({theme}) => theme.spacing.md};

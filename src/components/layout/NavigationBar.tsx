@@ -346,6 +346,8 @@ const FormModal = styled.div`
   justify-content: center;
   align-items: center;
   z-index: ${({theme}) => theme.zIndex.modal};
+  padding-top: 40%;
+
 `;
 
 const ModalContent = styled.div`
