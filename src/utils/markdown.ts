@@ -19,6 +19,9 @@ export const renderMarkdown = (content: string) => {
             if (isExecutable && (language === 'js' || language === 'javascript')) {
                 // JavaScript 터미널 UI 생성
                 terminalId++;
+
+                const encodedCode = btoa(unescape(encodeURIComponent(trimmedCode)));
+
                 codeBlocks.push(
                     `<div class="terminal-container" id="terminal-${terminalId}">
                         <div class="terminal-header">
@@ -29,7 +32,9 @@ export const renderMarkdown = (content: string) => {
                             </div>
                             <div class="terminal-title">JavaScript Console</div>
                             <button class="terminal-run-button" 
-                                    onclick="window.runJavaScriptCode(${terminalId}, \`${trimmedCode.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                                    data-code="${encodedCode}"
+                                    data-terminal-id="${terminalId}"
+                                    onclick="window.runJavaScriptCode(${terminalId}, this.getAttribute('data-code'))">
                                 ▶ Run
                             </button>
                         </div>
@@ -37,6 +42,8 @@ export const renderMarkdown = (content: string) => {
                             <div class="terminal-output" id="terminal-output-${terminalId}">
                                 <div class="terminal-welcome">Ready to run JavaScript. Click "Run" to execute.</div>
                             </div>
+                            <input type="text" class="terminal-input-field" id="terminal-input-${terminalId}" 
+                                   style="display: none; background: transparent; border: none; color: white; width: 100%; outline: none; font-family: monospace;" />
                         </div>
                     </div>`
                 );
@@ -259,13 +266,14 @@ function processLists(content: string): string {
 
 declare global {
     interface Window {
-        runJavaScriptCode: (terminalId: number, code: string) => void;
+        runJavaScriptCode: (terminalId: number, encodedCode: string) => void;
     }
 }
 
-window.runJavaScriptCode = (terminalId: number, code: string) => {
+window.runJavaScriptCode = (terminalId: number, encodedCode: string) => {
     const outputDiv = document.getElementById(`terminal-output-${terminalId}`);
     const terminalBody = document.getElementById(`terminal-body-${terminalId}`);
+    const inputField = document.getElementById(`terminal-input-${terminalId}`) as HTMLInputElement;
     const button = event?.target as HTMLButtonElement;
 
     if (!outputDiv || !terminalBody) return;
@@ -276,17 +284,23 @@ window.runJavaScriptCode = (terminalId: number, code: string) => {
         button.textContent = '⚡ Running...';
     }
 
+    // base64 디코딩
+    let code: string;
+    try {
+        code = decodeURIComponent(escape(atob(encodedCode)));
+    } catch (error) {
+        outputDiv.innerHTML = `<div class="terminal-error">❌ Error: Failed to decode code</div>`;
+        if (button) {
+            button.disabled = false;
+            button.textContent = '▶ Run';
+        }
+        return;
+    }
+
     // 터미널 클리어
     outputDiv.innerHTML = `<div class="terminal-line">$ node script.js</div>`;
 
-    // 입력 필드 추가
-    const inputField = document.createElement('input');
-    inputField.type = 'text';
-    inputField.className = 'terminal-input-field';
-    inputField.style.cssText = 'display: none; background: transparent; border: none; color: white; width: 100%; outline: none; font-family: monospace;';
-    terminalBody.appendChild(inputField);
-
-    const logs: string[] = [];
+    // Console 메서드 오버라이드
     const originalConsole = {
         log: console.log,
         error: console.error,
@@ -295,40 +309,68 @@ window.runJavaScriptCode = (terminalId: number, code: string) => {
     };
 
     // 출력 헬퍼
-    const addOutput = (text: string) => {
-        outputDiv.innerHTML += `<div class="terminal-output-text">${text}</div>`;
+    const addOutput = (text: string, type: string = 'log') => {
+        const className = type === 'error' ? 'terminal-error' : 'terminal-output-text';
+        outputDiv.innerHTML += `<div class="${className}">${text}</div>`;
         terminalBody.scrollTop = terminalBody.scrollHeight;
     };
 
+    // Console 메서드 재정의
     console.log = (...args: any[]) => {
         const text = args.map(arg =>
             typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
         ).join(' ');
         addOutput(text);
+        originalConsole.log(...args);
     };
 
     console.error = (...args: any[]) => {
-        addOutput(`<span style="color: #f48771;">❌ ${args.join(' ')}</span>`);
+        const text = args.map(arg =>
+            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+        ).join(' ');
+        addOutput(`❌ ${text}`, 'error');
+        originalConsole.error(...args);
     };
 
     console.warn = (...args: any[]) => {
-        addOutput(`<span style="color: #ffbd2e;">⚠️ ${args.join(' ')}</span>`);
+        const text = args.map(arg =>
+            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+        ).join(' ');
+        addOutput(`⚠️ ${text}`, 'warn');
+        originalConsole.warn(...args);
     };
 
     console.info = (...args: any[]) => {
-        addOutput(`<span style="color: #4ec9b0;">ℹ️ ${args.join(' ')}</span>`);
+        const text = args.map(arg =>
+            typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+        ).join(' ');
+        addOutput(`ℹ️ ${text}`, 'info');
+        originalConsole.info(...args);
     };
 
     try {
+        // 코드 실행
         const func = new Function(code);
         func();
 
+        // runPigGame 함수가 정의되었는지 확인
         if (typeof (window as any).runPigGame === 'function') {
             (window as any).runPigGame(outputDiv, inputField);
         }
 
     } catch (error) {
-        outputDiv.innerHTML += `<div class="terminal-error">❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}</div>`;
+        addOutput(`❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`, 'error');
     } finally {
+        // Console 메서드 복원
+        console.log = originalConsole.log;
+        console.error = originalConsole.error;
+        console.warn = originalConsole.warn;
+        console.info = originalConsole.info;
+
+        // 버튼 상태 복원
+        if (button) {
+            button.disabled = false;
+            button.textContent = '▶ Run';
+        }
     }
 };
