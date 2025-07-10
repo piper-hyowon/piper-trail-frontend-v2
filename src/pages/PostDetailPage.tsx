@@ -1254,13 +1254,13 @@ const PostDetailPage: React.FC = () => {
 
                 <ActionGroup>
                     <IconButton onClick={handleShare}>
-                        📤 {t("post.detail.actions.share" as any)}
+                        {t("post.detail.actions.share" as any)}
                     </IconButton>
                     <IconButton onClick={handleUpdateClick}>
-                        ✏️ {t("post.detail.actions.edit" as any)}
+                        {t("post.detail.actions.edit" as any)}
                     </IconButton>
                     <IconButton $variant="danger" onClick={handleDeleteClick}>
-                        🗑️ {t("post.detail.actions.delete" as any)}
+                        {t("post.detail.actions.delete" as any)}
                     </IconButton>
                 </ActionGroup>
             </ActionBar>

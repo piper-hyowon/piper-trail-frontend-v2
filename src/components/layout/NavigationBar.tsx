@@ -24,6 +24,7 @@ import {
 import DeleteConfirmModal from "../ui/DeleteConfirmModal.tsx";
 import SearchBar from "../ui/SearchBar.tsx";
 import type {CreatePostRequest, PostDetail, UpdatePostRequest} from "../../types/api.ts";
+import ReactDOM from "react-dom";
 
 interface PostData {
     id: string;
@@ -346,7 +347,7 @@ const FormModal = styled.div`
   justify-content: center;
   align-items: center;
   z-index: ${({theme}) => theme.zIndex.modal};
-  padding-top: 40%;
+  //padding-top: 10%;
 
 `;
 
@@ -1049,60 +1050,67 @@ const NavigationBar: React.FC = () => {
                     </HeadersContainer>
                 )}
             </NavContent>
-
             {/* 포스트 작성 모달*/}
             {showPostForm && (
-                <FormModal>
-                    <ModalContent>
-                        <ModalHeader>
-                            <ModalTitle>{formatMessage('layout.form.createPost', {category: getCategoryName(currentCategory)})}</ModalTitle>
-                            <CloseButton onClick={handleFormCancel}>×</CloseButton>
-                        </ModalHeader>
-                        <PostForm
-                            category={currentCategory}
-                            onSubmit={handlePostFormSubmit}
-                            onCancel={handleFormCancel}
-                        />
-                    </ModalContent>
-                </FormModal>
+                ReactDOM.createPortal(
+                    <FormModal>
+                        <ModalContent>
+                            <ModalHeader>
+                                <ModalTitle>{formatMessage('layout.form.createPost', {category: getCategoryName(currentCategory)})}</ModalTitle>
+                                <CloseButton onClick={handleFormCancel}>×</CloseButton>
+                            </ModalHeader>
+                            <PostForm
+                                category={currentCategory}
+                                onSubmit={handlePostFormSubmit}
+                                onCancel={handleFormCancel}
+                            />
+                        </ModalContent>
+                    </FormModal>,
+                    document.getElementById('modal-root')!
+                )
             )}
 
             {/* 포스트 수정 모달 */}
             {showUpdateForm && currentPostData && (
-                <FormModal>
-                    <ModalContent>
-                        <ModalHeader>
-                            <ModalTitle>{formatMessage('layout.form.editPost', {category: getCategoryName(currentCategory)})}</ModalTitle>
-                            <CloseButton onClick={handleFormCancel}>×</CloseButton>
-                        </ModalHeader>
-                        <PostForm
-                            category={currentCategory}
-                            initialData={{
-                                title: currentPostData.title,
-                                titleEn: currentPostData.titleEn,
-                                subtitle: currentPostData.subtitle,
-                                subtitleEn: currentPostData.subtitleEn,
-                                content: currentPostData.markdownContent || currentPostData.content || '',
-                                contentEn: currentPostData.markdownContentEn || currentPostData.contentEn,
-                                tags: currentPostData.tags || [],
-                                imageFiles: []
-                            }}
-                            onSubmit={handleUpdateFormSubmit}  // update용
-                            onCancel={handleFormCancel}
-                        />
-                    </ModalContent>
-                </FormModal>
+                ReactDOM.createPortal(
+                    <FormModal>
+                        <ModalContent>
+                            <ModalHeader>
+                                <ModalTitle>{formatMessage('layout.form.editPost', {category: getCategoryName(currentCategory)})}</ModalTitle>
+                                <CloseButton onClick={handleFormCancel}>×</CloseButton>
+                            </ModalHeader>
+                            <PostForm
+                                category={currentCategory}
+                                initialData={{
+                                    title: currentPostData.title,
+                                    titleEn: currentPostData.titleEn,
+                                    subtitle: currentPostData.subtitle,
+                                    subtitleEn: currentPostData.subtitleEn,
+                                    content: currentPostData.markdownContent || currentPostData.content || '',
+                                    contentEn: currentPostData.markdownContentEn || currentPostData.contentEn,
+                                    tags: currentPostData.tags || [],
+                                    imageFiles: []
+                                }}
+                                onSubmit={handleUpdateFormSubmit}  // update용
+                                onCancel={handleFormCancel}
+                            />
+                        </ModalContent>
+                    </FormModal>,
+                    document.getElementById('modal-root')!
+                )
             )}
-
             {/* 포스트 삭제 확인 모달 */}
             {showDeleteModal && currentPostData && (
-                <DeleteConfirmModal
-                    postTitle={currentPostData.title}
-                    onConfirm={handleDeleteConfirm}
-                    onCancel={handleFormCancel}
-                    isDeleting={deletePostMutation.isPending}
-                />
-            )}
+                ReactDOM.createPortal(
+                    <DeleteConfirmModal
+                        postTitle={currentPostData.title}
+                        onConfirm={handleDeleteConfirm}
+                        onCancel={handleFormCancel}
+                        isDeleting={deletePostMutation.isPending}
+                    />,
+                    document.getElementById('modal-root')!
+                ))
+            }
 
             {/* 인증 모달 */}
             {showAuthModal && (
