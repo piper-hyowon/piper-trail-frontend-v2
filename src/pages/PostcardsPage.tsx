@@ -200,7 +200,11 @@ const PostcardOverlay = styled.div<{ $isVisible: boolean }>`
 const PostcardListContent = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: ${({theme}) => theme.spacing.lg};
+  padding: ${({theme}) => `${theme.spacing.md} ${theme.spacing.sm}`};
+
+  @media (min-width: 768px) {
+    padding: ${({theme}) => theme.spacing.lg};
+  }
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -260,13 +264,34 @@ const ClosePostcardsButton = styled.button`
 
 const PostcardGrid = styled.div`
   display: grid;
-  gap: ${({theme}) => theme.spacing.lg};
-  max-width: 1000px;
+  gap: ${({theme}) => theme.spacing.md};
   width: 100%;
   margin: 0 auto;
 
+  grid-template-columns: 1fr;
+
   @media (min-width: 768px) {
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
+    gap: ${({theme}) => theme.spacing.lg};
+  }
+
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1200px;
+  }
+
+  @media (min-width: 1440px) {
+    grid-template-columns: repeat(4, 1fr);
+    max-width: 1600px;
+  }
+`;
+
+const PostcardWrapper = styled.div`
+  height: 100%;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: translateY(-4px);
   }
 `;
 
@@ -665,12 +690,13 @@ const PostcardsPage: React.FC = () => {
         return stampEntries.map((entry, index) => {
             const stampInfo = getStampInfo(entry.stampId);
             return (
-                <MemoizedPostcardCard
-                    key={entry.id}
-                    entry={entry}
-                    stampInfo={stampInfo}
-                    index={index}
-                />
+                <PostcardWrapper key={entry.id}>
+                    <MemoizedPostcardCard
+                        entry={entry}
+                        stampInfo={stampInfo}
+                        index={index}
+                    />
+                </PostcardWrapper>
             );
         });
     }, [stampEntries, getStampInfo]);
