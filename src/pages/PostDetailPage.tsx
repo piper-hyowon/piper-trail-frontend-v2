@@ -18,6 +18,7 @@ import {useLanguage} from "../context/LanguageContext";
 import {renderMarkdown} from "../utils/markdown.ts";
 import type {UpdatePostRequest} from "../types/api.ts";
 import ReactDOM from 'react-dom';
+import '../styles/rose-pine-dawn.css';
 
 const PostDetailContainer = styled.article`
   max-width: 800px;
@@ -125,8 +126,6 @@ const PostContent = styled.div`
   color: ${({theme}) => theme.colors.text};
   margin-bottom: ${({theme}) => theme.spacing.xl};
   font-family: 'Nanum Myeongjo', serif;
-  //font-family: 'Press Start 2P', 'Noto Sans KR', cursive;
-
 
   h1, h2, h3, h4, h5, h6 {
     color: ${({theme}) => theme.colors.text};
@@ -152,7 +151,6 @@ const PostContent = styled.div`
     font-size: 1.1rem;
   }
 
-
   p {
     margin-bottom: ${({theme}) => theme.spacing.md};
     line-height: 1.7;
@@ -165,7 +163,17 @@ const PostContent = styled.div`
     margin: ${({theme}) => theme.spacing.xl} 0;
   }
 
-  code {
+  /* 인라인 코드만 스타일링 (코드 블록 내부 코드는 제외) */
+
+  p > code,
+  li > code,
+  td > code,
+  h1 > code,
+  h2 > code,
+  h3 > code,
+  h4 > code,
+  h5 > code,
+  h6 > code {
     background: ${({theme}) => theme.colors.primary}10;
     color: ${({theme}) => theme.colors.primary};
     padding: 2px 6px;
@@ -175,50 +183,6 @@ const PostContent = styled.div`
     font-weight: 500;
   }
 
-
-  pre {
-    background: ${({theme}) => theme.colors.text === '#1A1A1A' ? '#f6f8fa' : '#1e1e1e'};
-    color: ${({theme}) => theme.colors.text === '#1A1A1A' ? '#24292e' : '#d4d4d4'};
-    padding: ${({theme}) => theme.spacing.lg};
-    border-radius: 8px;
-    overflow-x: auto;
-    margin: ${({theme}) => theme.spacing.lg} 0;
-    font-size: 0.9rem;
-    line-height: 1.6;
-    border: 1px solid ${({theme}) => theme.colors.primary}10;
-
-
-    &::-webkit-scrollbar {
-      height: 8px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: ${({theme}) => theme.colors.primary}30;
-      border-radius: 4px;
-    }
-
-    code {
-      background: transparent;
-      color: inherit;
-      padding: 0;
-      font-size: inherit;
-      font-weight: 400;
-    }
-  }
-
-  ${({theme}) => theme.colors.text !== '#1A1A1A' && `
-    pre {
-      .keyword { color: #4FC3F7; }
-      .string { color: #80DEEA; }
-      .comment { color: #66BB6A; }
-      .function { color: #BA68C8; }
-      .number { color: #4DB6AC; }
-    }
-  `}
   blockquote {
     border-left: 4px solid ${({theme}) => theme.colors.primary};
     padding: ${({theme}) => theme.spacing.md};
@@ -278,7 +242,6 @@ const PostContent = styled.div`
     backface-visibility: hidden;
   }
 
-
   table {
     width: 100%;
     border-collapse: collapse;
@@ -309,7 +272,9 @@ const PostContent = styled.div`
       overflow-x: auto;
     }
   }
-  
+
+  /* 터미널 컨테이너는 그대로 유지 */
+
   .terminal-container {
     margin: ${({theme}) => theme.spacing.lg} 0;
     border-radius: 8px;
@@ -438,11 +403,6 @@ const PostContent = styled.div`
 
     h3 {
       font-size: 1.2rem;
-    }
-
-    pre {
-      padding: ${({theme}) => theme.spacing.md};
-      font-size: 0.85rem;
     }
   }
 `;
@@ -702,9 +662,12 @@ const SeriesInfo = styled.div`
 
     code {
       background: ${({theme}) => theme.colors.primary}10;
-      padding: 1px 4px;
-      border-radius: 3px;
+      color: ${({theme}) => theme.colors.primary};
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
       font-size: 0.9em;
+      font-weight: 500;
     }
 
     &::-webkit-scrollbar {

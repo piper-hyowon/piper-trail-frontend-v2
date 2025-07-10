@@ -1,0 +1,311 @@
+/* Rose Pine Dawn Theme for Syntax Highlighting */
+.code-block-wrapper {
+    position: relative;
+    margin: 1.5rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #faf4ed;
+    border: 1px solid #f2e9e1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.code-block-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background: #fffaf3;
+    border-bottom: 1px solid #f2e9e1;
+}
+
+.code-language {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #907aa9;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.code-copy-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: 1px solid #dfdad9;
+    color: #797593;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.code-copy-button:hover {
+    background: #f2e9e1;
+    border-color: #cecacd;
+    color: #575279;
+}
+
+.code-copy-button:active {
+    transform: scale(0.95);
+}
+
+/* Prism.js Rose Pine Dawn Theme */
+pre[class*="language-"],
+code[class*="language-"] {
+    color: #575279;
+    background: none;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+    font-size: 0.9rem;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.6;
+    tab-size: 4;
+    hyphens: none;
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+    padding: 1.25rem;
+    margin: 0;
+    overflow: auto;
+    background: #faf4ed;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+    padding: 0.1em 0.3em;
+    border-radius: 0.3em;
+    white-space: normal;
+    background: #f2e9e1;
+    color: #d7827e;
+}
+
+/* Rose Pine Dawn token colors */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+    color: #9893a5;
+    font-style: italic;
+}
+
+.token.punctuation {
+    color: #797593;
+}
+
+.token.namespace {
+    opacity: 0.7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+    color: #d7827e;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+    color: #ea9d34;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+    color: #286983;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+    color: #907aa9;
+    font-weight: 500;
+}
+
+.token.function,
+.token.class-name {
+    color: #56949f;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+    color: #d7827e;
+}
+
+.token.important,
+.token.bold {
+    font-weight: bold;
+}
+
+.token.italic {
+    font-style: italic;
+}
+
+.token.entity {
+    cursor: help;
+}
+
+/* Selection */
+pre[class*="language-"]::-moz-selection,
+pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection,
+code[class*="language-"] ::-moz-selection {
+    text-shadow: none;
+    background: #dfdad9;
+}
+
+pre[class*="language-"]::selection,
+pre[class*="language-"] ::selection,
+code[class*="language-"]::selection,
+code[class*="language-"] ::selection {
+    text-shadow: none;
+    background: #dfdad9;
+}
+
+/* Line numbers (optional) */
+pre[class*="language-"].line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre[class*="language-"].line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em;
+    letter-spacing: -1px;
+    border-right: 1px solid #dfdad9;
+    user-select: none;
+}
+
+.line-numbers-rows > span {
+    display: block;
+    counter-increment: linenumber;
+}
+
+.line-numbers-rows > span:before {
+    content: counter(linenumber);
+    color: #9893a5;
+    display: block;
+    padding-right: 0.8em;
+    text-align: right;
+}
+
+/* Scrollbar styling */
+pre[class*="language-"]::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-track {
+    background: #f2e9e1;
+    border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb {
+    background: #dfdad9;
+    border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb:hover {
+    background: #cecacd;
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+    .code-block-wrapper {
+        background: #232136;
+        border-color: #393552;
+    }
+
+    .code-block-header {
+        background: #2a273f;
+        border-bottom-color: #393552;
+    }
+
+    .code-copy-button {
+        border-color: #44415a;
+        color: #e0def4;
+    }
+
+    .code-copy-button:hover {
+        background: #393552;
+        border-color: #56526e;
+    }
+
+    pre[class*="language-"] {
+        background: #232136;
+    }
+
+    code[class*="language-"],
+    pre[class*="language-"] {
+        color: #e0def4;
+    }
+
+    :not(pre) > code[class*="language-"] {
+        background: #393552;
+        color: #eb6f92;
+    }
+
+    /* Rose Pine Moon token colors for dark mode */
+    .token.comment {
+        color: #6e6a86;
+    }
+
+    .token.punctuation {
+        color: #908caa;
+    }
+
+    .token.property,
+    .token.number,
+    .token.constant,
+    .token.symbol {
+        color: #eb6f92;
+    }
+
+    .token.string,
+    .token.char {
+        color: #f6c177;
+    }
+
+    .token.operator,
+    .token.url {
+        color: #3e8fb0;
+    }
+
+    .token.keyword {
+        color: #c4a7e7;
+    }
+
+    .token.function,
+    .token.class-name {
+        color: #9ccfd8;
+    }
+
+    .token.variable {
+        color: #eb6f92;
+    }
+}

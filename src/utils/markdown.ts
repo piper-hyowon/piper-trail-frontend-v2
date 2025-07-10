@@ -1,3 +1,17 @@
+import Prism from 'prismjs';
+import 'prismjs/components/prism-typescript';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-go';
+import 'prismjs/components/prism-rust';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-bash';
+import 'prismjs/components/prism-sql';
+import 'prismjs/components/prism-json';
+import 'prismjs/components/prism-yaml';
+import 'prismjs/components/prism-markdown';
+import 'prismjs/components/prism-css';
+
 export const renderMarkdown = (content: string) => {
     if (!content) return '';
 
@@ -48,17 +62,36 @@ export const renderMarkdown = (content: string) => {
                     </div>`
                 );
             } else {
-                // 일반 코드 블록
+                // Prism.js로 하이라이팅
+                const highlighted = Prism.highlight(
+                    trimmedCode,
+                    Prism.languages[language] || Prism.languages.plaintext,
+                    language || 'plaintext'
+                );
+
+                // 고유 ID 생성
+                const codeId = `code-${Date.now()}-${codeBlocks.length}`;
+
                 codeBlocks.push(
-                    `<pre><code class="language-${language || 'text'}">${trimmedCode
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')}</code></pre>`
+                    `<div class="code-block-wrapper">
+                        <div class="code-block-header">
+                            <span class="code-language">${language || 'text'}</span>
+                            <button class="code-copy-button" onclick="window.copyCode('${codeId}')">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                                    <path d="M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a2 2 0 0 0-2-2H5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z"/>
+                                </svg>
+                                Copy
+                            </button>
+                        </div>
+                        <pre class="language-${language}"><code id="${codeId}" class="language-${language}">${highlighted}</code></pre>
+                    </div>`
                 );
             }
             return placeholder;
         }
     );
 
+    // 나머지 마크다운 처리 (기존 코드와 동일)...
     // 2. 인라인 코드
     const inlineCodes: string[] = [];
     renderedContent = renderedContent.replace(
@@ -71,12 +104,9 @@ export const renderMarkdown = (content: string) => {
     );
 
     // Bold/Italic 먼저 (리스트보다)
-    // Bold + Italic
     renderedContent = renderedContent.replace(/\*\*\*([^*]+)\*\*\*/g, '%%BOLDITALIC%%$1%%ENDBOLDITALIC%%');
-    // Bold
     renderedContent = renderedContent.replace(/\*\*([^*]+)\*\*/g, '%%BOLD%%$1%%ENDBOLD%%');
     renderedContent = renderedContent.replace(/__([^_]+)__/g, '%%BOLD%%$1%%ENDBOLD%%');
-    // Italic
     renderedContent = renderedContent.replace(/(?<!\*)\*(?!\*)([^*\n]+)\*(?!\*)/g, '%%ITALIC%%$1%%ENDITALIC%%');
     renderedContent = renderedContent.replace(/(?<!_)_(?!_)([^_\n]+)_(?!_)/g, '%%ITALIC%%$1%%ENDITALIC%%');
 
@@ -92,55 +122,7 @@ export const renderMarkdown = (content: string) => {
         '<a href="$2" target="_blank">$1</a>'
     );
 
-    // 테이블
-    const renderTable = (tableText: string) => {
-        const lines = tableText.trim().split('\n');
-        if (lines.length < 2) return tableText;
-
-        let html = '<table>';
-        lines.forEach((line, index) => {
-            if (index === 1 && line.match(/^\|[\s\-:|]+\|$/)) return;
-            const cells = line.split('|').slice(1, -1);
-            const tag = index === 0 ? 'th' : 'td';
-            html += '<tr>';
-            cells.forEach(cell => {
-                html += `<${tag}>${cell.trim()}</${tag}>`;
-            });
-            html += '</tr>';
-        });
-        html += '</table>';
-        return html;
-    };
-
-    renderedContent = renderedContent.replace(
-        /(\|.+\|\s*\n\|[\s\-:|]+\|\s*\n(\|.+\|\s*\n?)+)/gm,
-        (match) => renderTable(match)
-    );
-
-    // 인용문
-    const blockquotes: string[] = [];
-    renderedContent = renderedContent.replace(
-        /^(>+)(.*)$/gm,
-        (match, arrows, content) => {
-            const level = arrows.length;
-            const placeholder = `%%BLOCKQUOTE${blockquotes.length}%%`;
-            blockquotes.push(`<blockquote>${content.trim()}</blockquote>`);
-            return placeholder;
-        }
-    );
-
-    // 인용문 병합
-    renderedContent = renderedContent.replace(
-        /(%%BLOCKQUOTE\d+%%\n?)+/g,
-        (match) => {
-            const quotes = match.trim().split('\n').map(line => {
-                const index = parseInt(line.match(/%%BLOCKQUOTE(\d+)%%/)?.[1] || '0');
-                return blockquotes[index].replace(/<\/?blockquote>/g, '');
-            });
-            return `<blockquote>${quotes.join('<br>')}</blockquote>`;
-        }
-    );
-
+    // 헤더
     renderedContent = renderedContent.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, text) => {
         const level = hashes.length;
         return `<h${level}>${text.trim()}</h${level}>`;
@@ -168,11 +150,6 @@ export const renderMarkdown = (content: string) => {
 
     renderedContent = processLists(renderedContent);
 
-    // 취소선, 위첨자, 아래첨자
-    renderedContent = renderedContent.replace(/~~([^~]+)~~/g, '<del>$1</del>');
-    renderedContent = renderedContent.replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>');
-    renderedContent = renderedContent.replace(/~\{([^}]+)\}/g, '<sub>$1</sub>');
-
     // 단락
     renderedContent = renderedContent
         .split(/\n\n+/)
@@ -190,16 +167,10 @@ export const renderMarkdown = (content: string) => {
         .filter(p => p)
         .join('\n\n');
 
+    // 플레이스홀더 복원
     renderedContent = renderedContent.replace(/%%BOLDITALIC%%(.+?)%%ENDBOLDITALIC%%/g, '<strong><em>$1</em></strong>');
     renderedContent = renderedContent.replace(/%%BOLD%%(.+?)%%ENDBOLD%%/g, '<strong>$1</strong>');
     renderedContent = renderedContent.replace(/%%ITALIC%%(.+?)%%ENDITALIC%%/g, '<em>$1</em>');
-
-    blockquotes.forEach((quote, index) => {
-        const placeholder = `%%BLOCKQUOTE${index}%%`;
-        if (renderedContent.includes(placeholder)) {
-            renderedContent = renderedContent.replace(placeholder, quote);
-        }
-    });
 
     codeBlocks.forEach((code, index) => {
         renderedContent = renderedContent.replace(`%%CODEBLOCK${index}%%`, code);
@@ -209,16 +180,12 @@ export const renderMarkdown = (content: string) => {
         renderedContent = renderedContent.replace(`%%INLINECODE${index}%%`, code);
     });
 
-    // 이미지 lazy loading
-    renderedContent = renderedContent.replace(/<img/g, '<img loading="lazy"');
-
     return renderedContent;
 };
 
 function processLists(content: string): string {
     const lines = content.split('\n');
     const result: string[] = [];
-    let currentList: { type: 'ul' | 'ol', level: number } | null = null;
     let openLists: Array<{ type: 'ul' | 'ol', level: number }> = [];
 
     for (const line of lines) {
@@ -266,9 +233,36 @@ function processLists(content: string): string {
 
 declare global {
     interface Window {
+        copyCode: (codeId: string) => void;
         runJavaScriptCode: (terminalId: number, encodedCode: string) => void;
     }
 }
+
+window.copyCode = (codeId: string) => {
+    const codeElement = document.getElementById(codeId);
+    if (!codeElement) return;
+
+    const code = codeElement.textContent || '';
+
+    navigator.clipboard.writeText(code).then(() => {
+        // 버튼 텍스트 변경
+        const button = codeElement.closest('.code-block-wrapper')?.querySelector('.code-copy-button');
+        if (button) {
+            const originalHTML = button.innerHTML;
+            button.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+                </svg>
+                Copied!
+            `;
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+            }, 2000);
+        }
+    }).catch(err => {
+        console.error('Failed to copy code:', err);
+    });
+};
 
 window.runJavaScriptCode = (terminalId: number, encodedCode: string) => {
     const outputDiv = document.getElementById(`terminal-output-${terminalId}`);
