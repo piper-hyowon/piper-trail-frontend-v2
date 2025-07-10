@@ -63,11 +63,19 @@ export const renderMarkdown = (content: string) => {
                 );
             } else {
                 // Prism.js로 하이라이팅
-                const highlighted = Prism.highlight(
-                    trimmedCode,
-                    Prism.languages[language] || Prism.languages.plaintext,
-                    language || 'plaintext'
-                );
+                let highlighted;
+                try {
+                    highlighted = Prism.highlight(
+                        trimmedCode,
+                        Prism.languages[language] || Prism.languages.plaintext,
+                        language || 'plaintext'
+                    );
+                } catch (e) {
+                    // 하이라이팅 실패 시 원본 사용
+                    highlighted = trimmedCode
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
 
                 // 고유 ID 생성
                 const codeId = `code-${Date.now()}-${codeBlocks.length}`;
@@ -91,7 +99,6 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
-    // 나머지 마크다운 처리 (기존 코드와 동일)...
     // 2. 인라인 코드
     const inlineCodes: string[] = [];
     renderedContent = renderedContent.replace(
@@ -103,10 +110,21 @@ export const renderMarkdown = (content: string) => {
         }
     );
 
-    // Bold/Italic 먼저 (리스트보다)
+    // 헤더
+    renderedContent = renderedContent.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, text) => {
+        const level = hashes.length;
+        return `<h${level}>${text.trim()}</h${level}>`;
+    });
+
+    // hr
+    renderedContent = renderedContent.replace(/^---+$/gm, '<hr />');
+
+    // Bold + Italic
     renderedContent = renderedContent.replace(/\*\*\*([^*]+)\*\*\*/g, '%%BOLDITALIC%%$1%%ENDBOLDITALIC%%');
+    // Bold
     renderedContent = renderedContent.replace(/\*\*([^*]+)\*\*/g, '%%BOLD%%$1%%ENDBOLD%%');
     renderedContent = renderedContent.replace(/__([^_]+)__/g, '%%BOLD%%$1%%ENDBOLD%%');
+    // Italic
     renderedContent = renderedContent.replace(/(?<!\*)\*(?!\*)([^*\n]+)\*(?!\*)/g, '%%ITALIC%%$1%%ENDITALIC%%');
     renderedContent = renderedContent.replace(/(?<!_)_(?!_)([^_\n]+)_(?!_)/g, '%%ITALIC%%$1%%ENDITALIC%%');
 
@@ -122,14 +140,54 @@ export const renderMarkdown = (content: string) => {
         '<a href="$2" target="_blank">$1</a>'
     );
 
-    // 헤더
-    renderedContent = renderedContent.replace(/^(#{1,6})\s+(.+)$/gm, (match, hashes, text) => {
-        const level = hashes.length;
-        return `<h${level}>${text.trim()}</h${level}>`;
-    });
+    // 테이블
+    const renderTable = (tableText: string) => {
+        const lines = tableText.trim().split('\n');
+        if (lines.length < 2) return tableText;
 
-    // hr
-    renderedContent = renderedContent.replace(/^---+$/gm, '<hr />');
+        let html = '<table>';
+        lines.forEach((line, index) => {
+            if (index === 1 && line.match(/^\|[\s\-:|]+\|$/)) return;
+            const cells = line.split('|').slice(1, -1);
+            const tag = index === 0 ? 'th' : 'td';
+            html += '<tr>';
+            cells.forEach(cell => {
+                html += `<${tag}>${cell.trim()}</${tag}>`;
+            });
+            html += '</tr>';
+        });
+        html += '</table>';
+        return html;
+    };
+
+    renderedContent = renderedContent.replace(
+        /(\|.+\|\s*\n\|[\s\-:|]+\|\s*\n(\|.+\|\s*\n?)+)/gm,
+        (match) => renderTable(match)
+    );
+
+    // 인용문
+    const blockquotes: string[] = [];
+    renderedContent = renderedContent.replace(
+        /^(>+)(.*)$/gm,
+        (match, arrows, content) => {
+            const level = arrows.length;
+            const placeholder = `%%BLOCKQUOTE${blockquotes.length}%%`;
+            blockquotes.push(`<blockquote>${content.trim()}</blockquote>`);
+            return placeholder;
+        }
+    );
+
+    // 인용문 병합
+    renderedContent = renderedContent.replace(
+        /(%%BLOCKQUOTE\d+%%\n?)+/g,
+        (match) => {
+            const quotes = match.trim().split('\n').map(line => {
+                const index = parseInt(line.match(/%%BLOCKQUOTE(\d+)%%/)?.[1] || '0');
+                return blockquotes[index].replace(/<\/?blockquote>/g, '');
+            });
+            return `<blockquote>${quotes.join('<br>')}</blockquote>`;
+        }
+    );
 
     // 리스트
     renderedContent = renderedContent.replace(
@@ -150,6 +208,11 @@ export const renderMarkdown = (content: string) => {
 
     renderedContent = processLists(renderedContent);
 
+    // 취소선, 위첨자, 아래첨자
+    renderedContent = renderedContent.replace(/~~([^~]+)~~/g, '<del>$1</del>');
+    renderedContent = renderedContent.replace(/\^\{([^}]+)\}/g, '<sup>$1</sup>');
+    renderedContent = renderedContent.replace(/~\{([^}]+)\}/g, '<sub>$1</sub>');
+
     // 단락
     renderedContent = renderedContent
         .split(/\n\n+/)
@@ -167,10 +230,16 @@ export const renderMarkdown = (content: string) => {
         .filter(p => p)
         .join('\n\n');
 
-    // 플레이스홀더 복원
     renderedContent = renderedContent.replace(/%%BOLDITALIC%%(.+?)%%ENDBOLDITALIC%%/g, '<strong><em>$1</em></strong>');
     renderedContent = renderedContent.replace(/%%BOLD%%(.+?)%%ENDBOLD%%/g, '<strong>$1</strong>');
     renderedContent = renderedContent.replace(/%%ITALIC%%(.+?)%%ENDITALIC%%/g, '<em>$1</em>');
+
+    blockquotes.forEach((quote, index) => {
+        const placeholder = `%%BLOCKQUOTE${index}%%`;
+        if (renderedContent.includes(placeholder)) {
+            renderedContent = renderedContent.replace(placeholder, quote);
+        }
+    });
 
     codeBlocks.forEach((code, index) => {
         renderedContent = renderedContent.replace(`%%CODEBLOCK${index}%%`, code);
@@ -180,12 +249,16 @@ export const renderMarkdown = (content: string) => {
         renderedContent = renderedContent.replace(`%%INLINECODE${index}%%`, code);
     });
 
+    // 이미지 lazy loading
+    renderedContent = renderedContent.replace(/<img/g, '<img loading="lazy"');
+
     return renderedContent;
 };
 
 function processLists(content: string): string {
     const lines = content.split('\n');
     const result: string[] = [];
+    let currentList: { type: 'ul' | 'ol', level: number } | null = null;
     let openLists: Array<{ type: 'ul' | 'ol', level: number }> = [];
 
     for (const line of lines) {
@@ -233,11 +306,12 @@ function processLists(content: string): string {
 
 declare global {
     interface Window {
-        copyCode: (codeId: string) => void;
         runJavaScriptCode: (terminalId: number, encodedCode: string) => void;
+        copyCode: (codeId: string) => void;
     }
 }
 
+// 복사 함수
 window.copyCode = (codeId: string) => {
     const codeElement = document.getElementById(codeId);
     if (!codeElement) return;
