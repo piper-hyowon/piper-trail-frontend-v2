@@ -272,7 +272,7 @@ const PostcardGrid = styled.div`
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: ${({theme}) => theme.spacing.lg};
+    gap: ${({theme}) => theme.spacing.md};
   }
 
   @media (min-width: 1024px) {

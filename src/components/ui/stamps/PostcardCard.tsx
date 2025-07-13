@@ -227,7 +227,7 @@ const PostcardCard: React.FC<PostcardCardProps> = React.memo(({entry, stampInfo,
                         color={stampInfo?.color || '#ccc'}
                         name={stampInfo?.name || ''}
                         selected={false}
-                        size={120}
+                        size={100}
                     />
                 </StampContainer>
             </CardContainer>

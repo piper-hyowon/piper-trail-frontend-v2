@@ -17,6 +17,7 @@ export interface PostSummary {
     createdAt: Date;
     updatedAt: Date;
     series: SeriesInfoResponse | null;
+    thumbnailUrl?: string;
 }
 
 export interface SeriesInfoResponse {
@@ -134,6 +135,7 @@ export interface CreatePostRequest {
     subtitleEn?: string;
     tags: string[];
     category: string;
+    thumbnailUrl?: string;
 }
 
 export interface ImageMapping {

@@ -70,7 +70,8 @@ export const postTranslations = {
                     intro: "Introduction",
                     name: "Name",
                     menuRecommendation: "Menu Recommendation & Description",
-                    message: "Message"
+                    message: "Message",
+                    thumbnail: "Thumbnail Image"
                 },
                 placeholders: {
                     tech: {
@@ -106,6 +107,12 @@ export const postTranslations = {
                     onlyImages: "Only image files can be uploaded.",
                     previewText: "Preview will appear here..."
                 },
+                thumbnail: {
+                    upload: "Click to upload thumbnail",
+                    change: "Change image",
+                    hint: "Recommended size: 1200x630px, Max 5MB",
+                    remove: "Remove thumbnail"
+                },
                 tags: {
                     hint: "Press Enter to add tags",
                     placeholder: "Enter tags and press Enter"
@@ -118,7 +125,9 @@ export const postTranslations = {
                 validation: {
                     titleRequired: "Please enter a title",
                     subtitleRequired: "Please enter a subtitle",
-                    contentRequired: "Please enter content"
+                    contentRequired: "Please enter content",
+                    thumbnailSizeError: "Thumbnail file size must be less than 5MB",
+                    thumbnailTypeError: "Only image files (JPG, PNG, WebP) are allowed"
                 },
                 success: {
                     created: "Post has been created!",
@@ -130,7 +139,8 @@ export const postTranslations = {
                     deleteFailed: "Failed to delete post: {error}",
                     noPostId: "Post ID not found.",
                     formSubmission: "Form submission failed",
-                    loginFailed: "Login failed"
+                    loginFailed: "Login failed",
+                    thumbnailUploadFailed: "Failed to upload thumbnail"
                 },
                 newCategory: "\"{category}\" New Category"
             },
@@ -228,7 +238,8 @@ export const postTranslations = {
                     intro: "소개",
                     name: "이름",
                     menuRecommendation: "메뉴 추천 및 설명",
-                    message: "메시지"
+                    message: "메시지",
+                    thumbnail: "썸네일 이미지"
                 },
                 placeholders: {
                     blog: {
@@ -258,6 +269,12 @@ export const postTranslations = {
                     onlyImages: "이미지 파일만 업로드 가능합니다.",
                     previewText: "미리보기가 여기에 표시됩니다..."
                 },
+                thumbnail: {
+                    upload: "클릭하여 썸네일 업로드",
+                    change: "이미지 변경",
+                    hint: "권장 크기: 1200x630px, 최대 5MB",
+                    remove: "썸네일 제거"
+                },
                 tags: {
                     hint: "Enter 키를 눌러 태그를 추가하세요",
                     placeholder: "태그를 입력하고 Enter를 누르세요"
@@ -270,7 +287,9 @@ export const postTranslations = {
                 validation: {
                     titleRequired: "제목을 입력해주세요",
                     subtitleRequired: "부제를 입력해주세요",
-                    contentRequired: "내용을 입력해주세요"
+                    contentRequired: "내용을 입력해주세요",
+                    thumbnailSizeError: "썸네일 파일 크기는 5MB 이하여야 합니다",
+                    thumbnailTypeError: "이미지 파일(JPG, PNG, WebP)만 업로드 가능합니다"
                 },
                 success: {
                     created: "포스트가 생성되었습니다!",
@@ -282,7 +301,8 @@ export const postTranslations = {
                     deleteFailed: "포스트 삭제에 실패했습니다: {error}",
                     noPostId: "포스트 ID를 찾을 수 없습니다.",
                     formSubmission: "폼 제출에 실패했습니다",
-                    loginFailed: "로그인에 실패했습니다"
+                    loginFailed: "로그인에 실패했습니다",
+                    thumbnailUploadFailed: "썸네일 업로드에 실패했습니다"
                 },
                 newCategory: "\"{category}\" 신규 카테고리"
             },
@@ -310,3 +330,4 @@ export const postTranslations = {
         }
     }
 };
+``

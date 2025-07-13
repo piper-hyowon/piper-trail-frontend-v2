@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import {useLanguage} from '../../context/LanguageContext';
 import {renderMarkdown} from "../../utils/markdown.ts";
 import type {CreatePostRequest, ImageMapping, UpdatePostRequest} from "../../types/api.ts";
+import {IoCloseCircleOutline} from "react-icons/io5";
 
 interface PostFormProps {
     category: string | null;
@@ -15,6 +16,7 @@ interface PostFormProps {
         contentEn?: string;
         tags: string[];
         imageFiles: ImageFile[];
+        thumbnailUrl?: string;
     };
     onSubmit: (formData: CreatePostRequest | UpdatePostRequest | FormData) => void;
     onCancel: () => void;
@@ -32,7 +34,136 @@ const FormContainer = styled.div`
   flex-direction: column;
   gap: ${({theme}) => theme.spacing.md};
   max-height: calc(80vh - 120px);
-  padding-right: ${({ theme }) => theme.spacing.xs}; 
+  padding-right: ${({theme}) => theme.spacing.xs};
+`;
+
+const ThumbnailSection = styled.div`
+  margin-bottom: ${({theme}) => theme.spacing.md};
+  padding: ${({theme}) => theme.spacing.md};
+  background: ${({theme}) => `${theme.colors.background}F5`};
+  border-radius: ${({theme}) => theme.borderRadius};
+  border: 2px dashed ${({theme}) => `${theme.colors.primary}30`};
+`;
+
+const ThumbnailLabel = styled.label`
+  display: block;
+  margin-bottom: ${({theme}) => theme.spacing.sm};
+  font-weight: bold;
+  color: ${({theme}) => theme.colors.text};
+  font-size: ${({theme}) => theme.fontSizes.medium};
+`;
+
+const ThumbnailUploadArea = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+`;
+
+const ThumbnailPreview = styled.div`
+  width: 100%;
+  height: 200px;
+  border-radius: ${({theme}) => theme.borderRadius};
+  overflow: hidden;
+  background: ${({theme}) => theme.colors.secondaryBackground};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all ${({theme}) => theme.transitions.default};
+
+  &:hover {
+    border-color: ${({theme}) => theme.colors.primary};
+
+    .hover-overlay {
+      opacity: 1;
+    }
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const ThumbnailPlaceholder = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: ${({theme}) => theme.spacing.sm};
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.7;
+  width: 100%;
+  height: 100%;
+  background: url(/images/postlist_placeholder.png) center/contain no-repeat;
+  background-color: ${({theme}) => theme.colors.secondaryBackground};
+
+  span {
+    font-size: ${({theme}) => theme.fontSizes.small};
+    background: ${({theme}) => theme.colors.background}E6;
+    padding: ${({theme}) => theme.spacing.xs} ${({theme}) => theme.spacing.sm};
+    border-radius: ${({theme}) => theme.borderRadius};
+  }
+`;
+
+const ThumbnailHoverOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity ${({theme}) => theme.transitions.default};
+
+  span {
+    color: white;
+    font-weight: 600;
+  }
+`;
+
+const RemoveThumbnailButton = styled.button`
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: ${({theme}) => theme.colors.error};
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all ${({theme}) => theme.transitions.default};
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  svg {
+    font-size: 1.2rem;
+  }
+`;
+
+const ThumbnailInput = styled.input`
+  display: none;
+`;
+
+const ThumbnailHint = styled.p`
+  font-size: ${({theme}) => theme.fontSizes.small};
+  color: ${({theme}) => `${theme.colors.text}80`};
+  margin-top: ${({theme}) => theme.spacing.xs};
+  text-align: center;
 `;
 
 const FormField = styled.div`
@@ -63,7 +194,7 @@ const FormInput = styled.input`
 const TextareaContainer = styled.div`
   position: relative;
   height: 100%;
-  max-height: 300px;  // 최대 높이 제한
+  max-height: 300px;
   overflow-y: auto;
 `;
 
@@ -231,7 +362,6 @@ const PlaceholderCode = styled.code`
   font-size: 10px;
 `;
 
-// 미리보기 관련 스타일
 const PreviewContainer = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -280,7 +410,6 @@ const PreviewPanel = styled.div`
     margin: 16px 0;
     color: ${({theme}) => `${theme.colors.text}CC`};
   }
-
 
   table {
     border-collapse: collapse;
@@ -433,6 +562,9 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
         currentTag: '',
         tags: [] as string[],
         imageFiles: [] as ImageFile[],
+        thumbnailFile: null as File | null,
+        thumbnailPreview: '',
+        thumbnailUrl: ''
     });
 
     const [errors, setErrors] = useState({
@@ -444,6 +576,7 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
     const [showPreview, setShowPreview] = useState(false);
     const [imageFiles, setImageFiles] = useState<ImageFile[]>([]);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const thumbnailInputRef = useRef<HTMLInputElement | null>(null);
     const textareaRefKo = useRef<HTMLTextAreaElement | null>(null);
     const textareaRefEn = useRef<HTMLTextAreaElement | null>(null);
 
@@ -467,7 +600,8 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                 contentEn: initialData.contentEn || '',
                 tags: initialData.tags || [],
                 imageFiles: initialData.imageFiles || [],
-
+                thumbnailUrl: initialData.thumbnailUrl || '',
+                thumbnailPreview: initialData.thumbnailUrl || ''
             }));
         }
     }, [initialData]);
@@ -479,6 +613,35 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
         if (name in errors && value.trim()) {
             setErrors(prev => ({...prev, [name]: ''}));
         }
+    };
+
+    const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file && file.type.startsWith('image/')) {
+            setFormData(prev => ({
+                ...prev,
+                thumbnailFile: file,
+                thumbnailPreview: URL.createObjectURL(file)
+            }));
+        } else if (file) {
+            alert(t('post.form.imageSection.onlyImages' as any));
+        }
+
+        if (thumbnailInputRef.current) {
+            thumbnailInputRef.current!.value = '';
+        }
+    };
+
+    const handleRemoveThumbnail = () => {
+        if (formData.thumbnailPreview && formData.thumbnailFile) {
+            URL.revokeObjectURL(formData.thumbnailPreview);
+        }
+        setFormData(prev => ({
+            ...prev,
+            thumbnailFile: null,
+            thumbnailPreview: '',
+            thumbnailUrl: ''
+        }));
     };
 
     const handleImageAdd = (file: File) => {
@@ -632,7 +795,7 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
         e.preventDefault();
 
         if (validateForm()) {
-            if (imageFiles.length > 0) {
+            if (imageFiles.length > 0 || formData.thumbnailFile) {
                 const formDataToSend = new FormData();
 
                 formDataToSend.append('title', formData.title);
@@ -644,17 +807,25 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                 formDataToSend.append('category', category || '');
                 formDataToSend.append('tags', JSON.stringify(formData.tags));
 
-                const imageMetadata: ImageMapping[] = imageFiles.map((img, index) => ({
-                    id: img.id,
-                    placeholder: img.placeholder,
-                    filename: img.file.name,
-                    index,
-                }));
-                formDataToSend.append('imageMetadata', JSON.stringify(imageMetadata));
+                if (formData.thumbnailFile) {
+                    formDataToSend.append('thumbnail', formData.thumbnailFile);
+                } else if (formData.thumbnailUrl) {
+                    formDataToSend.append('thumbnailUrl', formData.thumbnailUrl);
+                }
 
-                imageFiles.forEach((imageFile) => {
-                    formDataToSend.append('images', imageFile.file);
-                });
+                if (imageFiles.length > 0) {
+                    const imageMetadata: ImageMapping[] = imageFiles.map((img, index) => ({
+                        id: img.id,
+                        placeholder: img.placeholder,
+                        filename: img.file.name,
+                        index,
+                    }));
+                    formDataToSend.append('imageMetadata', JSON.stringify(imageMetadata));
+
+                    imageFiles.forEach((imageFile) => {
+                        formDataToSend.append('images', imageFile.file);
+                    });
+                }
 
                 onSubmit(formDataToSend as FormData);
             } else {
@@ -666,11 +837,13 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
                     subtitleEn: formData.subtitleEn,
                     markdownContentEn: formData.contentEn,
                     tags: formData.tags,
-                    category: category || ''
+                    category: category || '',
+                    thumbnailUrl: formData.thumbnailUrl || undefined
                 } as CreatePostRequest);
             }
         }
     };
+
     const renderLanguageFields = (lang: 'ko' | 'en') => {
         const isKorean = lang === 'ko';
         const titleField = isKorean ? 'title' : 'titleEn';
@@ -808,6 +981,47 @@ const PostForm: React.FC<PostFormProps> = ({category, initialData, onSubmit, onC
     return (
         <FormContainer>
             <form onSubmit={handleSubmit}>
+                {/* 썸네일 업로드 섹션 */}
+                <ThumbnailSection>
+                    <ThumbnailLabel>
+                        {t('post.form.fields.thumbnail' as any) || '썸네일 이미지'}
+                    </ThumbnailLabel>
+                    <ThumbnailUploadArea>
+                        <ThumbnailPreview onClick={() => thumbnailInputRef.current!.click()}>
+                            {formData.thumbnailPreview ? (
+                                <>
+                                    <img src={formData.thumbnailPreview} alt="Thumbnail"/>
+                                    <ThumbnailHoverOverlay className="hover-overlay">
+                                        <span>{t('post.form.thumbnail.change' as any) || '이미지 변경'}</span>
+                                    </ThumbnailHoverOverlay>
+                                    <RemoveThumbnailButton
+                                        type="button"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleRemoveThumbnail();
+                                        }}
+                                    >
+                                        <IoCloseCircleOutline/>
+                                    </RemoveThumbnailButton>
+                                </>
+                            ) : (
+                                <ThumbnailPlaceholder>
+                                    <span>{t('post.form.thumbnail.upload' as any) || '클릭하여 썸네일 업로드'}</span>
+                                </ThumbnailPlaceholder>
+                            )}
+                        </ThumbnailPreview>
+                        <ThumbnailInput
+                            ref={thumbnailInputRef}
+                            type="file"
+                            accept="image/*"
+                            onChange={handleThumbnailSelect}
+                        />
+                        <ThumbnailHint>
+                            {t('post.form.thumbnail.hint' as any) || '권장 크기: 1200x630px, 최대 5MB'}
+                        </ThumbnailHint>
+                    </ThumbnailUploadArea>
+                </ThumbnailSection>
+
                 <TabContainer>
                     <Tab
                         type="button"

@@ -7,7 +7,12 @@ import Pagination from '../components/ui/Pagination';
 import SortSelector from '../components/ui/SortSelector';
 import AuthModal from '../components/ui/AuthModal';
 import PostForm from "../components/ui/PostForm.tsx";
-import {IoAddCircleOutline, IoEyeOutline, IoCalendarOutline, IoFolderOpenOutline} from "react-icons/io5";
+import {
+    IoAddCircleOutline,
+    IoEyeOutline,
+    IoCalendarOutline,
+    IoFolderOpenOutline,
+} from "react-icons/io5";
 import {usePostsByCategory, usePostsByTag, useSearchPosts, useCreatePost, useBulkPostStats} from '../hooks/useApi';
 import {LoginCredentials, useApi} from '../context/ApiContext';
 import {useLanguage} from '../context/LanguageContext';
@@ -191,6 +196,41 @@ const SortLabel = styled.label`
   margin: 0;
 `;
 
+const ThumbnailContainer = styled.div`
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background: ${({theme}) => theme.colors.secondaryBackground};
+  position: relative;
+
+  @media (max-width: 768px) {
+    height: 160px;
+  }
+`;
+
+const ThumbnailImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform ${({theme}) => theme.transitions.default};
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+const ThumbnailPlaceholder = styled.div`
+  width: 100%;
+  height: 100%;
+  background: url(/images/postlist_placeholder.png) center/contain no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${({theme}) => theme.colors.text};
+  opacity: 0.5;
+  font-size: 3rem;
+`;
+
 const StyledCard = styled(Card)`
   background: ${({theme}) => theme.colors.background};
   border: 1px solid ${({theme}) => `${theme.colors.primary}10`};
@@ -200,7 +240,9 @@ const StyledCard = styled(Card)`
   overflow: hidden;
   animation: ${fadeIn} 0.6s ease-out;
   animation-fill-mode: both;
-  padding: ${({theme}) => theme.spacing.md};
+  padding: 0;
+  display: flex;
+  flex-direction: column;
 
   &:nth-child(1) {
     animation-delay: 0.1s;
@@ -222,7 +264,18 @@ const StyledCard = styled(Card)`
     transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
     border-color: ${({theme}) => `${theme.colors.primary}30`};
+
+    ${ThumbnailImage} {
+      transform: scale(1.05);
+    }
   }
+`;
+
+const CardBody = styled.div`
+  padding: ${({theme}) => theme.spacing.md};
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 `;
 
 const StyledCardTitle = styled(CardTitle)<{ $isSeriesPost?: boolean }>`
@@ -238,6 +291,7 @@ const StyledCardTitle = styled(CardTitle)<{ $isSeriesPost?: boolean }>`
     color: ${({theme}) => theme.colors.primary};
   }
 `;
+
 const CardSubtitle = styled.div`
   color: ${({theme}) => theme.colors.text};
   opacity: 0.6;
@@ -501,6 +555,7 @@ const SeriesCard = styled(StyledCard)`
     }
   }
 `;
+
 const SeriesHeader = styled.div`
   display: flex;
   align-items: center;
@@ -532,7 +587,7 @@ const SeriesBadge = styled.div`
   }
 
   span:first-child {
-    font-size: 18px; // 이모지 크기 증가 (기존 14px)
+    font-size: 18px;
     filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
   }
 `;
@@ -609,7 +664,6 @@ const PostListPage: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // ApiContext에서 인증 상태와 함수들 가져오기
     const {isAuthenticated, login} = useApi();
     const {t, language} = useLanguage();
 
@@ -623,11 +677,9 @@ const PostListPage: React.FC = () => {
     const currentSort = searchParams.get('sort') || DEFAULT_SORT;
     const selectedTags = (searchParams.get('tags') ?? '').split(',').filter(Boolean);
 
-    // 검색 관련 파라미터
     const searchQuery = searchParams.get('q') || '';
     const searchCategory = searchParams.get('category') || '';
 
-    // 모달 상태 관리
     const [showPostForm, setShowPostForm] = useState(false);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMessage, setAuthMessage] = useState('');
@@ -648,7 +700,6 @@ const PostListPage: React.FC = () => {
         navigate(`/series/${seriesSlug}`);
     }, [navigate]);
 
-    // API 호출
     let postsQuery;
     if (isSearchRoute) {
         const [sortBy, sortDirection] = currentSort.split(',');
@@ -734,7 +785,7 @@ const PostListPage: React.FC = () => {
             if (postData instanceof FormData) {
                 await createPostMutation.mutateAsync(postData);
             } else {
-                await createPostMutation.mutateAsync({
+                const requestData = {
                     title: postData.title,
                     titleEn: postData.titleEn,
                     subtitle: postData.subtitle,
@@ -742,8 +793,10 @@ const PostListPage: React.FC = () => {
                     markdownContent: postData.markdownContent,
                     markdownContentEn: postData.markdownContentEn,
                     category: currentCategory || 'null',
-                    tags: postData.tags || []
-                });
+                    tags: postData.tags || [],
+                    thumbnailUrl: (postData as any).thumbnailUrl
+                };
+                await createPostMutation.mutateAsync(requestData);
             }
 
             setShowPostForm(false);
@@ -811,7 +864,6 @@ const PostListPage: React.FC = () => {
     const handleFormSubmit = useCallback(async (formData: CreatePostRequest | FormData) => {
         try {
             if (!isAuthenticated) {
-                // 인증되지 않았으면 폼 데이터 저장하고 인증 모달 표시
                 setFormData(formData);
                 setShowPostForm(false);
                 setAuthMessage(formatMessage('post.auth.required', {
@@ -822,7 +874,6 @@ const PostListPage: React.FC = () => {
                 return;
             }
 
-            // 인증되어 있으면 바로 포스트 생성
             await createPost(formData);
         } catch (error) {
             console.error(t('post.form.errors.formSubmission' as any), error);
@@ -836,7 +887,6 @@ const PostListPage: React.FC = () => {
             if (success) {
                 setShowAuthModal(false);
 
-                // 저장된 폼 데이터가 있으면 바로 포스트 생성
                 if (formData) {
                     await createPost(formData);
                 } else {
@@ -904,7 +954,6 @@ const PostListPage: React.FC = () => {
                         <PostCount>{formatMessage('post.list.count', {count: postsData.total || 0})}</PostCount>
                     </PostListTitleSection>
 
-                    {/* 검색 라우트가 아닐 때만 글 작성 버튼 표시 */}
                     {!isSearchRoute && (
                         <CreatePostButton
                             onClick={handleCreatePostClick}
@@ -941,7 +990,6 @@ const PostListPage: React.FC = () => {
                         </TagFilterSection>
                     )}
 
-                    {/* 검색 페이지에서 검색어만 있고 태그가 없는 경우 */}
                     {isSearchRoute && availableTags.length === 0 && searchQuery && (
                         <TagFilterSection>
                             <h4>{formatMessage('post.list.filters.searchResults', {query: searchQuery})}</h4>
@@ -966,73 +1014,100 @@ const PostListPage: React.FC = () => {
 
             <PostsGrid>
                 {posts.length > 0 ? (
-                    posts.map((post) => {
+                    posts.map((post: any) => {
                         const isSeriesPost = post.series !== null;
                         const Card = isSeriesPost ? SeriesCard : StyledCard;
 
                         return (
                             <Card key={post.id} onClick={() => handleCardClick(post)}>
-                                {isSeriesPost && post.series && (
-                                    <>
-                                        <SeriesOrder>
-                                            {post.series.currentOrder}
-                                        </SeriesOrder>
-                                        <SeriesHeader>
-                                            <SeriesBadge
-                                                onClick={(e) => handleSeriesHomeClick(e, post.series!.seriesSlug)}>
-                                                <span style={{fontSize: '14px'}}>📚</span>
-                                                <span>{language === "ko" ? post.series.seriesTitle : post.series.seriesTitleEn}</span>
-                                            </SeriesBadge>
-                                        </SeriesHeader>
-                                    </>
-                                )}
 
-                                <StyledCardTitle $isSeriesPost={isSeriesPost}>
-                                    {post.title}
-                                </StyledCardTitle>
-
-                                {post.subtitle && (
-                                    <CardSubtitle>{post.subtitle}</CardSubtitle>
-                                )}
-
-                                <StyledCardContent>
-                                    {post.tags && post.tags.length > 0 && (
-                                        <TagList
-                                            tags={post.tags}
-                                            onTagClick={handlePostTagClick}
-                                            maxVisible={4}
-                                            variant="subtle"  // subtle 스타일 사용
+                                <ThumbnailContainer>
+                                    {post.thumbnailUrl ? (
+                                        <ThumbnailImage
+                                            src={post.thumbnailUrl}
+                                            alt={post.title}
+                                            loading="lazy"
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = 'none';
+                                                e.currentTarget.parentElement!.innerHTML = `
+                                                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.2) 100%); color: rgba(139, 92, 246, 0.5); font-size: 3rem;">
+                                                            <svg width="48" height="48" fill="currentColor" viewBox="0 0 24 24">
+                                                                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/>
+                                                            </svg>
+                                                        </div>
+                                                    `;
+                                            }}
                                         />
+                                    ) : (
+                                        <ThumbnailPlaceholder/>
                                     )}
-                                </StyledCardContent>
+                                </ThumbnailContainer>
 
-                                <StyledCardFooter>
-                                    <CardMeta>
-                                        {post.category && (
-                                            <span>
-        <IoFolderOpenOutline/>
-                                                {post.category}
-      </span>
+                                <CardBody>
+                                    {isSeriesPost && post.series && (
+                                        <>
+                                            <SeriesOrder>
+                                                {post.series.currentOrder}
+                                            </SeriesOrder>
+                                            <SeriesHeader>
+                                                <SeriesBadge
+                                                    onClick={(e) => handleSeriesHomeClick(e, post.series!.seriesSlug)}>
+                                                    <span style={{fontSize: '14px'}}>📚</span>
+                                                    <span>{language === "ko" ? post.series.seriesTitle : post.series.seriesTitleEn}</span>
+                                                </SeriesBadge>
+                                            </SeriesHeader>
+                                        </>
+                                    )}
+
+                                    <StyledCardTitle $isSeriesPost={isSeriesPost}>
+                                        {language === 'ko' ? post.title : (post.titleEn || post.title)}
+                                    </StyledCardTitle>
+
+                                    {post.subtitle && (
+                                        <CardSubtitle>
+                                            {language === 'ko' ? post.subtitle : (post.subtitleEn || post.subtitle)}
+                                        </CardSubtitle>
+                                    )}
+
+                                    <StyledCardContent>
+                                        {post.tags && post.tags.length > 0 && (
+                                            <TagList
+                                                tags={post.tags}
+                                                onTagClick={handlePostTagClick}
+                                                maxVisible={4}
+                                                variant="subtle"
+                                            />
                                         )}
-                                        <span>
-      <IoEyeOutline/>
-                                            {statsData?.[post.slug]?.viewCount ?? post.viewCount ?? 0}
-    </span>
-                                    </CardMeta>
-                                    <PostDate>
-                                        <IoCalendarOutline/>
-                                        {new Date(post.createdAt).toLocaleDateString()}
-                                    </PostDate>
-                                </StyledCardFooter>
+                                    </StyledCardContent>
 
-                                {isSeriesPost && post.series && (
-                                    <SeriesInfo>
-                                        <SeriesProgress>
-                                            {post.series.currentOrder}편 / 총 {post.series.totalCount}편
-                                        </SeriesProgress>
-                                        {post.series.isLatest && <LatestBadge>NEW</LatestBadge>}
-                                    </SeriesInfo>
-                                )}
+                                    <StyledCardFooter>
+                                        <CardMeta>
+                                            {post.category && (
+                                                <span>
+                                                    <IoFolderOpenOutline/>
+                                                    {post.category}
+                                                </span>
+                                            )}
+                                            <span>
+                                                <IoEyeOutline/>
+                                                {statsData?.[post.slug]?.viewCount ?? post.viewCount ?? 0}
+                                            </span>
+                                        </CardMeta>
+                                        <PostDate>
+                                            <IoCalendarOutline/>
+                                            {new Date(post.createdAt).toLocaleDateString()}
+                                        </PostDate>
+                                    </StyledCardFooter>
+
+                                    {isSeriesPost && post.series && (
+                                        <SeriesInfo>
+                                            <SeriesProgress>
+                                                {post.series.currentOrder}편 / 총 {post.series.totalCount}편
+                                            </SeriesProgress>
+                                            {post.series.isLatest && <LatestBadge>NEW</LatestBadge>}
+                                        </SeriesInfo>
+                                    )}
+                                </CardBody>
                             </Card>
                         );
                     })
@@ -1058,7 +1133,6 @@ const PostListPage: React.FC = () => {
                 )}
             </PostsGrid>
 
-            {/* 페이지네이션 섹션 */}
             {totalPages > 1 && (
                 <PaginationSection>
                     <Pagination
@@ -1069,7 +1143,6 @@ const PostListPage: React.FC = () => {
                 </PaginationSection>
             )}
 
-            {/* 포스트 작성 모달 (검색 라우트가 아닐 때만) */}
             {showPostForm && !isSearchRoute && (
                 ReactDOM.createPortal(
                     <FormModal>
@@ -1089,7 +1162,6 @@ const PostListPage: React.FC = () => {
                 )
             )}
 
-            {/* 인증 모달 */}
             {showAuthModal && (
                 <AuthModal
                     onLogin={handleLogin}
