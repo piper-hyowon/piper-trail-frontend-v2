@@ -576,7 +576,7 @@ const projects: Project[] = [
         status: "ongoing",
         links: [
             {type: "github", url: "https://github.com/piper-hyowon/dBtree"},
-            {type: "preview", url: "https://dbtree.vercel.app"}
+            {type: "live", url: "https://www.dbtree.cloud"}
         ],
         highlights: {
             technical: {
