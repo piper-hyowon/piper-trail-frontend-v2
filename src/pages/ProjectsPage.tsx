@@ -661,8 +661,8 @@ const projects: Project[] = [
             en: "A blockchain-based platform where users collect NFT goods through puzzle-based gameplay"
         },
         techStack: {
-            backend: ["NestJS", "TypeScript", "TypeORM", "WebSocket"],
-            blockchain: ["Solidity", "Polygon", "Hardhat", "OpenZeppelin"],
+            blockchain: ["Solidity v0.8.24", "Polygon", "Hardhat v2.22.3", "OpenZeppelin v5.0.2", "TypeScript", "Jest"],
+            backend: ["TypeScript", "NestJS", "socket.io", "Mailgun", "Discord Webhook"],
             frontend: ["React", "TypeScript", "Web3Auth", "Vite"],
             database: ["PostgreSQL", "Redis"],
             deployment: ["DigitalOcean Droplet", "AWS S3", "GitHub Actions"],
@@ -676,75 +676,109 @@ const projects: Project[] = [
         highlights: {
             technical: {
                 ko: [
-                    "스마트 컨트랙트 가스비 최적화 (동적 배열 사전 할당, 스토리지 접근 최소화)",
+                    "// 스마트 컨트랙트 보안 및 최적화",
                     "ERC-20/ERC-721 스마트 컨트랙트 설계 및 구현",
-                    "상태 기반 NFT 교환 시스템 (동시 수락 방지, 블록체인 최종 검증)",
-                    "Web3Auth를 활용한 지갑 없는 소셜 로그인 시스템",
-                    "WebSocket 기반 실시간 미니게임 구현",
-                    "권한 관리 시스템으로 게임 공정성 보장",
-                    "블록체인 트랜잭션 모니터링 및 수집 스케줄러 구현",
-                    "5초 간격 블록체인 동기화 스케줄러 (RPC 비용 절감, API 응답 속도 향상)",
+                    "ReentrancyGuard로 재진입 공격 방지, AccessControl로 권한 관리",
+                    "시즌별 제한된 NFT 발행으로 희소성 보장",
+                    "데이터 타입 최소화로 가스비 최적화",
+                    "Hardhat + TypeScript 테스트 코드 작성",
+                    "",
+                    "// P2P NFT 거래 시스템 (NFTSwap 컨트랙트)",
+                    "사용자는 approve만, 실제 거래 실행은 백엔드가 안전하게 처리",
+                    "상태 머신 패턴으로 거래 단계 관리 (동시 수락 방지)",
+                    "",
+                    "// 블록체인 데이터 수집 최적화",
+                    "UTC 시간대별 Cron 스케줄러로 6시간 단위 자동 전환 (24시간 무료 운영)",
+                    "5초 간격 온체인 데이터 DB 동기화",
+                    "",
+                    "// 사용자 경험",
+                    "Web3Auth 소셜 로그인으로 지갑 없는 Web3 온보딩",
+                    "WebSocket 기반 실시간 미니게임",
                 ],
                 en: [
-                    "Smart contract gas optimization (dynamic array pre-allocation, storage access minimization)",
+                    "// Smart Contract Security & Optimization",
                     "ERC-20/ERC-721 smart contract design and implementation",
-                    "State-based NFT exchange system (preventing concurrent acceptance, blockchain final verification)",
-                    "Wallet-free social login system using Web3Auth",
-                    "WebSocket-based real-time mini-game implementation",
-                    "Permission management system ensuring game fairness",
-                    "Blockchain transaction monitoring and collection scheduler implementation",
-                    "5-second synchronization scheduler (RPC cost reduction, faster API response)"
+                    "Reentrancy attack prevention with ReentrancyGuard, permission management with AccessControl",
+                    "Scarcity ensured through season-limited NFT issuance",
+                    "Gas optimization through data type minimization",
+                    "Hardhat + TypeScript test code implementation",
+                    "",
+                    "// P2P NFT Trading System (NFTSwap Contract)",
+                    "Users only approve, backend safely executes actual transactions",
+                    "Trade phase management with state machine pattern (preventing concurrent acceptance)",
+                    "",
+                    "// Blockchain Data Collection Optimization",
+                    "Automatic switching every 6 hours with UTC-based Cron scheduler (24-hour free operation)",
+                    "5-second interval on-chain data DB synchronization",
+                    "",
+                    "// User Experience",
+                    "Wallet-free Web3 onboarding with Web3Auth social login",
+                    "WebSocket-based real-time mini-games",
                 ]
             },
             service: {
                 ko: [
                     "쉽고 재미있는 Web3 온보딩 경험 제공",
-                    "게임화를 통한 캠퍼스 건축물 정보 학습",
-                    "랜덤 퀘스트와 협력적 퍼즐 완성으로 참여 유도",
+                    "스토리 메뉴를 통한 학교 관련 정보/역사 학습",
+                    "랜덤 퀘스트와 협력적 퍼즐 완성, 경쟁 요소(랭킹)으로 참여 유도",
                     "시즌제 운영으로 지속적인 콘텐츠 업데이트",
-                    "캠퍼스 변화를 디지털로 아카이빙하여 영구 보존",
-                    "블록체인 기반 투명한 소유권 및 거래 내역 추적",
+                    "블록체인 기반 캠퍼스 변화 영구 아카이빙",
+                    "투명한 소유권 및 거래 내역 추적"
                 ],
                 en: [
                     "Easy and fun Web3 onboarding experience",
-                    "Learn campus building information through gamification",
-                    "User engagement through random quests and collaborative puzzle completion",
-                    "Continuous content updates with seasonal operations",
-                    "Digital archiving of campus changes for permanent preservation",
-                    "Transparent ownership and transaction tracking based on blockchain",
+                    "Learning school-related information/history through Story menu",
+                    "User engagement through random quests, collaborative puzzle completion, and competitive elements (ranking)", "Continuous content updates with seasonal operations",
+                    "Permanent archiving of campus changes on blockchain",
+                    "Transparent ownership and transaction tracking"
                 ]
             }
         },
         period: {
-            start: "2024-01",
+            start: "2024-03",
             end: "2024-12"
         },
         myRole: {
             ko: [
-                "프로덕트 오너 & 스크럼 마스터 (프로젝트 관리, 팀 리딩)",
-                "프로젝트 문서 담당(기획서, 화면 설계서, 수행 계획서, 개발 보고서 등 산출물 작성",
-                "스마트 컨트랙트 설계 및 개발 (ERC-20/ERC-721, 시즌 시스템, 토큰 권한 관리, NFT 발행/교환)",
-                "백엔드 API 서버 구축 (WebSocket 기반 실시간 미니게임, 블록체인 트랜잭션 수집 스케줄러, 퍼즐/아이템 NFT 현황 데이터 관리, 랭킹, 거래, 마이페이지)",
-                "인프라 구축 및 배포",
-                "프론트엔드 일부 개발(지갑 로그인/유저 NFT 조회/NFT 거래 등 블록체인 연동, 3D 모델 렌더링, 웹소켓 연동)",
-                "3D 모델링 및 NFT 메타데이터 설계"
+                "// 프로젝트 리더십",
+                "팀 리더로서 기술 의사결정 및 프로젝트 방향 설정",
+                "프로덕트 오너 & 스크럼 마스터 역할 수행",
+                "전체 프로젝트 문서화 (기획서, 설계서, 보고서, 발표 자료)",
+                "",
+                "// 핵심 개발 영역",
+                "스마트 컨트랙트 전체 설계 및 구현",
+                "백엔드 API 서버 구축 및 배포",
+                "블록체인 트랜잭션 수집 시스템 개발",
+                "P2P NFT 거래 시스템 구현",
+                "",
+                "// 기타 기여",
+                "프론트엔드 블록체인/WebSocket/3D 모델 연동",
+                "3D 모델링 및 NFT 메타데이터 설계",
+                "인프라 구축 (DigitalOcean, AWS S3)"
             ],
             en: [
-                "Product Owner & Scrum Master (Project Management, Team Leadership)",
-                "Project Documentation Lead (Planning, UI/UX Design, Development Reports)",
-                "Smart Contract Design & Development (ERC-20/ERC-721, Season System, Token Permission Management, NFT Minting/Trading)",
-                "Backend API Server Development (WebSocket-based Real-time Mini-games, Blockchain Transaction Collection Scheduler, Puzzle/Item NFT Status Management, Ranking, Trading, MyPage)",
-                "Infrastructure Setup and Deployment",
-                "Partial Frontend Development (Blockchain Integration for Wallet Login/User NFT Inquiry/NFT Trading, 3D Model Rendering, WebSocket Integration)",
-                "3D Modeling and NFT Metadata Design"
+                "// Project Leadership",
+                "Technical decision-making and project direction as team leader",
+                "Product Owner & Scrum Master roles",
+                "Complete project documentation (planning, design, reports, presentations)",
+                "",
+                "// Core Development Areas",
+                "Full smart contract design and implementation",
+                "Backend API server development and deployment",
+                "Blockchain transaction collection system development",
+                "P2P NFT trading system implementation",
+                "",
+                "// Additional Contributions",
+                "Frontend blockchain/WebSocket/3D model integration",
+                "3D modeling and NFT metadata design",
+                "Infrastructure setup (DigitalOcean, AWS S3)"
             ],
             summary: {
-                ko: "팀 리더 & 풀스택 블록체인 개발 & 기획",
-                en: "Team Leader & Full-stack Blockchain Developer & Planning"
+                ko: "팀 리더 & 풀스택 블록체인 개발",
+                en: "Team Leader & Full-stack Blockchain Developer"
             }
         }
-    },
-];
+    }];
 
 const RoleSummaryContainer = styled.div`
   grid-column: 1 / -1;
