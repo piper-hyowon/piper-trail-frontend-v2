@@ -1249,7 +1249,9 @@ const PostDetailPage: React.FC = () => {
             )}
             <ActionBar>
                 <BackButton to={`/${post.category || "uncategorized"}`}>
-                    {t("post.detail.backToList" as any)}
+                    {formatMessage("post.detail.backTo", {
+                        category: getCategoryDisplayName(post.category),
+                    })}
                 </BackButton>
 
                 <ActionGroup>

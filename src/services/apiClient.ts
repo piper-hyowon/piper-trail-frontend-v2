@@ -70,7 +70,7 @@ class ApiClient {
 
         const headers: Record<string, string> = {
             'Accept-Language': this.language,
-            'Cache-Control': 'no-cache, no-store, must-revalidate',  // TODO: 임시
+            // 'Cache-Control': 'no-cache, no-store, must-revalidate',  // TODO: 임시
         };
 
         if (!(options.body instanceof FormData)) {
@@ -91,7 +91,7 @@ class ApiClient {
             const response = await fetch(url, {
                 ...options,
                 headers,
-                cache: 'no-store', // TODO: 임시
+                // cache: 'no-store', // TODO: 임시
             });
 
             // 401 에러 시 토큰 갱신 시도
@@ -100,7 +100,7 @@ class ApiClient {
                 if (refreshed) {
                     // 갱신된 토큰으로 재시도
                     headers['Authorization'] = `Bearer ${this.accessToken}`;
-                    const retryResponse = await fetch(url, {...options, headers, cache: 'no-store'}); // cache TODO:
+                    const retryResponse = await fetch(url, {...options, headers });
 
                     if (!retryResponse.ok) {
                         throw new Error(`HTTP ${retryResponse.status}: ${retryResponse.statusText}`);
@@ -241,10 +241,6 @@ class ApiClient {
             const [sortBy, sortDir] = params.sort.split(',');
             if (sortBy) searchParams.append('sortBy', sortBy);
             if (sortDir) searchParams.append('sortDir', sortDir);
-        }
-
-        if (Date.now() < new Date('2025-07-01').getTime()) {
-            searchParams.append('_cb', Date.now().toString());
         }
 
         const queryString = searchParams.toString();

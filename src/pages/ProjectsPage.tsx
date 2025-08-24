@@ -509,22 +509,20 @@ const projects: Project[] = [
         highlights: {
             technical: {
                 ko: [
-                    "JWT(Access 1시간/Refresh 3일) + TOTP 기반 2FA 관리자 인증",
-                    "BCrypt(강도 12) 비밀번호 해싱",
-                    "Caffeine 인메모리 캐시 + HTTP ETag 검증",
+                    "JWT(Access 1시간/Refresh 3일)+ Google Authenticator 호환 TOTP 2FA 인증",
+                    "3단계 캐싱(HTTP Etag → Caffeine → MongoDB), 이벤트 기반 자동 무효화",
                     "도메인 이벤트 MongoDB 저장 (Post, Comment, Admin 로그인)",
-                    "스팸 점수: 키워드(0.3) + 빈도(0.4) + 특수문자(0.2) + 반복패턴(0.3)",
-                    "방명록 Rate Limiting (분당/시간당)",
-                    "Command/Query 분리, 이벤트 기반 캐시 무효화"
+                    "스팸 방어: 키워드(0.3)·빈도(0.4)·패턴(0.3) 가중치 기반 실시간 위험도 평가",
+                    "방명록 IP별 Rate Limiting (분당/시간당)",
+                    "Command/Query 분리"
                 ],
                 en: [
-                    "JWT (1hr/3d) + TOTP-based 2FA admin auth",
-                    "BCrypt (rounds 12) password hashing",
-                    "Caffeine in-memory cache + HTTP ETag validation",
-                    "Domain event MongoDB storage (Post, Comment, Admin login)",
-                    "Spam scoring: keywords(0.3) + frequency(0.4) + special chars(0.2) + patterns(0.3)",
-                    "Guestbook rate limiting (per minute/hour)",
-                    "Command/Query separation, event-based cache invalidation"
+                    "JWT authentication (Access: 1h / Refresh: 3d) + TOTP 2FA compatible with Google Authenticator",
+                    "3-tier caching (HTTP ETag → Caffeine → MongoDB) with event-driven automatic invalidation",
+                    "Domain events stored in MongoDB (Post, Comment, Admin login)",
+                    "Spam protection: real-time risk scoring based on keyword (0.3), frequency (0.4), and pattern (0.3) weights",
+                    "Rate limiting on guestbook by IP (per minute/hour)",
+                    "Command/Query segregation"
                 ]
             },
             service: {
