@@ -486,22 +486,22 @@ const projects: Project[] = [
         id: 1,
         imageUrl: '/images/dolphin_capture.png',
         title: {
-            ko: "piper-trail.com",
-            en: "piper-trail.com"
+            ko: "취향 가득 RESTful Blog",
+            en: "My Tasteful RESTful Blog"
         },
         description: {
-            ko: "취향 가득 개인 홈페이지",
-            en: "Personal homepage filled with individuality and personal taste"
+            ko: "REST API와 HATEOAS 원칙을 체험할 수 있는 블로그 프로젝트",
+            en: "A blog project to experience REST API and HATEOAS principles"
         },
         techStack: {
-            backend: ["Spring Boot", "Java"],
+            backend: ["Java 21", "Spring Boot 3.4", "Spring Security"],
             frontend: ["React", "TypeScript"],
             database: ["MongoDB"],
-            deployment: ["Railway", "MongoDB Atlas", "Vercel"],
-            architecture: ["CQRS", "Event-Driven Architecture"]
+            deployment: ["Render", "Vercel", "Cloudflare R2"],
+            architecture: ["CQRS", "Event-Driven"]
         },
         type: ["personal"],
-        status: "ongoing",
+        status: "completed",
         links: [
             {type: "github", url: "https://github.com/piper-hyowon/piper-trail-backend"},
             {type: "live", url: "https://piper-trail.com"}
@@ -509,45 +509,50 @@ const projects: Project[] = [
         highlights: {
             technical: {
                 ko: [
-                    "멀티레벨 캐싱: Caffeine + HTTP ETag/Cache-Control + 이벤트 기반 캐시 무효화",
-                    "메모리 기반 Rate Limiting (ConcurrentHashMap) + 시간 윈도우",
-                    "JWT, TOTP 기반 2단계 관리자 인증",
-                    "MongoDB 동적 통계 분석",
-                    "위험도 기반 스팸 감지 + 자동 대응",
-                    "MongoDB Full-text Search + 한글 URL slug 지원"
+                    "JWT(Access 1시간/Refresh 3일) + TOTP 기반 2FA 관리자 인증",
+                    "BCrypt(강도 12) 비밀번호 해싱",
+                    "Caffeine 인메모리 캐시 + HTTP ETag 검증",
+                    "도메인 이벤트 MongoDB 저장 (Post, Comment, Admin 로그인)",
+                    "스팸 점수: 키워드(0.3) + 빈도(0.4) + 특수문자(0.2) + 반복패턴(0.3)",
+                    "방명록 Rate Limiting (분당/시간당)",
+                    "Command/Query 분리, 이벤트 기반 캐시 무효화"
                 ],
                 en: [
-                    "Multi-level caching: Caffeine + HTTP ETag/Cache-Control + Event-based cache invalidation",
-                    "In-memory rate limiting (ConcurrentHashMap) with sliding time window",
-                    "Two-factor admin authentication with JWT and TOTP",
-                    "Dynamic statistics analysis using MongoDB",
-                    "Risk-based spam detection and automated handling",
-                    "MongoDB full-text search with Korean URL slug support"
+                    "JWT (1hr/3d) + TOTP-based 2FA admin auth",
+                    "BCrypt (rounds 12) password hashing",
+                    "Caffeine in-memory cache + HTTP ETag validation",
+                    "Domain event MongoDB storage (Post, Comment, Admin login)",
+                    "Spam scoring: keywords(0.3) + frequency(0.4) + special chars(0.2) + patterns(0.3)",
+                    "Guestbook rate limiting (per minute/hour)",
+                    "Command/Query separation, event-based cache invalidation"
                 ]
             },
             service: {
                 ko: [
-                    "REST API 컨셉 UI",
-                    "도메인 이벤트 영구 저장(시스템 변경 이력 추적)",
-                    "로그인 없는 방문자 상호작용",
-                    "- 익명 댓글: 패스워드 기반 수정/삭제 + 스팸 필터링",
-                    "- 6가지 감정 스탬프 방명록 + 스팸 방지 Rate Limiting",
-                    "- 서버도 해독 불가능한 E2E 암호화 비밀 채팅🔐(개발중)",
-                    "쿠키 기반 익명 방문자 추적 + 통계 집계"
+                    "관리자 2FA (Google Authenticator 호환)",
+                    "익명 댓글 (비밀번호로 삭제)",
+                    "스팸 감지 (0.4점 검토, 0.7점 차단)",
+                    "6종 스탬프 방명록",
+                    "마크다운 포스트 작성/수정",
+                    "시리즈 포스트",
+                    "한/영 다국어 지원",
+                    "조회수 통계, 일별/리퍼러별/지역별 집계"
                 ],
                 en: [
-                    "REST API-style UI",
-                    "Domain event persistence for tracking system changes",
-                    "Visitor interaction without login",
-                    "- Anonymous comments: password-based editing/deletion with spam filtering",
-                    "- Guestbook with 6 emotion stamps and rate limiting for spam prevention",
-                    "- End-to-end encrypted secret chat 🔐 (under development), unreadable even by the server",
-                    "Anonymous visitor tracking via cookies with statistical aggregation"
+                    "Admin 2FA (Google Authenticator compatible)",
+                    "Anonymous comments (password-based deletion)",
+                    "Spam detection (review >0.4, block >0.7)",
+                    "6-stamp guestbook",
+                    "Markdown post create/edit",
+                    "Series posts",
+                    "KO/EN i18n",
+                    "View statistics by day/referrer/region"
                 ]
             }
         },
         period: {
             start: "2024-11",
+            end: "2025-01"
         },
         myRole: {
             ko: ["풀스택 개발, 인프라, 기획, 3D 모델링"],
@@ -562,15 +567,15 @@ const projects: Project[] = [
             en: "dBtree"
         },
         description: {
-            ko: "DB 퀴즈 풀고 레몬 수확🍋  —가벼운 무료 DBaaS",
-            en: "Solve DB quizzes to harvest lemons 🍋 — a lightweight, playful free DBaaS"
+            ko: "DB 퀴즈 풀고 레몬 수확🍋 — 무료 DBaaS 플랫폼",
+            en: "Solve DB quizzes to harvest lemons 🍋 — Free DBaaS service with gamification"
         },
         techStack: {
-            backend: ["Go"],
+            backend: ["Go 1.24", "net/http", "database/sql"],
             frontend: ["React", "TypeScript"],
             database: ["PostgreSQL", "Redis"],
-            deployment: ["Docker", "Kubernetes", "AWS", "Vercel"],
-            architecture: ["Hexagonal Architecture"]
+            deployment: ["K3s", "AWS EC2", "Let's Encrypt", "AWS SES"],
+            architecture: ["Hexagonal Architecture", "Manual DI"]
         },
         type: ["personal"],
         status: "ongoing",
@@ -581,18 +586,42 @@ const projects: Project[] = [
         highlights: {
             technical: {
                 ko: [
-                    "작성 중",
+                    "Kubernetes Operator 개발: Kubebuilder로 CRD 정의, StatefulSet/Service/PVC 라이프사이클 자동 관리",
+                    "동시성 제어: Redis SETNX로 중복 퀴즈 방지 + PostgreSQL 행 레벨 락으로 레몬 수확 경쟁 상태 해결",
+                    "트랜잭션 보장: 인스턴스 생성 실패시 defer로 레몬 환불, K8s 리소스 롤백",
+                    "Hexagonal Architecture: 도메인은 인터페이스만 정의, 인프라에서 구현 (DIP 원칙)",
+                    "포트 할당: PostgreSQL UNIQUE 제약으로 NodePort(30000-31999) 중복 방지",
+                    "Go 표준 라이브러리 활용: 외부 웹 프레임워크 없이 net/http로 라우터/미들웨어 구현",
+                    "스케줄러: 고루틴으로 레몬 재생성(1분), 인스턴스 과금(1시간) 주기 실행",
+                    "에러 처리: 도메인별 커스텀 에러 타입 30개+, runtime.Caller로 호출 위치 추적"
                 ],
                 en: [
-                    "Work in progress",
+                    "Kubernetes Operator: CRD with Kubebuilder, auto-manage StatefulSet/Service/PVC lifecycle",
+                    "Concurrency Control: Redis SETNX for quiz duplication + PostgreSQL row-level lock for harvest race condition",
+                    "Transaction Guarantee: Lemon refund with defer on failure, K8s resource rollback",
+                    "Hexagonal Architecture: Domain defines interfaces, infra implements (DIP principle)",
+                    "Port Allocation: PostgreSQL UNIQUE constraint for NodePort(30000-31999)",
+                    "Go stdlib only: Router/middleware with net/http, no external web framework",
+                    "Scheduler: Goroutines for lemon regrowth(1min), instance billing(1hr)",
+                    "Error Handling: 30+ domain error types, call location tracking with runtime.Caller"
                 ]
             },
             service: {
                 ko: [
-                    "작성 중",
+                    "공유 레몬 나무: 10개 위치 고정, 수확시 1시간 후 재생성, 랜덤 퀴즈 할당",
+                    "수확 메커니즘: 퀴즈 정답 → 5초 내 원 클릭 → DB 트랜잭션으로 선착순 1명만 성공",
+                    "인스턴스 관리: MongoDB 지원, CPU/Memory/Disk 설정, 외부 접속용 NodePort 자동 할당",
+                    "과금 시스템: 시간당 레몬 차감, 부족시 일시정지, 1시간 유예 후 자동 삭제",
+                    "리소스 모니터링: EC2 가용 자원 실시간 체크, 생성 가능 여부 사전 검증",
+                    "보안: 초기 패스워드 1회 표시, 서버 미저장, K8s Secret 관리"
                 ],
                 en: [
-                    "Work in progress",
+                    "Shared Lemon Tree: 10 fixed positions, 1-hour regrowth after harvest, random quiz assignment",
+                    "Harvest Mechanism: Quiz answer → Click circle in 5s → Only 1 winner via DB transaction",
+                    "Instance Management: MongoDB support, CPU/Memory/Disk config, auto NodePort allocation",
+                    "Billing System: Hourly lemon deduction, pause on shortage, auto-delete after 1hr grace",
+                    "Resource Monitoring: Real-time EC2 resource check, pre-validation for creation",
+                    "Security: One-time password display, not stored in server, K8s Secret management"
                 ]
             }
         },
@@ -600,9 +629,26 @@ const projects: Project[] = [
             start: "2025-02"
         },
         myRole: {
-            ko: ["풀스택 개발, 아키텍처 설계, 기획, 인프라"],
-            en: ["Full-stack Development, Architecture Design, Planning, Infrastructure"],
-
+            ko: [
+                "시스템 설계: Hexagonal Architecture 적용, 백엔드/K8s Operator 분리",
+                "백엔드 개발(Go): 인증, 레몬, 퀴즈, DB 인스턴스 CRUD API",
+                "Kubernetes Operator: Reconciliation Loop로 DB 인스턴스 상태 관리 자동화",
+                "동시성 제어: Redis + PostgreSQL 조합으로 분산 락 구현",
+                "인프라: AWS EC2에 K3s 설치, PostgreSQL/Redis 로컬 구성, Let's Encrypt SSL 인증서",
+                "프론트엔드: React로 대시보드 UI (진행중)"
+            ],
+            en: [
+                "System Design: Hexagonal Architecture, Backend/K8s Operator separation",
+                "Backend Development(Go): Auth, Lemon, Quiz, DB instance CRUD API",
+                "Kubernetes Operator: DB instance state management with Reconciliation Loop",
+                "Concurrency Control: Distributed lock with Redis + PostgreSQL",
+                "Infrastructure: K3s on AWS EC2, PostgreSQL/Redis local installation, Let's Encrypt SSL",
+                "Frontend: Dashboard UI with React (in progress)"
+            ],
+            summary: {
+                ko: "백엔드 개발, K8s Operator 개발, 시스템 설계",
+                en: "Backend Development, K8s Operator Development, System Design"
+            }
         }
     },
     {
