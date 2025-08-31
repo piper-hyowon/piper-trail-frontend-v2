@@ -328,7 +328,7 @@ const MailboxScene = React.memo(function MailboxScene({hasEntries, entries}: any
             <PerspectiveCamera
                 makeDefault
                 position={[3, 2, 4]}
-                fov={50}
+                fov={70}
             />
 
             <OrbitControls
