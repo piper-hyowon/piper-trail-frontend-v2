@@ -225,10 +225,22 @@ export const renderMarkdown = (content: string) => {
 
             if (!paragraph) return '';
 
+            // 리스트 아이템이면 br 태그 추가하지 않음
+            if (paragraph.includes('<ul>') || paragraph.includes('<ol>') ||
+                paragraph.includes('</ul>') || paragraph.includes('</ol>')) {
+                return paragraph;
+            }
+
             return `<p>${paragraph.replace(/\n/g, '<br />')}</p>`;
         })
         .filter(p => p)
         .join('\n\n');
+
+    // 리스트 처리 후 불필요한 br 태그 제거
+    renderedContent = renderedContent.replace(/<\/li>\s*<br\s*\/?>/g, '</li>');
+    renderedContent = renderedContent.replace(/<br\s*\/?>\s*<li>/g, '<li>');
+    renderedContent = renderedContent.replace(/<\/ul>\s*<br\s*\/?>/g, '</ul>');
+    renderedContent = renderedContent.replace(/<\/ol>\s*<br\s*\/?>/g, '</ol>');
 
     renderedContent = renderedContent.replace(/%%BOLDITALIC%%(.+?)%%ENDBOLDITALIC%%/g, '<strong><em>$1</em></strong>');
     renderedContent = renderedContent.replace(/%%BOLD%%(.+?)%%ENDBOLD%%/g, '<strong>$1</strong>');
@@ -286,7 +298,9 @@ function processLists(content: string): string {
                 openLists[level] = {type, level};
             }
 
-            result.push(`<li>${content}</li>`);
+            // 여기가 핵심: 모든 li 내용을 일관되게 처리
+            // p 태그를 제거하거나 모든 항목에 p 태그 추가
+            result.push(`<li>${content.replace(/<\/?p>/g, '')}</li>`);
         } else {
             while (openLists.length > 0) {
                 const list = openLists.pop();

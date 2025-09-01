@@ -19,7 +19,7 @@
 }
 
 .code-language {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: #907aa9;
     text-transform: uppercase;
@@ -57,7 +57,7 @@ code[class*="language-"] {
     color: #575279;
     background: none;
     font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     text-align: left;
     white-space: pre;
     word-spacing: normal;

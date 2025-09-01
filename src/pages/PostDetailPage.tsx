@@ -202,7 +202,7 @@ const PostContent = styled.div`
 
     li {
       margin-bottom: ${({theme}) => theme.spacing.xs};
-      line-height: 1.4;
+      line-height: 1.7;
     }
   }
 
@@ -349,7 +349,7 @@ const PostContent = styled.div`
     overflow-y: auto;
     padding: 15px;
     font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .terminal-output {
