@@ -250,18 +250,26 @@ const PostContent = styled.div`
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     border-radius: 8px;
     overflow: hidden;
+    table-layout: fixed;
 
     th, td {
       padding: ${({theme}) => theme.spacing.sm} ${({theme}) => theme.spacing.md};
       text-align: left;
       border-bottom: 1px solid ${({theme}) => theme.colors.primary}10;
+      min-width: 100px;
     }
 
+    th:first-child,
+    td:first-child {
+      min-width: 150px;
+    }
+    
     th {
       background: ${({theme}) => theme.colors.primary}10;
       font-weight: 600;
       color: ${({theme}) => theme.colors.text};
     }
+
 
     tr:last-child td {
       border-bottom: none;
