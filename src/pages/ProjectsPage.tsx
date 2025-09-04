@@ -908,14 +908,13 @@ const projects: Project[] = [
         },
         myRole: {
             ko: [
-                "// 프로젝트 리더십",
-                "팀 리더로서 기술 의사결정 및 프로젝트 방향 설정",
+                "// 프로젝트 관리",
                 "프로덕트 오너 & 스크럼 마스터 역할 수행",
                 "전체 프로젝트 문서화 (기획서, 설계서, 보고서, 발표 자료)",
-                "// 핵심 개발 영역",
+                "// 개발",
                 "스마트 컨트랙트 전체 설계 및 구현",
                 "백엔드 API 서버 구축 및 배포",
-                "블록체인 트랜잭션 수집 시스템 개발",
+                "블록체인 트랜잭션 수집 스케줄러",
                 "P2P NFT 거래 시스템 구현",
                 "// 기타 기여",
                 "프론트엔드 블록체인/WebSocket/3D 모델 연동",
@@ -923,8 +922,7 @@ const projects: Project[] = [
                 "인프라 구축 (DigitalOcean, AWS S3)"
             ],
             en: [
-                "// Project Leadership",
-                "Technical decision-making and project direction as team leader",
+                "// Project Management",
                 "Product Owner & Scrum Master roles",
                 "Complete project documentation (planning, design, reports, presentations)",
                 "// Core Development Areas",

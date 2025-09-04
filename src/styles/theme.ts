@@ -148,9 +148,12 @@ export const theme: Record<ThemeMode, Theme> = {
             magicGradient: 'radial-gradient(circle at 30% 50%, rgba(255, 181, 232, 0.3) 0%, rgba(212, 181, 255, 0.3) 25%, rgba(181, 234, 255, 0.3) 50%, transparent 70%)',
             dreamGradient: 'linear-gradient(135deg, #FFEAA7 0%, #FDCB6E 25%, #FFB5E8 50%, #C7ECEE 75%, #DFE6E9 100%)',
             // Postcard 그라데이션
-            postcardWarmGradient: 'linear-gradient(135deg, #F5F0E8 0%, #EAE0D5 50%, #DDD0C2 100%)',
-            postcardSoftGradient: 'linear-gradient(to bottom, #F8F5F0 0%, #F2EDE6 100%)',
-            postcardVintageGradient: 'radial-gradient(circle at center, #F5F0E8 0%, #E8DDD0 70%, #DDD0C2 100%)',
+            // postcardWarmGradient: 'linear-gradient(135deg, #F5F0E8 0%, #EAE0D5 50%, #DDD0C2 100%)',
+            postcardWarmGradient: '#50b7ad',
+            // postcardSoftGradient: 'linear-gradient(to bottom, #F8F5F0 0%, #F2EDE6 100%)',
+            postcardSoftGradient: '#50b7ad',
+            // postcardVintageGradient: 'radial-gradient(circle at center, #F5F0E8 0%, #E8DDD0 70%, #DDD0C2 100%)',
+            postcardVintageGradient: 'rgba(164,213,254,0.69)',
         },
         colors: {
             background: '#FEFEFE',
