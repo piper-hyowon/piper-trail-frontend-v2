@@ -667,15 +667,14 @@ const projects: Project[] = [
             en: "My Tasteful RESTful Blog"
         },
         description: {
-            ko: "REST API와 HATEOAS 원칙을 체험할 수 있는 블로그 프로젝트",
-            en: "A blog project to experience REST API and HATEOAS principles"
+            ko: "명령/조회 분리와 이벤트 기반 캐싱을 적용한 개인 블로그 시스템",
+            en: "Personal Blog System with Command/Query Separation and Event-Based Caching"
         },
         techStack: {
             backend: ["Java 21", "Spring Boot 3.4", "Spring Security"],
             frontend: ["React", "TypeScript"],
             database: ["MongoDB"],
-            deployment: ["Render", "Vercel", "Cloudflare R2"],
-            architecture: ["CQRS", "Event-Driven"]
+            deployment: ["Vercel", "Cloudflare R2"],
         },
         type: ["personal"],
         status: "completed",

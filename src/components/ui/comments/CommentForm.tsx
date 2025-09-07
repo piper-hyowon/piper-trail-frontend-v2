@@ -354,7 +354,7 @@ export const CommentForm: React.FC<CommentFormProps> = ({postId, onSuccess}) => 
 
                 {formData.content && (
                     <div>
-                        <PreviewLabel>✨ {t('comment.form.preview' as any) || "미리보기"}</PreviewLabel>
+                        <PreviewLabel>{t('comment.form.preview' as any) || "미리보기"}</PreviewLabel>
                         <PreviewContainer
                             $fontFamily={formData.fontFamily}
                             $textColor={formData.textColor}

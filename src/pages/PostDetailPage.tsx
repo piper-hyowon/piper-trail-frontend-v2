@@ -263,7 +263,7 @@ const PostContent = styled.div`
     td:first-child {
       min-width: 150px;
     }
-    
+
     th {
       background: ${({theme}) => theme.colors.primary}10;
       font-weight: 600;

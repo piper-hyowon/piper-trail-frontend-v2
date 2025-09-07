@@ -46,7 +46,7 @@ export const postTranslations = {
                     edit: "✏️ Edit",
                     delete: "🗑️ Delete"
                 },
-                resourceLinks: "API Resource Links",
+                resourceLinks: "_links",
                 loading: "📖 Loading post...",
                 notFound: "Post Not Found",
                 notFoundDetail: "The requested post does not exist or has been deleted.",
@@ -214,7 +214,7 @@ export const postTranslations = {
                     edit: "✏️ 수정",
                     delete: "🗑️ 삭제"
                 },
-                resourceLinks: "API Resource Links",
+                resourceLinks: "_links",
                 loading: "📖 포스트를 불러오는 중...",
                 notFound: "포스트를 찾을 수 없습니다",
                 notFoundDetail: "요청하신 포스트가 존재하지 않거나 삭제되었습니다.",
