@@ -1,32 +1,30 @@
-export const config = {
-    runtime: 'edge',
-};
+export default async function handler(req, res) {
+    if (!process.env.PRERENDER_TOKEN) {
+        return res.status(500).send('No token');
+    }
 
-export default async function handler(request) {
-    const url = new URL(request.url);
-    const path = url.searchParams.get('path') || '/';
+    const domain = 'www.piper-trail.com';
+    const path = req.url.replace('/api/prerender', '').replace('?path=', '');
 
-    // Prerender.io로 전달
-    const prerenderUrl = `https://service.prerender.io/https://piper-trail.com${path}`;
+    const targetUrl = `https://${domain}${path}`;
+    const prerenderUrl = `https://service.prerender.io/${targetUrl}`;
+
+    console.log('Target URL:', targetUrl);
+    console.log('Prerender URL:', prerenderUrl);
 
     try {
         const response = await fetch(prerenderUrl, {
             headers: {
-                'X-Prerender-Token': process.env.PRERENDER_TOKEN,
+                'X-Prerender-Token': process.env.PRERENDER_TOKEN
             }
         });
 
         const html = await response.text();
 
-        return new Response(html, {
-            status: 200,
-            headers: {
-                'Content-Type': 'text/html; charset=utf-8',
-            }
-        });
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.status(200).send(html);
     } catch (error) {
-        console.error('Prerender error:', error);
-        // 에러 시 홈으로
-        return Response.redirect('https://piper-trail.com');
+        console.error('Error:', error);
+        res.status(500).send('Failed');
     }
 }
