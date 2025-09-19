@@ -4,12 +4,31 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(bot|Bot|crawler|Crawler|spider|Spider|facebookexternalhit|Slackbot|Twitterbot|Pinterest|LinkedInBot|WhatsApp|Kakaotalk|kakao|daum|naver|Yeti|Googlebot|bingbot).*"
+        }
+      ],
+      "destination": "https://service.prerender.io/https://piper-trail.com/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
-
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Prerender-Token",
+          "value": "$PRERENDER_TOKEN"
+        }
+      ]
+    },
     {
       "source": "/models/(.*)",
       "headers": [
@@ -137,15 +156,6 @@
     },
     {
       "source": "/sitemap.xml",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600"
-        }
-      ]
-    },
-    {
-      "source": "/(.*)",
       "headers": [
         {
           "key": "Cache-Control",

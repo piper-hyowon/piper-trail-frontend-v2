@@ -1,19 +1,27 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/images/favi.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="icon" type="image/svg+xml" href="/images/favi.png"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <script>
+        window.prerenderReady = false;
+    </script>
+    <meta name="fragment" content="!">
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2YWFGEJX5Z"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
 
-      gtag('config', 'G-2YWFGEJX5Z');
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+
+        gtag('js', new Date());
+
+        gtag('config', 'G-2YWFGEJX5Z');
     </script>
-
 
     <title>Piper Trail | Backend Developer </title>
     <meta property="og:title" content="Piper Trail | Backend Developer ">
@@ -23,9 +31,29 @@
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Dev Blog">
 
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+</head>
+<body>
+<div id="root"></div>
+<div id="modal-root"></div>
+<script type="module" src="/src/main.tsx"></script>
+
+<script>
+    if (window.prerenderReady === false) {
+        const checkReactApp = setInterval(() => {
+            const rootElement = document.getElementById('root');
+            if (rootElement && rootElement.children.length > 0) {
+                setTimeout(() => {
+                    window.prerenderReady = true;
+                    clearInterval(checkReactApp);
+                }, 1500);
+            }
+        }, 100);
+
+        setTimeout(() => {
+            window.prerenderReady = true;
+            clearInterval(checkReactApp);
+        }, 5000);
+    }
+</script>
+</body>
 </html>

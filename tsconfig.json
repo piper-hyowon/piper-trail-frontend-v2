@@ -34,5 +34,6 @@
   "include": [
     "src",
     "src/types/**/*",
+    "src/**/*.d.ts",
   ]
 }

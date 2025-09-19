@@ -27,6 +27,8 @@
     "allowSyntheticDefaultImports": true
   },
   "include": [
-    "src"
+    "src",
+    "src/**/*.d.ts",
+    "types.d.ts"
   ]
 }

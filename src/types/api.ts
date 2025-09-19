@@ -49,7 +49,8 @@ export interface PostDetail {
     content: string;
     contentEn: string;
     _links: Map<string, LinkInfo>;
-    series: PostSeriesDetailResponse
+    series: PostSeriesDetailResponse;
+    thumbnailUrl: string;
 }
 
 export interface PostSeriesDetailResponse {

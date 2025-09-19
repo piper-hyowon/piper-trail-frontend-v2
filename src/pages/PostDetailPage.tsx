@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from "react";
+import React, {useState, useCallback, useEffect} from "react";
 import styled from "styled-components";
 import {useParams, Link, useNavigate} from "react-router-dom";
 import {
@@ -837,6 +837,27 @@ const PostDetailPage: React.FC = () => {
 
     const {data: post, isLoading, error} = usePost(postSlug!);
     const {data: stat} = usePostStats(postSlug!);
+
+    useEffect(() => {
+        if (post) {
+            document.title = `${post.title} | Piper Trail`;
+
+            const metaTags = {
+                'og:title': post.title,
+                'og:description': post.subtitle || post.content.substring(0, 160),
+                'og:image': post.thumbnailUrl || '/images/logo.png',
+                'og:url': window.location.href
+            };
+
+            Object.entries(metaTags).forEach(([property, content]) => {
+                let element = document.querySelector(`meta[property="${property}"]`);
+                if (element) {
+                    element.setAttribute('content', content);
+                }
+            });
+            window.prerenderReady = true;
+        }
+    }, [post]);
 
     // 모달 상태 관리
     const [showUpdateForm, setShowUpdateForm] = useState(false);
