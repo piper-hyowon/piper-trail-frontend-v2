@@ -9,10 +9,10 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": ".*(bot|Bot|crawler|Crawler|spider|Spider|facebookexternalhit|Slackbot|Twitterbot|Pinterest|LinkedInBot|WhatsApp|Kakaotalk|kakao|daum|naver|Yeti|Googlebot|bingbot).*"
+          "value": ".*(bot|Bot|crawler|Crawler|spider|Spider|facebook|slack|twitter|whatsapp|telegram|discord|kakao|naver|daum|bing|google).*"
         }
       ],
-      "destination": "https://service.prerender.io/https://piper-trail.com/:path*"
+      "destination": "/api/prerender?path=/:path*"
     },
     {
       "source": "/(.*)",
@@ -20,15 +20,6 @@
     }
   ],
   "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Prerender-Token",
-          "value": "$PRERENDER_TOKEN"
-        }
-      ]
-    },
     {
       "source": "/models/(.*)",
       "headers": [
