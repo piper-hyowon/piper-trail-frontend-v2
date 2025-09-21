@@ -19,7 +19,7 @@ import {useLanguage} from '../context/LanguageContext';
 import type {CreatePostRequest} from "../types/api.ts";
 import ReactDOM from 'react-dom';
 
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 6;
 const DEFAULT_SORT = 'createdAt,desc';
 
 const SORT_OPTIONS = [
@@ -402,17 +402,12 @@ const ErrorContainer = styled.div`
 `;
 
 const PostsGrid = styled.div`
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: ${({theme}) => theme.spacing.sm};
 
-  @media (min-width: 768px) {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
   }
 `;
 
