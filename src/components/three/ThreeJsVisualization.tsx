@@ -55,7 +55,11 @@ const SceneContent: React.FC<{
     orbitControlsRef: React.RefObject<any>;
 }> = ({isDay, categories, onIslandClick}) => {
 
-    const envPreset = useMemo(() => (isDay ? 'sunset' : 'night'), [isDay]);
+    // const envPreset = useMemo(() => (isDay ? 'sunset' : 'night'), [isDay]);
+    const envFile = useMemo(
+    () => (isDay ? '/venice_sunset_1k.hdr' : '/moonless_golf_1k.hdr'),
+    [isDay]
+);
 
     const finalIslands: IslandConfig[] = useMemo(() => {
         return categories.map((category) => {
@@ -86,7 +90,7 @@ const SceneContent: React.FC<{
         <>
             <SkyScene isDay={isDay}/>
             <Environment
-                preset={envPreset}
+                preset={envFile}
                 background={false}
                 resolution={64}
             />
