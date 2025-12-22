@@ -90,7 +90,7 @@ const SceneContent: React.FC<{
         <>
             <SkyScene isDay={isDay}/>
             <Environment
-                file={envFile}
+                files={envFile}
                 background={false}
                 resolution={64}
             />
