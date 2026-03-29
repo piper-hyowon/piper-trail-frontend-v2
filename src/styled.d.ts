@@ -30,6 +30,7 @@ declare module 'styled-components' {
             postcardVintageGradient: string;
         };
         colors: {
+            bbosong: any;
             background: string;
             secondaryBackground: string;
             backgroundTertiary: string;
@@ -91,6 +92,7 @@ declare module 'styled-components' {
             magic: string;
             postcardSoft: string;
             postcardWarm: string;
+            bbosongSoft: string;
         };
         seaColors: string[];
         skyColors: string[];

@@ -1,5 +1,5 @@
 export interface IslandObject {
-    type: 'book' | 'mailbox' | 'palmTree' | 'question' | 'donut' | 'questionMark' | 'projects' | 'dolphin' | 'lamppost';
+    type: 'book' | 'mailbox' | 'palmTree' | 'question' | 'donut' | 'questionMark' | 'projects' | 'dolphin' | 'lamppost' | 'duzzleLib';
     config: {
         position: [number, number, number];
         scale: number;
@@ -139,6 +139,20 @@ export const islands: IslandConfig[] = [
                     scale: 7,
                 },
             },
+        ],
+    },
+       {
+        path: '/projects/duzzle',
+        name: 'duzzle',
+        position: [-150, 30, -30],
+        objects: [
+            {
+                type: 'duzzleLib',
+                config: {
+                    position: [1, 1, -5],
+                    scale: 0.1,
+                },
+            }
         ],
     },
 ];

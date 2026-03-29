@@ -19,6 +19,8 @@ import DolphinPage from "./pages/DolphinPage.tsx";
 import {EasterEggProvider} from "./context/EasterEggDolphinContext.tsx";
 import EasterEggPage from "./pages/EasterEggPage.tsx";
 import SeriesHomePage from "./pages/SeriesHomePage.tsx";
+import DuzzleLibPage from './pages/DuzzleLibraryPage.tsx';
+import BbosongDiaryPage from './pages/BbosongPage.tsx';
 
 const VALID_CATEGORIES = BLOG_CATEGORIES.map(e => e.name);
 
@@ -51,6 +53,7 @@ const App: React.FC = () => {
                                         {/*Static*/}
                                         <Route path="/about" element={<AboutPage/>}/>
                                         <Route path="/projects" element={<ProjectsPage/>}/>
+                                        <Route path="/projects/duzzle" element={<DuzzleLibPage/>}/>
 
                                         <Route path="/iloveyou" element={<EasterEggPage/>}/>
                                         <Route path="/hello" element={<EasterEggPage/>}/>
@@ -65,15 +68,22 @@ const App: React.FC = () => {
 
 
                                         {/*Blog Category*/}
-                                        {VALID_CATEGORIES.map(category => (
-                                            <React.Fragment key={category}>
-                                                <Route path={`/${category}`} element={<PostListPage/>}/>
-                                                <Route path={`/${category}/:postSlug`} element={<PostDetailPage/>}/>
-                                            </React.Fragment>
-                                        ))}
-                                        <Route path="/search" element={<PostListPage/>}/>
-                                        <Route path="/series/:slug" element={<SeriesHomePage/>}/>
+                                
 
+{/* Blog Category - bbosong-diary 제외 */}
+{VALID_CATEGORIES.filter(category => category !== 'bbosong-diary').map(category => (
+    <React.Fragment key={category}>
+        <Route path={`/${category}`} element={<PostListPage/>}/>
+        <Route path={`/${category}/:postSlug`} element={<PostDetailPage/>}/>
+    </React.Fragment>
+))}
+
+{/* bbosong - 커스텀 페이지 + 블로그 디테일만 재사용 */}
+<Route path="/bbosong-diary" element={<BbosongDiaryPage/>}/>
+<Route path="/bbosong-diary/:postSlug" element={<PostDetailPage/>}/>
+
+<Route path="/search" element={<PostListPage/>}/>
+<Route path="/series/:slug" element={<SeriesHomePage/>}/>
 
                                         {/* 미분류 포스트 (null, uncategorized) */}
                                         <Route path="/null" element={<PostListPage/>}/>
